@@ -8,16 +8,20 @@ from matplotlib import pyplot as plt
 import matplotlib as mpl
 import baltic as bt
 
+alignment, reference_file = sys.argv[1:]
+protein_list = ['C', 'M', 'E', 'NS1', 'NS2A', 'NS2B', 'NS3', 'NS4A', '2K', 'NS4B', 'NS5']
+
 def load_reference(reference_file):
     reference_seq = SeqIO.read(reference_file, 'genbank')
-    genome_annotation = reference_seq.features
-    protein_list = ['C', 'M', 'E', 'NS1', 'NS2A', 'NS2B', 'NS3', 'NS4A', '2K', 'NS4B', 'NS5']
-        # grab annotation from genbank
-    proteins = {f.qualifiers['gene'][0]:FeatureLocation(start=f.location.start, end=f.location.end, strand=1)
-                    for f in genome_annotation
-                        if 'gene' in f.qualifiers
-                            and f.qualifiers['gene'][0] in protein_list}
-    return sorted(proteins.items, key=lambda i: k[1][0]), reference_seq
+    seen = []
+    proteins = {}
+    for f in reference_seq.features:
+        if 'product' in f.qualifiers:
+            gene = f.qualifiers['product'][0].split()[-1]
+            if gene not in seen and gene in protein_list:
+                proteins[gene] = FeatureLocation(start=f.location.start, end=f.location.end, strand=1)
+                seen.append(gene)
+    return sorted(proteins.items(), key=lambda i: protein_list.index(gene)), reference_seq
 
 def convert_coordinate(refseq, compareseq, coordinate):
     coordinate = coordinate - 1 # Adjust for python coordinates
@@ -27,8 +31,8 @@ def convert_coordinate(refseq, compareseq, coordinate):
     assert refseq[coordinate] != '-', 'ERROR! Coordinate '+str(coordinate+1)+' is a gap in the reference sequence.'
 
     reference = refseq[coordinate:coordinate+100].replace('-', '')
-	refpattern = '-*'.join(list(reference)) # Match in new sequence while ignoring of gaps
-	matchlist = re.findall(refpattern, compareseq) #check to make sure we get one and only one match
+    refpattern = '-*'.join(list(reference)) # Match in new sequence while ignoring of gaps
+    matchlist = re.findall(refpattern, compareseq) #check to make sure we get one and only one match
     assert len(matchlist) == 1, 'ERROR: found %d matches for coordinate %d'%(len(matchlist), coordinate+1)
     return re.search(refpattern, compareseq).start()+1 #return the starting and converted (genomic) coordinates
 
@@ -36,18 +40,49 @@ def split_alignment(alignment_file, proteins):
     align = AlignIO.read(open(alignment_file, 'r'), 'fasta')
     ofile_stem = alignment_file.split('/')[-1].split('.')[0]
     ofile_list = []
-    for protein, start, end in proteins:
-        ofile_name = ofile_stem++'_%s.phyx'%(protein)
+    for protein, (start, end) in proteins:
+        ofile_name = ofile_stem+'_%s.phyx'%(protein)
         ofile_list.append(ofile_name)
         start, end = start - 1, end - 1 # adjust for pythonic coordinates
         align_segment = align[:, start:end+1] #[allrows, startcolumn:endcolumn] endcolumn += 1 for inclusive slicing
-        AlignIO.write(align_segment, ofile_name, 'phylip-relaxed')
+        filtered_align_segment = AlignIO.MultipleSeqAlignment([])
+        for seq in align_segment:
+            if float(str(seq.seq).count(-)) / float(len(str(seq.seq))) >= 0.70:
+                filtered_align_segment.append(seq)
+        AlignIO.write(filtered_align_segment, ofile_name, 'phylip-relaxed')
     return ofile_list
 
 def run_raxml(alignment_list):
     for a in alignment_list:
         protein = a.split('_')[-1].split('.')[0]
         os.system('raxml -f d -T 2 -j -s %s -n topology_%s -c 25 -m GTRCAT -p 344312987'%(a, protein))
+        for i in ['rm RAxML_info*', 'rm RAxML_checkpoint*', 'rm RAxML_parisimony*', 'rm RAxML_result*', 'rm RAxML_log*', 'rm *.reduced']:
+            os.system(i)
+
+####### Run #########################
+proteins, reference_seq = load_reference(reference_file)
+reference_acc, reference_seq = reference_seq.id.split('.')[0], str(reference_seq.seq)
+compare_seq = None
+for i in SeqIO.parse(alignment, 'fasta'):
+    if i.description.split('|')[1].split('.')[0] == reference_acc:
+        compare_seq = str(i.seq)
+assert compare_seq != None
+
+converted_proteins = []
+for gene, loc in proteins: ### extract integer start and end from location object
+    start = convert_coordinate(reference_seq, compare_seq, int(loc.start))
+    end = convert_coordinate(reference_seq, compare_seq, int(loc.end))
+    converted_proteins.append((gene, (start, end)))
+proteins = converted_proteins
+
+alignments = split_alignment(alignment, proteins)
+run_raxml(alignments)
+treefiles = sorted(glob('*bestTree*'), key=lambda i: protein_list.index(i.split('_')[-1]))
+trees = { i:bt.loadNexus(treefile, absoluteTime=False) for i,treefile in enumerate(treefiles) }
+for i in range(1,len(treefiles)):
+    untangle(trees[i-1], trees[i])
+
+### Adapt this later to actually plot everything
 
 ######## Plotting utilities #########
 def euclidean((x1,y1),(x2,y2)):
@@ -80,23 +115,6 @@ def untangle(tree1, tree2):
             n.rotate()
             tree2.drawTree()
 
-alignment, reference_file = sys.argv[1:]
-proteins, reference_seq = load_reference
-reference_acc, reference_seq = reference_seq.id, str(reference_seq.seq)
-compare_seq = [ i for i in SeqIO.parse(alignment, 'fasta') if i.description.split('/')[1] == reference_acc ][0]
-
-for gene, (start, end) in proteins:
-    start = convert_coordinate(reference_seq, compare_seq, start)
-    end = convert_coordinate(reference_seq, compare_seq, end)
-
-alignments = split_alignment(alignment, proteins)
-run_raxml(alignments)
-tree_list = [ './RAxML_bestTree.topology_%s'%p for p in proteins ]
-tree_list = []# insert a line here to parse with baltic
-for i in range(1,len(tree_list)):
-    untangle(trees[i-1], trees[i])
-
-### Adapt this later to actually plot everything
 '''
 ################
 ## Plot Genome Map
