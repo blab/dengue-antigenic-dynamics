@@ -3,6 +3,7 @@ import numpy as np
 from Bio import SeqIO
 from collections import defaultdict
 import argparse
+import math
 
 '''
 Purpose: Match Smith dataset strain names to vdb strain names.
@@ -10,11 +11,13 @@ Smith strains --> accessions --> vdb records (if already in db; otherwise write 
 '''
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-table', default='/Users/Sidney/nextstrain/dengue/data/smith2015/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
-parser.add_argument('-sequences', default='/Users/Sidney/nextstrain/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
-parser.add_argument('-key', default='/Users/Sidney/nextstrain/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.txt', help="Full path to strain<\t>accession key")
+parser.add_argument('-table', default='/Users/Sidney/Dropbox/dengue/data/smith2015/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
+parser.add_argument('-sequences', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
+parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.txt', help="Full path to strain<\t>accession key")
 parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue.fasta', type=str, help="Full path of vdb sequence file")
-parser.add_argument('-outf', default = 'agm_dengue', type=str,  help="file stem for outfiles")
+parser.add_argument('-outf', default = 'dengue', type=str,  help="file stem for outfiles")
+parser.add_argument('-src', default = 'agm_1mo', type=str,  help="source designation")
+
 
 args = parser.parse_args()
 
@@ -183,7 +186,7 @@ def format_smith_upload(acc_list):
             row[n] = None
             serotype, country, strain, year = s.split('/')
         row['Accession'] = smith_strain_acc[s]
-        row['Name'] = strain
+        row['Name'] = s
         row['Start'] = 935
         row['Stop'] = 2413
         row['Segment'] = 'E'
@@ -193,7 +196,8 @@ def format_smith_upload(acc_list):
         row['Species'] = 'dengue virus'
         row['Sequence'] = str(smith_sequences[a].seq)
         missing_records.append(row)
-    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t')
+    open('smith_viruses.tsv', 'w').write('# %d viruses from smith data not in vdb\n'%len(missing_records))
+    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t', mode='a')
 
 def table_to_tsv(titerdf, ofile_stem):
     titer_file = open(ofile_stem+'_titers.tsv', 'w')
@@ -201,8 +205,12 @@ def table_to_tsv(titerdf, ofile_stem):
     value_counts = defaultdict(int)
     for virus, seraseries in titerdf.iterrows():
         for sera, value in seraseries.iteritems():
-            if value != np.nan:
-                titer_file.write('\t'.join([virus, sera, 'agm_'+sera, str(value)])+'\n')
+            if type(value)== float and math.isnan(value):
+                continue
+            elif value == '<10':
+                continue
+            else:
+                titer_file.write('\t'.join([virus, sera, sera, args.src, str(value)])+'\n')
                 value_counts[virus] += 1
 
     for virus in titerdf.index.values:
