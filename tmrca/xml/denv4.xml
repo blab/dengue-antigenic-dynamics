@@ -915,7 +915,7 @@
 	<!-- The strict clock (Uniform rates across branches)                        -->
 	<strictClockBranchRates id="branchRates">
 		<rate>
-			<parameter id="clock.rate" value="1.0"/>
+			<parameter id="clock.rate" value="1.0" lower="0.0"/>
 		</rate>
 	</strictClockBranchRates>
 	<rateStatistic id="meanRate" name="meanRate" mode="mean" internal="true" external="true">
@@ -993,6 +993,9 @@
 		<scaleOperator scaleFactor="0.75" weight="1">
 			<parameter idref="alpha"/>
 		</scaleOperator>
+		<scaleOperator scaleFactor="0.75" weight="3">
+			<parameter idref="clock.rate"/>
+		</scaleOperator>
 		<subtreeSlide size="1.0" gaussian="true" weight="15">
 			<treeModel idref="treeModel"/>
 		</subtreeSlide>
@@ -1014,6 +1017,14 @@
 		<scaleOperator scaleFactor="0.75" weight="3">
 			<parameter idref="constant.popSize"/>
 		</scaleOperator>
+		<upDownOperator scaleFactor="0.75" weight="3">
+			<up>
+				<parameter idref="clock.rate"/>
+			</up>
+			<down>
+				<parameter idref="treeModel.allInternalNodeHeights"/>
+			</down>
+		</upDownOperator>
 	</operators>
 
 	<!-- Define MCMC                                                             -->
@@ -1041,6 +1052,12 @@
 				<exponentialPrior mean="0.5" offset="0.0">
 					<parameter idref="alpha"/>
 				</exponentialPrior>
+				<ctmcScalePrior>
+					<ctmcScale>
+						<parameter idref="clock.rate"/>
+					</ctmcScale>
+					<treeModel idref="treeModel"/>
+				</ctmcScalePrior>
 				<oneOnXPrior>
 					<parameter idref="constant.popSize"/>
 				</oneOnXPrior>
@@ -1066,6 +1083,9 @@
 			</column>
 			<column label="rootHeight" sf="6" width="12">
 				<parameter idref="treeModel.rootHeight"/>
+			</column>
+			<column label="clock.rate" sf="6" width="12">
+				<parameter idref="clock.rate"/>
 			</column>
 		</log>
 
