@@ -6,39 +6,39 @@ from pprint import pprint
 import argparse
 from glob import glob
 import pandas as pd
+import math
 
 ####    Parse arguments, pull input data    ####
 parser = argparse.ArgumentParser()
 parser.add_argument('-table', default='/Users/Sidney/Dropbox/dengue/data/smith2015/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
 parser.add_argument('-sequences', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
-parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.txt', help="Full path to strain<\t>accession key")
+parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.tsv', help="Full path to strain<\t>accession key")
 parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue.fasta', type=str, help="Full path of vdb sequence file")
-parser.add_argument('-outf', default = 'dengue', type=str,  help="file stem for outfiles")
 parser.add_argument('-src', default = 'agm_1mo', type=str,  help="source designation")
 args = parser.parse_args()
 
 titers_df = pd.read_csv(args.table, index_col=0, comment='#', na_values='*')
 titers_df.dropna(how='all', inplace=True)
 
-strain_acc = { line.split()[2]:line.split()[3] for line in open(args.key, 'r') if not line.startswith('virnumber')}
+strain_acc = { line.split()[2]:line.split()[3] for line in open(args.key, 'r')}
 smith_sequences = { s.description:str(s.seq) for s in SeqIO.parse(args.sequences, 'fasta')}
 
 vdb = [ s.description for s in SeqIO.parse(open(args.vdb, 'r'), 'fasta') ]
 vdb_strains = [s.split('|')[0] for s in vdb]
-vdb_accessions = {s.split('|')[1] : s.split('|')[0] for s in vdb }
+# vdb_accessions = {s.split('|')[1] : s.split('|')[0] for s in vdb }
 
-vdb_strain_subsets = subset_strains(vdb_strains)
-smith_sequences_subsets = subset_strains(smith_sequences.keys())
 ####    Pull existing titer measurements (if any)   #####
 
-existing_titers = glob('%s_strains.tsv'%args.outf)
+existing_titers = glob('dengue_strains.tsv')
 if existing_titers != []:
-    existing_titers = { line.split()[0]:int(line.split()[1]) for line in open(existing_titers[0], 'r') }
+    existing_titers = { line.split('\t')[0]:int(line.split('\t')[1]) for line in open(existing_titers[0], 'r') }
 
-seen_smith_viruses = glob('smith_viruses.tsv')
-if seen_smith_viruses != []:
+try:
+    seen_smith_viruses = glob('smith_viruses.tsv')
     seen_smith_viruses = pd.read_csv(seen_smith_viruses[0], dtype='str', delimiter='\t', index_col=0, header=0, skiprows=1)
     seen_smith_viruses = list(seen_smith_viruses['Name'])
+except:
+    seen_smith_viruses = []
 
 ####    Define functions        ####
 def subset_strains(strains):
@@ -117,15 +117,15 @@ def match_strain_names(titerstrains, subset_data):
             continue
 
     unmatched = set(unmatched).difference(set(rename.keys()))
-    print 'Found matches in vdb for these strains:'
-    pprint(sorted(rename.items()), width=130)
+    # print 'Found matches in vdb for these strains:'
+    # pprint(sorted(rename.items()), width=130)
     return rename, unmatched
 
 def find_sequence(missing_strain):
     ''' find the closest strain name in the fasta file, return corresponding sequence '''
     choices = match_sero_year(missing_strain, smith_sequences_subsets) # check against sequences with the right serotype and year
-    match = get_closest_match(get_strain_id(missing_strain), choices, 80, p=True) # match on strain identifier
-    if match and match_broad_ids(t, match) != False: # require broad IDs to be identical if they exist
+    match = get_closest_match(get_strain_id(missing_strain), choices, 80) # match on strain identifier
+    if match and match_broad_ids(missing_strain, match) != False: # require broad IDs to be identical if they exist
         return match
     else:
         return None
@@ -151,11 +151,11 @@ def format_smith_upload(missing_strains, no_append=True):
     not_in_key = []
     for s in missing_strains:
         newstrain = make_vdb_name(s)
-        if strainID in seen_smith_viruses:
+        if newstrain in seen_smith_viruses:
             continue
         try:
             fasta_match = find_sequence(s)
-            accession = key[fasta_match]
+            accession = strain_acc[fasta_match]
         except:
             not_in_key.append(s)
             continue
@@ -170,16 +170,16 @@ def format_smith_upload(missing_strains, no_append=True):
         row['Start'] = 935
         row['Stop'] = 2413
         row['Segment'] = 'E'
-        row['Organism'] = 'dengue virus '+serotype[-1]
+        row['Organism'] = 'dengue virus '+row['Serotype'][-1]
         row['Species'] = 'dengue virus'
-        row['Sequence'] = str(smith_sequences[fasta_match].seq)
-        missing_records.append(row)
+        row['Sequence'] = smith_sequences[fasta_match]
+        records.append(row)
 
     if no_append:
-        open('smith_viruses.tsv', 'a').write('# %d viruses from smith data not in vdb\n'%len(acc_list))
+        open('smith_viruses.tsv', 'a').write('# viruses from smith data not in vdb\n')
     else:
         pass
-    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t', mode='a', header=no_append)
+    pd.DataFrame(records).to_csv('smith_viruses.tsv', sep='\t', mode='a', header=no_append)
     return not_in_key
 
 def table_to_tsv(titerdf):
@@ -204,17 +204,21 @@ def table_to_tsv(titerdf):
 
 
 ####    Find strains with existing VDB records      ####
-found_viruses, missing_viruses = match_strain_names(titers_df.columns.values(), vdb_strain_subsets)
+vdb_strain_subsets = subset_strains(vdb_strains)
+smith_sequences_subsets = subset_strains(smith_sequences.keys())
+
+found_viruses, missing_viruses = match_strain_names(titers_df.columns.values, vdb_strain_subsets)
 for v in missing_viruses:
     found_viruses[v] = make_vdb_name(v)
-found_sera, missing_sera = match_strain_names(titers_df.index.values(), vdb_strain_subsets)
+found_sera, missing_sera = match_strain_names(titers_df.index.values, vdb_strain_subsets)
 for s in missing_sera:
     found_sera[s] = make_vdb_name(s)
 titers_df.rename(index = found_viruses, columns = found_sera, inplace=True)
 table_to_tsv(titers_df)
 
 ####    Deal with records not in VDB    ####
-missing_strains = list(set(missing_viruses + missing_sera))
+missing_strains = list(set(list(missing_viruses) + list(missing_sera)))
+
 print 'These strains were not found in vdb, but were in provided fasta file.\nTo upload, run `fauna$ python vdb/dengue_upload --fname smith_viruses.tsv --ftype tsv -v dengue -db vdb`\n'
 not_in_key = format_smith_upload(missing_strains)
 pprint(set(missing_strains).difference(set(not_in_key)))
