@@ -4,6 +4,9 @@ from Bio import SeqIO
 from collections import defaultdict
 import argparse
 import math
+from pprint import pprint
+import sys
+from glob import glob
 
 '''
 Purpose: Match Smith dataset strain names to vdb strain names.
@@ -17,23 +20,34 @@ parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015
 parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue.fasta', type=str, help="Full path of vdb sequence file")
 parser.add_argument('-outf', default = 'dengue', type=str,  help="file stem for outfiles")
 parser.add_argument('-src', default = 'agm_1mo', type=str,  help="source designation")
-
-
 args = parser.parse_args()
 
+seen_titers = glob('%s_strains.tsv'%args.outf)
+if seen_titers != []:
+    existing_titers = { line.split()[0]:int(line.split()[1]) for line in open(seen_titers[0], 'r') }
+else:
+    existing_titers = {}
 
-
+seen_not_in_vdb = glob('smith_viruses.tsv')
+if seen_not_in_vdb != []:
+    existing_not_in_vdb = pd.read_csv(seen_not_in_vdb[0], dtype='str', delimiter='\t', index_col=0, header=0, skiprows=1)
+    existing_not_in_vdb = list(existing_not_in_vdb['Accession'])
+else:
+    existing_not_in_vdb = []
 ############    Parse input data      ################
 
-agm_titers_df = pd.read_csv(args.table, index_col=0, comment='#', na_values='*')
-agm_titers_df.dropna(how='all', inplace=True)
+titers_df = pd.read_csv(args.table, index_col=0, comment='#', na_values='*')
+titers_df.dropna(how='all', inplace=True)
 smith_key_df = pd.read_csv(args.key, header=0, sep='\t',index_col=0)
 
 # { vdb_strain: acc }
 vdb_acc_strains = { s.description.split('|')[1] : s.description.split('|')[0].split('.')[0] for s in SeqIO.parse(args.vdb, 'fasta')}
+vdb_acc_strains['AF326573']='DENV4/DOMINICA/81669/1981'
+vdb_acc_strains['AF038403']='DENV2/PAPUANEWGUINEA/NEWGUINEAC/1944'
+vdb_acc_strains['L11422']='DENV3/FIJI/29472/1992'
 
 # { acc: vdb_strain } (keep track of already-fixed names)
-found_acc_vdb = {}
+found_acc_vdb = {'AF326573': 'DENV4/DOMINICA/81669/1981', 'AF038403': 'DENV2/PAPUANEWGUINEA/NEWGUINEAC/1944', 'L11422':'DENV3/FIJI/29472/1992'}
 
 # { smith_strain: accession }, manually add missing metadata
 smith_strain_acc = { s['fullname'] : s['genbank'] for i,s in smith_key_df.iterrows()}
@@ -94,6 +108,29 @@ for s in smith_strain_acc.keys():
         smith_strain_acc[fix_smith_strain(s)] = smith_strain_acc[s]
     except:
         smith_strain_acc[fix_smith_strain(s, type='sera')] = smith_strain_acc[s]
+
+def convert_smith_vaccine_strains(titerdf):
+    vaccine_strains = {'DEN1': 'DENV1/NA/WESTERNPACIFICDELTA30/NA', 'DEN2': 'DENV2/NA/NEWGUINEAC/NA', 'DEN3': 'DENV3/NA/SLEMANDELTA30/NA', 'DEN4': 'DENV4/NA/81669DELTA30/NA'}
+    titer_file = open(args.outf+'_titers.tsv', 'a')
+    strain_file = open(args.outf+'_strains.tsv', 'w')
+    value_counts = defaultdict(int, existing_titers)
+    for virus, seraseries in titerdf.iterrows():
+        for sera, value in seraseries.iteritems():
+            smith_fields = sera.split('_')
+            sera = vaccine_strains[smith_fields[0]]
+            ID = smith_fields[-1]
+            if type(value)== float and math.isnan(value):
+                continue
+            elif value == '<10':
+                continue
+            else:
+                titer_file.write('\t'.join([virus, sera, ID, args.src, str(value)])+'\n')
+                value_counts[virus] += 1
+
+    for virus in titerdf.index.values:
+        strain_file.write('\t'.join([virus, str(value_counts[virus])])+'\n')
+    titer_file.close()
+    strain_file.close()
 
 def convert_smith_vdb_strains(smith_strains, type='virus'):
     smith_vdb_strains = {}
@@ -161,7 +198,8 @@ def match_virus_sera(smith_vdb_virus_strains, smith_vdb_sera_strains, sera_not_i
 
     sera_not_in_key = [ s for s in sera_not_in_key if s[0] not in smith_vdb_sera_strains ] # remove the ones we found matches to
     if sera_not_in_key != []:
-        print 'still no match for these sera strains:\n', sorted(sera_not_in_key) # warn and output still unmatched strains
+        pprint('still no match for these sera strains:' )
+        pprint(sorted([s[0] for s in sera_not_in_key])) # warn and output still unmatched strains
         print '\n\nserocountryyear keys:\n', sorted(serocountryyear_strain.keys())
     return smith_vdb_sera_strains, sera_not_in_key
 
@@ -173,8 +211,15 @@ def format_smith_upload(acc_list):
     to make uploading missing records to vdb easy.
     Write this to tsv and print suggested upload command.
     '''
+    if existing_not_in_vdb == []:
+        open('smith_viruses.tsv', 'a').write('# %d viruses from smith data not in vdb\n'%len(acc_list))
+        header = True
+    else:
+    	header = False
     missing_records = []
     for a in acc_list:
+        if a in existing_not_in_vdb:
+            continue
         row = {}
         try:
             s = found_acc_vdb[a]
@@ -196,13 +241,12 @@ def format_smith_upload(acc_list):
         row['Species'] = 'dengue virus'
         row['Sequence'] = str(smith_sequences[a].seq)
         missing_records.append(row)
-    open('smith_viruses.tsv', 'w').write('# %d viruses from smith data not in vdb\n'%len(missing_records))
-    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t', mode='a')
+    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t', mode='a', header=header)
 
 def table_to_tsv(titerdf, ofile_stem):
-    titer_file = open(ofile_stem+'_titers.tsv', 'w')
+    titer_file = open(ofile_stem+'_titers.tsv', 'a')
     strain_file = open(ofile_stem+'_strains.tsv', 'w')
-    value_counts = defaultdict(int)
+    value_counts = defaultdict(int, existing_titers)
     for virus, seraseries in titerdf.iterrows():
         for sera, value in seraseries.iteritems():
             if type(value)== float and math.isnan(value):
@@ -222,29 +266,35 @@ def table_to_tsv(titerdf, ofile_stem):
 ########## Run ###############
 
 # Parse virus strain names
-smith_vdb_virus_strains, missing_key_viruses, missing_vdb_viruses = convert_smith_vdb_strains(agm_titers_df.index.values)
+smith_vdb_virus_strains, missing_key_viruses, missing_vdb_viruses = convert_smith_vdb_strains(titers_df.index.values)
 acc_vdb_strains = { smith_strain_acc[smith_strain]:smith_vdb_virus_strains[smith_strain]
                     for smith_strain in smith_vdb_virus_strains
                           if smith_strain in smith_strain_acc }
 
-# Parse sera strain names
-smith_vdb_sera_strains, missing_key_sera, missing_vdb_sera = convert_smith_vdb_strains(agm_titers_df.columns.values, type='sera')
-# Try and match uncaptured sera names to parsed virus names
-smith_vdb_sera_strains, missing_key_sera = match_virus_sera(smith_vdb_virus_strains, smith_vdb_sera_strains, missing_key_sera)
-# Rename dataset with standardardized strain names (that match vdb)
-agm_titers_df.rename(index = smith_vdb_virus_strains, columns = smith_vdb_sera_strains, inplace=True)
-
-# Accessions not in vdb (found in either viruses or sera)
-not_in_vdb = set([smith_strain_acc[fix_smith_strain(v)] for v in missing_vdb_viruses] + [smith_strain_acc[fix_smith_strain(s, type='sera')] for s in missing_vdb_sera])
+if 'monovalent' in args.src:
+    # Name known vaccine strains by serotype; handle writing separately (these come with ferret_ids, unlike all the other data)
+    titers_df.rename(index = smith_vdb_virus_strains, inplace=True)
+    convert_smith_vaccine_strains(titers_df)
+    # Accessions not in vdb (found in viruses)
+    not_in_vdb = set([smith_strain_acc[fix_smith_strain(v)] for v in missing_vdb_viruses])
+else:
+    # Parse sera strain names
+    smith_vdb_sera_strains, missing_key_sera, missing_vdb_sera = convert_smith_vdb_strains(titers_df.columns.values, type='sera')
+    # Try and match uncaptured sera names to parsed virus names
+    smith_vdb_sera_strains, missing_key_sera = match_virus_sera(smith_vdb_virus_strains, smith_vdb_sera_strains, missing_key_sera)
+    # Rename dataset with standardardized strain names (that match vdb)
+    titers_df.rename(index = smith_vdb_virus_strains, columns = smith_vdb_sera_strains, inplace=True)
+    table_to_tsv(titers_df, args.outf)
+    # Accessions not in vdb (found in either viruses or sera)
+    not_in_vdb = set([smith_strain_acc[fix_smith_strain(v)] for v in missing_vdb_viruses] + [smith_strain_acc[fix_smith_strain(s, type='sera')] for s in missing_vdb_sera])
+    table_to_tsv(titers_df, args.outf)
 
 print 'These accessions were not found in vdb.\nTo upload, run `fauna$ python vdb/dengue_upload --fname smith_viruses.tsv --ftype tsv -v dengue -db vdb`\n', not_in_vdb
 format_smith_upload(not_in_vdb)
 
 print '\n\nWrote all {strain name synonymns : accessions} to tsv: key1A_strain_synonymns.tsv'
-key_synonymns = open('key1A_strain_synonymns.tsv', 'w')
+key_synonymns = open('key1A_strain_synonymns.tsv', 'a')
 key_synonymns.write('fullname\tgenbank\n')
 for s,a in sorted(smith_strain_acc.items(), key=lambda i: i[1]):
     key_synonymns.write('%s\t%s\n'%(s,a))
 key_synonymns.close()
-
-table_to_tsv(agm_titers_df, args.outf)
