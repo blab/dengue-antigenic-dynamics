@@ -10,8 +10,10 @@ def remove_no_date(infile):
 		elif seq.description.split('|')[2].startswith('19') or seq.description.split('|')[2].startswith('20'):
 			seq.description = seq.description.replace('-XX-', '').replace('XX|', '|').replace('-|', '|')		
 			sequences.append(seq)
-	SeqIO.write(sequences, '/Users/Sidney/nextstrain/dengue/data/subsampled_alignments/%s_dated.fasta'%fstem, 'fasta')
+	print len(sequences)
+	SeqIO.write(sequences, '/Users/Sidney/Dropbox/dengue/data/subsampled_alignments/%s_dated.fasta'%fstem, 'fasta')
 
-files = glob('/Users/Sidney/nextstrain/dengue/data/subsampled_alignments/*.fasta')
+files = glob('/Users/Sidney/Dropbox/dengue/data/subsampled_alignments/*.fasta')
+print files
 for f in files:
 	remove_no_date(f)

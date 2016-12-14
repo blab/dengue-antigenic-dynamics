@@ -1,7 +1,7 @@
 from glob import glob
 from Bio import SeqIO
 
-infiles = glob('/Users/Sidney/nextstrain/dengue/data/subsampled_alignments/denv*.fasta')
+infiles = glob('/Users/Sidney/Dropbox/dengue/data/subsampled_alignments/denv*.fasta')
 
 for f in infiles:
     ofile = open(f.split('/')[-1].split('.')[0]+'_gard.fasta', 'w')
