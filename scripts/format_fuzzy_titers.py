@@ -3,14 +3,42 @@ from Bio import SeqIO
 import re
 from collections import defaultdict
 from pprint import pprint
+import argparse
+from glob import glob
+import pandas as pd
 
-####     Pull data       ####
-smith_strains = sorted([ line.split()[0] for line in open('/Users/Sidney/Dropbox/dengue/data/smith2015/key1A_strain_synonymns.tsv', 'r') if not line.startswith('fullname') ])
-smith_sequences = { s.description:str(s.seq) for s in SeqIO.parse('/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', 'fasta')}
+####    Parse arguments, pull input data    ####
+parser = argparse.ArgumentParser()
+parser.add_argument('-table', default='/Users/Sidney/Dropbox/dengue/data/smith2015/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
+parser.add_argument('-sequences', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
+parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.txt', help="Full path to strain<\t>accession key")
+parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue.fasta', type=str, help="Full path of vdb sequence file")
+parser.add_argument('-outf', default = 'dengue', type=str,  help="file stem for outfiles")
+parser.add_argument('-src', default = 'agm_1mo', type=str,  help="source designation")
+args = parser.parse_args()
 
-vdb = [ s.description for s in SeqIO.parse(open('/Users/Sidney/nextstrain/fauna/data/dengue.fasta', 'r'), 'fasta') ]
+titers_df = pd.read_csv(args.table, index_col=0, comment='#', na_values='*')
+titers_df.dropna(how='all', inplace=True)
+
+strain_acc = { line.split()[2]:line.split()[3] for line in open(args.key, 'r') if not line.startswith('virnumber')}
+smith_sequences = { s.description:str(s.seq) for s in SeqIO.parse(args.sequences, 'fasta')}
+
+vdb = [ s.description for s in SeqIO.parse(open(args.vdb, 'r'), 'fasta') ]
 vdb_strains = [s.split('|')[0] for s in vdb]
 vdb_accessions = {s.split('|')[1] : s.split('|')[0] for s in vdb }
+
+vdb_strain_subsets = subset_strains(vdb_strains)
+smith_sequences_subsets = subset_strains(smith_sequences.keys())
+####    Pull existing titer measurements (if any)   #####
+
+existing_titers = glob('%s_strains.tsv'%args.outf)
+if existing_titers != []:
+    existing_titers = { line.split()[0]:int(line.split()[1]) for line in open(existing_titers[0], 'r') }
+
+seen_smith_viruses = glob('smith_viruses.tsv')
+if seen_smith_viruses != []:
+    seen_smith_viruses = pd.read_csv(seen_smith_viruses[0], dtype='str', delimiter='\t', index_col=0, header=0, skiprows=1)
+    seen_smith_viruses = list(seen_smith_viruses['Name'])
 
 ####    Define functions        ####
 def subset_strains(strains):
@@ -93,21 +121,102 @@ def match_strain_names(titerstrains, subset_data):
     pprint(sorted(rename.items()), width=130)
     return rename, unmatched
 
-def find_sequences(missing_strains):
+def find_sequence(missing_strain):
     ''' find the closest strain name in the fasta file, return corresponding sequence '''
-    unmatched = []
+    choices = match_sero_year(missing_strain, smith_sequences_subsets) # check against sequences with the right serotype and year
+    match = get_closest_match(get_strain_id(missing_strain), choices, 80, p=True) # match on strain identifier
+    if match and match_broad_ids(t, match) != False: # require broad IDs to be identical if they exist
+        return match
+    else:
+        return None
+
+def make_vdb_name(strain):
+    ''' return standardized strain name like DENV1/COUNTRY/STRAINID/YEAR '''
+    sero = 'DENV' + re.search('DEN[V]?[1-4]{1}', strain, flags=re.IGNORECASE).group(0)[-1] # DEN1 --> DENV1
+    year = str(int(re.search('20[\d]{2}|19[\d]{2}', strain).group(0)))
+    country = re.search('[a-z,A-Z]{3,20}[_\/]{1}|[_\/]{1}[a-z,A-Z]{3,20}|[\/]{1}[a-zA-z]{4,6}_[a-zA-z]{4,6}[\/]{1}', strain, flags=re.IGNORECASE).group(0)
+    for p in [sero, year, country, '/', '_', '-']:
+        strain = re.sub(p, '', strain, flags=re.IGNORECASE)
+    country = country.replace('_', '').replace('/', '')
+    return '/'.join([sero, country, strain, year]).upper()
+
+def format_smith_upload(missing_strains, no_append=True):
+    '''
+    Given strain list, pull metadata from strain name and put into LANL format
+    to make uploading missing records to vdb easy.
+    Write this to tsv and print suggested upload command.
+    Return list of any strains that weren't found in the fasta and/or key.
+    '''
+    records = []
+    not_in_key = []
     for s in missing_strains:
-        choices = match_sero_year(s, smith_sequences_subsets) # check against sequences with the right serotype and year
-        match = get_closest_match(get_strain_id(s), choices, 80, p=True) # match on strain identifier
-        if match and match_broad_ids(t, match) != False: # require broad IDs to be identical if they exist
-            return smith_sequences[match]
-        else:
-            return None
+        newstrain = make_vdb_name(s)
+        if strainID in seen_smith_viruses:
+            continue
+        try:
+            fasta_match = find_sequence(s)
+            accession = key[fasta_match]
+        except:
+            not_in_key.append(s)
+            continue
+        row = {}
+
+        NA_fields = ['Species', 'Isolate Name', 'Georegion', 'Author', 'Sampling City', 'Pubmed ID']
+        for n in NA_fields:
+            row[n] = None
+        row['Serotype'], row['Country'], row['Strain'], row['Sampling Year'] = newstrain.split('/')
+        row['Accession'] = accession
+        row['Name'] = newstrain
+        row['Start'] = 935
+        row['Stop'] = 2413
+        row['Segment'] = 'E'
+        row['Organism'] = 'dengue virus '+serotype[-1]
+        row['Species'] = 'dengue virus'
+        row['Sequence'] = str(smith_sequences[fasta_match].seq)
+        missing_records.append(row)
+
+    if no_append:
+        open('smith_viruses.tsv', 'a').write('# %d viruses from smith data not in vdb\n'%len(acc_list))
+    else:
+        pass
+    pd.DataFrame(missing_records).to_csv('smith_viruses.tsv', sep='\t', mode='a', header=no_append)
+    return not_in_key
+
+def table_to_tsv(titerdf):
+    titer_file = open('dengue_titers.tsv', 'a')
+    strain_file = open('dengue_strains.tsv', 'w')
+    value_counts = defaultdict(int, existing_titers)
+    for virus, seraseries in titerdf.iterrows():
+        for sera, value in seraseries.iteritems():
+            if type(value)== float and math.isnan(value):
+                continue
+            elif value == '<10':
+                continue
+            else:
+                titer_file.write('\t'.join([virus, sera, sera, args.src, str(value)])+'\n')
+                value_counts[virus] += 1
+
+    for virus in titerdf.index.values:
+        strain_file.write('\t'.join([virus, str(value_counts[virus])])+'\n')
+
+    titer_file.close()
+    strain_file.close()
+
 
 ####    Find strains with existing VDB records      ####
+found_viruses, missing_viruses = match_strain_names(titers_df.columns.values(), vdb_strain_subsets)
+for v in missing_viruses:
+    found_viruses[v] = make_vdb_name(v)
+found_sera, missing_sera = match_strain_names(titers_df.index.values(), vdb_strain_subsets)
+for s in missing_sera:
+    found_sera[s] = make_vdb_name(s)
+titers_df.rename(index = found_viruses, columns = found_sera, inplace=True)
+table_to_tsv(titers_df)
 
-vdb_strain_subsets = subset_strains(vdb_strains)
-found, missing = match_strain_names(smith_strains, vdb_strain_subsets)
-
-####    Find sequence records for strains not in VDB    ####
-smith_sequences_subsets = subset_strains(smith_sequences.keys())
+####    Deal with records not in VDB    ####
+missing_strains = list(set(missing_viruses + missing_sera))
+print 'These strains were not found in vdb, but were in provided fasta file.\nTo upload, run `fauna$ python vdb/dengue_upload --fname smith_viruses.tsv --ftype tsv -v dengue -db vdb`\n'
+not_in_key = format_smith_upload(missing_strains)
+pprint(set(missing_strains).difference(set(not_in_key)))
+print 'WARNING: these strains were not found in vdb or provided fasta file:'
+pprint(not_in_key)
