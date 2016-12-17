@@ -3,3 +3,5 @@ papers/*
 slides/*
 *.fasta
 *.trees
+*.ipynb_checkpoints
+.dropbox
