@@ -77,7 +77,7 @@ def format_smith_upload(missing_strains, no_append=True):
 		NA_fields = ['Species', 'Isolate Name', 'Georegion', 'Author', 'Sampling City', 'Pubmed ID']
 		for n in NA_fields:
 			row[n] = None
-		row['Serotype'], row['Country'], row['Strain'], row['Sampling Year'] = newstrain.split('/')
+		row['Serotype'], row['Country'], row['Strain'], row['Sampling Year'] = s.split('/')
 		row['Accession'] = accession
 		row['Name'] = s
 		row['Start'] = 935
