@@ -8,11 +8,11 @@ import math
 
 ####    Parse arguments, pull input data    ####
 parser = argparse.ArgumentParser()
-parser.add_argument('-titers', default='/Users/Sidney/Dropbox/dengue/data/smith2015/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
-parser.add_argument('-sequences', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
-parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/smith2015/Fig1A-key-for-tree-names-virus-names.tsv', help="Full path to strain<\t>accession key")
-parser.add_argument('-synonyms', default='/Users/Sidney/Dropbox/dengue/data/smith2015/vdb_smith_synonyms.tsv', type=str, help="Full path of vdbName<\t>all<\t>smith<\t>synonyms file")
-parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue.fasta', type=str, help="Full path of vdb dengue fasta file")
+parser.add_argument('-titers', default='/Users/Sidney/Dropbox/dengue/data/katzelnick2015/raw/agm_1month_titers.csv', type=str, help="Full path of titer table tsv")
+parser.add_argument('-sequences', default='/Users/Sidney/Dropbox/dengue/data/katzelnick2015/metadata/Fig1A-aligned-nucleotide-sequences.FASTA', type=str, help="Full path of virus sequence file")
+parser.add_argument('-key', default='/Users/Sidney/Dropbox/dengue/data/katzelnick2015/metadata/Fig1A-key-for-tree-names-virus-names.tsv', help="Full path to strain<\t>accession key")
+parser.add_argument('-synonyms', default='./vdb_smith_synonyms.tsv', type=str, help="Full path of vdbName<\t>all<\t>smith<\t>synonyms file")
+parser.add_argument('-vdb', default='/Users/Sidney/nextstrain/fauna/data/dengue_all.fasta', type=str, help="Full path of vdb dengue fasta file")
 parser.add_argument('-src', default = 'agm_1mo', type=str,  help="source designation")
 args = parser.parse_args()
 

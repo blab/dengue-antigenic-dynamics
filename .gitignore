@@ -5,3 +5,9 @@ slides/*
 *.trees
 *.ipynb_checkpoints
 .dropbox
+
+*.png
+
+*.p
+
+\.Icon\.swp
