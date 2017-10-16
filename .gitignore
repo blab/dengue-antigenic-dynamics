@@ -6,8 +6,7 @@ slides/*
 *.ipynb_checkpoints
 .dropbox
 
-*.png
-
 *.p
 
-\.Icon\.swp
+\.Icon
+\.swp
