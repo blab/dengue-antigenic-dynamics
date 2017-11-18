@@ -14,3 +14,9 @@ slides/*
 recombination/
 
 titer-analysis/png/
+
+scripts/frequencies/scratchwork/
+
+manuscript/\.latex/
+
+manuscript/\.latex\.json
