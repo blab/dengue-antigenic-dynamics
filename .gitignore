@@ -10,3 +10,7 @@ slides/*
 
 \.Icon
 \.swp
+\.Icon\.swp
+recombination/
+
+titer-analysis/png/
