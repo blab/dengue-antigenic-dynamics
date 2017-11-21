@@ -5,6 +5,8 @@ slides/*
 *.trees
 *.ipynb_checkpoints
 .dropbox
+.DS_Store
+environment*
 
 *.p
 
