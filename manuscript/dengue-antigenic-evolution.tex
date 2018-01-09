@@ -269,11 +269,82 @@ This could be because XYZQ (see discussion).
 %(Figure~\ref{FIGURE1_LABEL_HERE})
 
 \section*{Discussion}
+Our results show that each serotype of DENV contains multiple distinct antigenic phenotypes. We also find that DENV antigenic evolution is driven by DENV genetic evolution, and meaningfully contributes to DENV viral fitness. However, this intraserotype antigenic heterogeneity does not appear to drive dengue clade turnover.
 
-\subsection*{DICUSSION SUBSECTION 1 TITLE HERE}
-%\lmc{Detecting?}
-DISCUSSION SUBSECTION 1 TEXT HERE
-%  titers are noisy, and just because we're measuring titers in the tree model doesn't mean we're measuring antigenic novelty. addressed by looking at population impact / that these values predict clade success.
+\subsection*{Strengths and limitations of the model}
+As discussed more extensively in Neher et al, the tree model makes two major implicit assumptions.
+First, the model assumes that titers are symmetric (i.e., that $T_{ij} \approxeq T_{ji}$).
+As shown in Figure \ref{titer_symmetry}, this is largely accurate: once overall virus and sera potency are accounted for, titers are roughly symmetric after a primary infection.
+It has been previously hypothesized that the order in which populations are exposed to different serotypes and/or genotypes of DENV was an important driver of outbreak severity.
+The finding that titers are roughly symmetrical--i.e., that $T_{ij} \approxeq T_{ji}$, once the overall viral avidity is accounted for--suggests that epidemic magnitude is instead driven by a combination of population demography, the time between epidemics, and the antigenic distance between strains $i$ and $j$, rather than the order in which they appear in the population.
+While this is a subtle distinction, it has important ramifications for assessing epidemic risk.
+
+The model also assumes that antigenic change is additive (i.e., that as viruses diverge genetically, they are also "pushed" apart in antigenic space, rather than pulled closer together).
+For most viruses, this assumption holds true except for instances where a single site is independently mutated along multiple branches.
+For DENV, however, it has been hypothesized that enhanced infection via ADE is a fitness advantage.
+ADE only occurs when viruses share partially overlapping immune profiles: viruses that are very near in antigenic space are cross-neutralized, and viruses that are very far in antigenic space are not recognized by the cross-reactive antibodies required for ADE.
+Thus, it has been hypothesized that DENV fitness is optimized by a moderate amount of antigenic novelty, suggesting that its antigenic evolution is driven by both a "push" to escape neutralization and a "pull" towards more cross-reactive antigenic phenotypes.
+The additive formulation of the tree model inherently only incorporates the former.
+And yet, despite this constraint, the model predicts out-of-sample titers with accuracy near the level of error inherent in the assay.
+We speculate that this is an artefact of the fact that this dataset does not incorporate the effects of ADE -- the "pull" that the tree model does not capture.
+It is striking, then, that this divergence-based model of antigenic evolution is still strongly predictive of DENV clade success.
+It is unclear whether this is because ADE does not contribute to DENV viral fitness, or XYZQ.
+
+\subsection*{Strengths and limitations of the data}
+Due to the sparcity of available techniques and sera samples, DENV antigenic relationships are incredibly challenging and costly to measure accurately.
+DENV neutralization titer measurements are inherently noisy due to substantial host heterogeneity and the dynamic nature of the virion structure.
+Additionally, although ADE is an important component of DENV antigenic relationships and evolution, it is very difficult to measure due to technical barriers precluding the use of an FC-\gamma receptor bearing cell lines.
+Finally, there is no ideal model of DENV infection; while the non-human primates used to generate these data likely recaptilate relevant antibody responses, they do not recapitulate the full disease progression to DHF.
+Ultimately, titer measurements may not precisely indicate antigenic distance.
+
+Nevertheless, there are many pieces of evidence--both in the literature and in our current study--that suggest these data are incredibly valuable and relevant for understanding DENV antigenic relationships.
+In their original publication, Katzelnick et al elegantly showed that although these are noisy measurements, the same overall relationships between viruses can be observed in sera from non-human primates, children, and vaccine recipients.
+Furthermore, titer values obtained on mosquito cells and on X cells were well-correlated.
+This suggests that although titer measurements are noisy, these values do faithfully represent the relative antigenic distances between DENV viruses in human antigenic space.
+This is further supported by recent analysis by Katzelnick et al. of longitudinal cohort data, which showed that PRNT50 titers, like those used here, are good predictors of case outcomes in an endemic setting.
+Additionally, our results show that antigenic distances based on titer measurements are able to predict real-world viral population dynamics.
+This suggests that although PRNT50 titers are imperfect approximations of antigenic distance, they have sufficient information content to predict outcomes for both individuals and populations.
+
+\subsection*{These results represent a lower-bound on DENV intraserotype antigenic heterogeneity}
+This dataset is by far the most comprehensive available: the available measurements span the full geographic and temporal range of DENV evolution, but they are generally limited to one strain per canonical DENV "genotype".
+Thus, while our results clearly show that genotypes within a serotype are significantly antigenically diverse, we are unable to assess the extent of antigenic diversity among strains within these genotypes.
+However, we find that DENV antigenic evolution tracks DENV genetic evolution, with each X sub/site in E conferring approximately X log2 titer units of distance in antigenic space.
+Given that each serotype of DENV contains between X-X subs/site of genetic diversity in E, and the measured and interpolated antigenic relationships reported here span X-X units within a serotype, we expect that these results represent a lower-bound on the amount of antigenic heterogeneity present within each serotype of DENV.
+Thus, we expect that increased resolution, as more data becomes available, will show antigenic distances between genotypes of similar magnitude, but with greater within-genotype heterogeneity.
+
+\subsection*{Antigenic novelty drives DENV serotype replacement}
+Increased data availability may also shed light on why we do not detect sub-serotype levels of antigenic novelty contributing to viral fitness.
+We find that in Southeast Asia, serotype dominance switches on average every X-X years; clade dominance switches every X-X years.
+We find that serotype-level antigenic novelty contributes to DENV fitness, but clade-level antigenic novelty putatively does not.
+This raises the question of why, then, we observe relatively frequency clade turnover, and whether antigenic novelty contributes to this process.
+We propose three hypotheses as potential explanations.
+First, it is entirely possible that sub-serotype antigenic differences are not large enough to influence viral fitness.
+Second, given more complete data, we may be able to detect more fine-grained antigenic differences that better explain the observed population dynamics.
+Finally, this may be a function of demography.
+Naive individuals are equally susceptible to all DENV strains, and thus do not contribute to the antigenic fitness of any particular strain.
+Individuals who have had exactly one infection are differentially susceptible to different DENV strains, and thus increase or decrease particular strains' antigenic fitness in that population.
+The average time between primary and secondary infection in Southeast Asia is X.
+We would thus expect that clade dynamics driven by post-primary individuals would play out over a period of ~X years, which is substantially shorter than the observed period of serotype turnover.
+% some actual hypothesis here? i.e., how does boosting in post-secondary individuals play into this?
+
+\subsection*{Implications for DENV clade designations}
+Appropriately classifying evolving pathogens into clades is important for promoting a common language and defining relevant experimental conditions for researchers.
+DENV viruses are typically classified into "genotypes" originally named by either Twiddy and Holmes or SOMEONE.
+These designations were comprehensive at the time they were proposed, but as DENV continues to emerge as a global pathogen, most of these canonical genotypes have extensively diversified.
+For example, the canonical genotype X (denoted with * in Figure \ref{tree}), now contains X clades that are separated by BRANCHLENGTH, comparable to the BRANCHLENGTH separating "genotype X" from "genotype Y".
+Our results also show that each of these canonical genotypes represents a distinct antigenic phenotype; while we cannot comment on the antigenic diversity within each genotype, we expect that our current results represent a substantial underestimation of antigenic heterogeneity.
+Initially, we propose a classification schema of X (illustrated in Figure SOMETHING), based on X.
+This proposed classification schema better represents the genetic diversity of DENV, although it does not fully represent the antigenic diversity of DENV.
+
+\subsection*{Opportunities for enhanced surveillance and epidemic preparedness}
+This study represents proof of concept for both predicting DENV antigenic phenotypes based on sequence data, and then using this phenotypic data to predict which DENV clades will dominate in the coming season.
+Recent analysis of a longitudinal cohort study in Nicaragua suggests that for individuals, the risk of severe infection is driven by their titers before their secondary infection.
+We hypothesize that population-level epidemic severity is similarly dependent on population exposure history and antigenic distance.
+Obtaining additional titer data describing the antigenic phenotypes of each distinct circulating clade could enable robust predictions of epidemic severity, improving resource allocation and epidemic preparedness.
+We thus urge surveillance agencies to invest in routine antigenic characterization of circulating DENV clades.
+
+\subsection*{Implications for vaccine design and opportunities for future investigation}
+% I need to think about what to put here. 
 
 \newpage
 
