@@ -27,7 +27,7 @@ def normalize_frequencies_by_timepoint(frequencies):
         normalized_frequencies = frequencies.apply(normalize, axis=1)
         return normalized_frequencies
 
-def sum_over_j(antigenic_fitness, i, timepoint, proportion_remaining):
+def sum_over_j(cls, i, timepoint, proportion_remaining):
     '''
     Look at all a single time point.
     At that timepoint, look at all clades, j, that are cocirculating with i.
@@ -37,20 +37,20 @@ def sum_over_j(antigenic_fitness, i, timepoint, proportion_remaining):
 
     frequency_weighted_protection = 0.
 
-    for j in antigenic_fitness.clades:
+    for j in cls.clades:
         if i==j:
             init_titers = 0.
         else:
-            init_titers = antigenic_fitness.titers[tuple(sorted([i,j]))]
+            init_titers = cls.titers[tuple(sorted([i,j]))]
         remaining_titers = proportion_remaining * init_titers
-        probability_protected = max(antigenic_fitness.sigma*remaining_titers + 1., 0.)
-        j_frequency = antigenic_fitness.frequencies[j][timepoint]
+        probability_protected = max(cls.sigma*remaining_titers + 1., 0.)
+        j_frequency = cls.frequencies[j][timepoint]
 
         frequency_weighted_protection += probability_protected*j_frequency
 
     return frequency_weighted_protection
 
-def sum_over_past_t(antigenic_fitness, i, timepoint_of_interest):
+def sum_over_past_t(cls, i, timepoint_of_interest):
     '''
     For a given time point of interest, look at what the population has acquired protection to
     over the past `tp_back` timepoints.
@@ -61,31 +61,73 @@ def sum_over_past_t(antigenic_fitness, i, timepoint_of_interest):
         ''' Assume immunity wanes linearly with slope gamma per year (n)'''
         return max(gamma*n + 1., 0.)
 
-    tp_idx = antigenic_fitness.timepoints.index(timepoint_of_interest) # index of timepoint of interest
-    t_to_sum = antigenic_fitness.timepoints[tp_idx - antigenic_fitness.tp_back : tp_idx] # previous timepoints to sum immunity over
+    tp_idx = cls.timepoints.index(timepoint_of_interest) # index of timepoint of interest
+    t_to_sum = cls.timepoints[tp_idx - cls.tp_back : tp_idx] # previous timepoints to sum immunity over
 
     # proportion of titers acquired in each interval expected to remain by timepoint of interest
-    waning_over_time = [ waning(antigenic_fitness.gamma, t - timepoint_of_interest) for t in t_to_sum]
+    waning_over_time = [ waning(cls.gamma, t - timepoint_of_interest) for t in t_to_sum]
 
     # proportion of the population that acquired protection in each interval
-    protection_over_time = [ sum_over_j(antigenic_fitness, i, t, p_remaining)
+    protection_over_time = [ sum_over_j(cls, i, t, p_remaining)
                           for (t, p_remaining) in zip(t_to_sum, waning_over_time) ]
 
     accumulated_protection = sum(protection_over_time)/float(len(protection_over_time))
     return accumulated_protection
 
-def population_exposure(antigenic_fitness, i):
+def population_exposure(cls, i):
     ''' estimate the proportion of the population that is immune to i at the beginning of season t
     '''
 
-    valid_timepoints = antigenic_fitness.timepoints[antigenic_fitness.tp_back:]
+    valid_timepoints = cls.timepoints[cls.tp_back:]
 
     # if antigenic_resolution == 'null':
     #     return { t: 0. for t in valid_timepoints }
     # else:
-    population_exposure = { t: sum_over_past_t(antigenic_fitness, i, t) for t in valid_timepoints}
+    population_exposure = { t: sum_over_past_t(cls, i, t) for t in valid_timepoints}
 
     return population_exposure
+
+def predict_timepoint(initial_frequency, initial_fitness, years_forward):
+    if initial_frequency < 0.15:
+        return np.nan
+    else:
+        return initial_frequency*np.exp(initial_fitness*years_forward)
+
+def clade_rolling_prediction(cls, i):
+    '''
+    For each timepoint t, predict the frequency of i based on
+    its fitness and initial frequency at time t-years_forward
+    '''
+
+    initial_fitnesses = cls.fitness[i]
+    initial_frequencies = cls.frequencies[i]
+    initial_timepoints = cls.timepoints[cls.tp_back: -1*cls.tp_forward]
+    predicted_timepoints = cls.timepoints[cls.tp_forward+cls.tp_back:]
+    print initial_timepoints
+    print predicted_timepoints
+
+    predicted_frequencies = { pred_t : predict_timepoint(initial_frequencies[init_t],
+                                                         initial_fitnesses[init_t],
+                                                         cls.years_forward)
+                            for (init_t, pred_t)
+                            in zip(initial_timepoints, predicted_timepoints) }
+
+    return predicted_frequencies
+
+def clade_rolling_growth_rate(cls,i,predicted=True):
+
+    initial_timepoints = cls.timepoints[: -1*cls.tp_forward]
+    initial_frequencies = cls.frequencies[i][initial_timepoints]
+
+    final_timepoints = cls.timepoints[cls.tp_forward:]
+    if predicted==True:
+        final_frequencies = cls.predicted_rolling_frequencies[i][final_timepoints]
+    else:
+        final_frequencies = cls.frequencies[i][final_timepoints]
+
+    time_intervals = [ str(f)+'/'+str(i) for (i, f) in zip(initial_timepoints, final_timepoints)]
+    growth_rates = [ f / i for (i,f) in zip(initial_frequencies, final_frequencies)]
+    return pd.Series(growth_rates, index=time_intervals)
 
 class AntigenicFitness():
     def __init__(self, args):
@@ -102,6 +144,8 @@ class AntigenicFitness():
         self.timepoints = self.frequencies.index.tolist()
         n_years = int(self.timepoints[-1]) - int(self.timepoints[0]) # number of years in the frequencies dataset
         self.tppy = int(len(self.timepoints)/n_years) # timepoints per year
+        self.tp_forward = self.tppy*self.years_forward
+        self.tp_back = self.tppy*self.years_back
 
         self.tp_back = self.years_back*self.tppy # number of timepoints to sum over
         self.tp_forward = self.years_forward*self.tppy # number of timepoints forward to predict
@@ -126,12 +170,30 @@ class AntigenicFitness():
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
 
-def plot_fitness_v_frequency(antigenic_fitness):
+    def predict_rolling_frequencies(self):
+        '''
+        Making a rolling prediction of frequency for each clade.
+        Normalize these predicted frequencies so that they sum to 1. at each timepoint
+        '''
+        all_predicted_frequencies = pd.DataFrame({ i : clade_rolling_prediction(self, i)
+                                    for i in self.clades })
+        self.predicted_rolling_frequencies = normalize_frequencies_by_timepoint(all_predicted_frequencies)
+        if self.save:
+            self.predicted_rolling_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
+
+    def calc_growth_rates(self):
+        self.predicted_growth_rates = pd.DataFrame({i:clade_rolling_growth_rate(self, i, predicted=True) for i in self.clades})
+        self.actual_growth_rates = pd.DataFrame({i:clade_rolling_growth_rate(self, i, predicted=False) for i in self.clades})
+        if self.save:
+            self.predicted_growth_rates.to_csv(self.out_path+self.name+'_predicted_growth_rates.csv')
+            self.actual_growth_rates.to_csv(self.out_path+self.name+'_actual_growth_rates.csv')
+
+def plot_fitness_v_frequency(cls):
 
     fig, axes = plt.subplots(2,1,figsize=(8,6))
 
-    fitness=antigenic_fitness.fitness
-    frequencies = antigenic_fitness.frequencies
+    fitness=cls.fitness
+    frequencies = cls.frequencies
 
     for clade in fitness.columns.values:
         axes[0].plot(fitness[clade].index.values, fitness[clade], linestyle='--', label='%s fitness'%clade)
@@ -139,14 +201,54 @@ def plot_fitness_v_frequency(antigenic_fitness):
 
     axes[0].set_title('Clade fitness')
     axes[1].set_title('Observed clade frequency')
-    # plt.sca(axes[0])
-    # plt.legend(loc=(1,1), ncol=2)
-    # plt.sca(axes[1])
-    # plt.legend(loc=(1,1), ncol=2)
     plt.tight_layout()
 
-    if antigenic_fitness.save:
-        plt.savefig(antigenic_fitness.out_path+antigenic_fitness.name+'_fitness.png', dpi=300)
+    if cls.save:
+        plt.savefig(cls.out_path+cls.name+'_fitness.png', dpi=300)
+    else:
+        plt.show()
+
+def plot_rolling_frequencies(cls):
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12,8))
+    for clade, predicted_freqs in cls.predicted_rolling_frequencies.iteritems():
+        date_min, date_max = predicted_freqs.index.min(), predicted_freqs.index.max()
+        axes[0].plot(predicted_freqs.index.values,predicted_freqs.values, linestyle='--', label='Predicted %s frequencies'%clade)
+
+        actual_frequencies = cls.frequencies[clade][date_min:date_max]
+        axes[1].plot(actual_frequencies.index.values, actual_frequencies.values, label='Actual %s frequencies'%clade)
+
+    axes[0].set_title('Predicted clade frequencies')
+    axes[1].set_title('Observed clade frequencies')
+
+    plt.tight_layout()
+    if cls.save:
+        plt.savefig(cls.out_path+cls.name+'_frequencies.png', dpi=300)
+    else:
+        plt.show()
+
+def plot_growth_rates(cls):
+    '''
+    For the actual and predicted frequencies, find where both values are non-null and > 0.1
+    Plot actual vs. predicted
+    '''
+    actual, predicted = cls.actual_growth_rates, cls.predicted_growth_rates
+    actual = actual.loc[actual.index.isin(predicted.index.values)]
+
+    assert predicted.columns.tolist() == actual.columns.tolist()
+    assert actual.index.tolist() == predicted.index.tolist()
+
+    actual, predicted = actual.values.flatten(), predicted.values.flatten()
+    mask = (~np.isnan(actual)) & (~np.isnan(predicted))
+    fit = stats.linregress(actual[mask], predicted[mask])
+
+    ax=sns.regplot(actual[mask], predicted[mask])
+    ax.set_xlabel('Actual growth rate')#, X(t+%d)/X(t)'%years_forward)
+    ax.set_ylabel('Predicted growth rate')#, X(t+%d)/X(t)'%years_forward)
+    ax.text(0,0.2,'r = %.2f'%fit[2], )
+    plt.tight_layout()
+
+    if cls.save:
+        plt.savefig(cls.out_path+cls.name+'_growth_rates.png', dpi=300)
     else:
         plt.show()
 
@@ -171,7 +273,15 @@ if __name__=="__main__":
     args = args.parse_args()
 
     antigenic_fitness = AntigenicFitness(args)
+    print 'calculating fitness'
     antigenic_fitness.calculate_fitness()
+    print 'predicting frequencies'
+    antigenic_fitness.predict_rolling_frequencies()
+    print 'calculating growth rates'
+    antigenic_fitness.calc_growth_rates()
 
     if antigenic_fitness.plot:
+        print 'generating plots'
         plot_fitness_v_frequency(antigenic_fitness)
+        plot_rolling_frequencies(antigenic_fitness)
+        plot_growth_rates(antigenic_fitness)
