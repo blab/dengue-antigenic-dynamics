@@ -88,10 +88,10 @@ def population_exposure(cls, i):
     return population_exposure
 
 def predict_timepoint(initial_frequency, initial_fitness, years_forward):
-    if initial_frequency < 0.15:
-        return np.nan
-    else:
-        return initial_frequency*np.exp(initial_fitness*years_forward)
+    # if initial_frequency < 0.1:
+    #     return np.nan
+    # else:
+    return initial_frequency*np.exp(initial_fitness*years_forward)
 
 def clade_rolling_prediction(cls, i):
     '''
@@ -103,8 +103,6 @@ def clade_rolling_prediction(cls, i):
     initial_frequencies = cls.frequencies[i]
     initial_timepoints = cls.timepoints[cls.tp_back: -1*cls.tp_forward]
     predicted_timepoints = cls.timepoints[cls.tp_forward+cls.tp_back:]
-    print initial_timepoints
-    print predicted_timepoints
 
     predicted_frequencies = { pred_t : predict_timepoint(initial_frequencies[init_t],
                                                          initial_fitnesses[init_t],
@@ -116,10 +114,10 @@ def clade_rolling_prediction(cls, i):
 
 def clade_rolling_growth_rate(cls,i,predicted=True):
 
-    initial_timepoints = cls.timepoints[: -1*cls.tp_forward]
+    initial_timepoints = cls.timepoints[cls.tp_back: -1*cls.tp_forward]
     initial_frequencies = cls.frequencies[i][initial_timepoints]
 
-    final_timepoints = cls.timepoints[cls.tp_forward:]
+    final_timepoints = cls.timepoints[cls.tp_forward+cls.tp_back:]
     if predicted==True:
         final_frequencies = cls.predicted_rolling_frequencies[i][final_timepoints]
     else:
@@ -127,35 +125,46 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 
     time_intervals = [ str(f)+'/'+str(i) for (i, f) in zip(initial_timepoints, final_timepoints)]
     growth_rates = [ f / i for (i,f) in zip(initial_frequencies, final_frequencies)]
+
     return pd.Series(growth_rates, index=time_intervals)
 
 class AntigenicFitness():
     def __init__(self, args):
 
-        self.clades = args.clades
-        self.date_range = args.date_range
+        self.clades = args.clades # which non-overlapping clades to look at
+        self.date_range = args.date_range # which dates to look at
 
-        self.frequencies = pd.read_csv(args.frequency_path, index_col=0)
-        self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # normalize the actual frequencies
-        self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])]
+        # actual / observed frequencies
+        self.frequencies = pd.read_csv(args.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
+        self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # restrict to clades of interest, normalize
+        self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
 
-        self.years_forward = args.years_forward
-        self.years_back = args.years_back
+        self.years_forward = args.years_forward # how many years forward to try and predict (rolling)
+        self.years_back = args.years_back # how many years of exposure to account for in fitness estimations
         self.timepoints = self.frequencies.index.tolist()
         n_years = int(self.timepoints[-1]) - int(self.timepoints[0]) # number of years in the frequencies dataset
         self.tppy = int(len(self.timepoints)/n_years) # timepoints per year
-        self.tp_forward = self.tppy*self.years_forward
-        self.tp_back = self.tppy*self.years_back
+        self.tp_forward = self.tppy*self.years_forward # number of timepoints forward
+        self.tp_back = self.tppy*self.years_back # number of timepoints back
 
-        self.tp_back = self.years_back*self.tppy # number of timepoints to sum over
-        self.tp_forward = self.years_forward*self.tppy # number of timepoints forward to predict
+        self.noisy_predictions_mask = self.frequencies < 0.1 # log which initial values were low
+        # keep track of which predictions will be made based on low initial values
+        self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
 
+        if args.fitness:
+            if args.fitness == 'null': # negative control: fitnesses all = 0.
+                self.fitness = pd.DataFrame(index=self.timepoints, columns=self.clades)
+                self.fitness.fillna(0., inplace=True)
+            else: # load from file if provided
+                self.fitness = pd.read_csv(args.fitness, index_col=0)
+        else:
+            self.fitness = None
+
+        # load pre-computed antigenic distances between clades
         self.titers = {(str(k1), str(k2)):v for (k1,k2),v in pd.Series.from_csv(args.dTiters_path, header=None,index_col=[0,1]).to_dict().items()}
 
-        self.sigma=args.sigma
-        self.gamma=args.gamma
-
-        self.fitness = None
+        self.sigma=args.sigma # slope of C(Dij) (protection vs. titers)
+        self.gamma=args.gamma # slope of waning(n) (time vs. titers)
 
         self.plot=args.plot
         self.save=args.save
@@ -172,12 +181,20 @@ class AntigenicFitness():
 
     def predict_rolling_frequencies(self):
         '''
-        Making a rolling prediction of frequency for each clade.
-        Normalize these predicted frequencies so that they sum to 1. at each timepoint
+        Making a "rolling prediction" of frequency for each clade.
+        Normalize these predicted frequencies so that they sum to 1. at each timepoint,
+        then mask out predictions based on noisy initial frequencies.
+
+        Returns pd.DataFrame(index = t+dt, columns=clades,
+                            values = predicted frequency at time t+dt, based on frequency & fitness at time t )
+        Xi(t+dt) = Xi(t) * e^( Fi(t) * dt), where Xi is frequency and Fi is fitness of i
         '''
         all_predicted_frequencies = pd.DataFrame({ i : clade_rolling_prediction(self, i)
                                     for i in self.clades })
-        self.predicted_rolling_frequencies = normalize_frequencies_by_timepoint(all_predicted_frequencies)
+
+        self.predicted_rolling_frequencies = normalize_frequencies_by_timepoint(all_predicted_frequencies) # normalize based on ALL tips
+        self.predicted_rolling_frequencies = self.predicted_rolling_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial frequencies at >0.1
+
         if self.save:
             self.predicted_rolling_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
 
@@ -259,6 +276,7 @@ if __name__=="__main__":
     args = argparse.ArgumentParser()
     args.add_argument('-f', '--frequency_path', help='frequencies csv', default='../../data/titer-model/frequencies/southeast_asia_clade_frequencies.csv')
     args.add_argument('-t', '--dTiters_path', help='pairwise dTiters csv', default='../../data/titer-model/frequencies/clade_dtiters.csv')
+    args.add_argument('--fitness', type=str, help='path to precomputed frequencies or \'null\'')
     args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'])
     args.add_argument('-d', '--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('-yb', '--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
@@ -273,8 +291,9 @@ if __name__=="__main__":
     args = args.parse_args()
 
     antigenic_fitness = AntigenicFitness(args)
-    print 'calculating fitness'
-    antigenic_fitness.calculate_fitness()
+    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
+        print 'calculating fitness'
+        antigenic_fitness.calculate_fitness()
     print 'predicting frequencies'
     antigenic_fitness.predict_rolling_frequencies()
     print 'calculating growth rates'
