@@ -131,12 +131,18 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 class AntigenicFitness():
     def __init__(self, args):
 
-        self.clades = args.clades # which non-overlapping clades to look at
         self.date_range = args.date_range # which dates to look at
 
-        # actual / observed frequencies
+        # actual (observed) frequencies
         self.frequencies = pd.read_csv(args.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
+
+        if not args.clades:
+            self.clades = self.frequencies.columns.values
+        else:
+            self.clades = args.clades # which non-overlapping clades to look at
+
         self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # restrict to clades of interest, normalize
+
         self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
 
         self.years_forward = args.years_forward # how many years forward to try and predict (rolling)
@@ -278,6 +284,7 @@ if __name__=="__main__":
     args.add_argument('-t', '--dTiters_path', help='pairwise dTiters csv', default='../../data/titer-model/frequencies/clade_dtiters.csv')
     args.add_argument('--fitness', type=str, help='path to precomputed frequencies or \'null\'')
     args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'])
+    # args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=None)
     args.add_argument('-d', '--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('-yb', '--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('-yf', '--years_forward', type=int, help='how many years into the future to predict', default=5)
