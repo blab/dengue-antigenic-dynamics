@@ -8,6 +8,7 @@ from collections import defaultdict
 from pprint import pprint
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.optimize import minimize
 
 def normalize_frequencies_by_timepoint(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
@@ -267,6 +268,34 @@ def plot_growth_rates(cls):
     plt.clf()
     plt.close()
 
+def clean_run_and_calc_r(args):
+    antigenic_fitness = AntigenicFitness(args)
+    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
+        print 'calculating fitness'
+        antigenic_fitness.calculate_fitness()
+    print 'predicting frequencies'
+    antigenic_fitness.predict_rolling_frequencies()
+    print 'calculating growth rates'
+    antigenic_fitness.calc_growth_rates()
+
+    actual, predicted = antigenic_fitness.actual_growth_rates, antigenic_fitness.predicted_growth_rates
+    actual = actual.loc[actual.index.isin(predicted.index.values)]
+
+    assert predicted.columns.tolist() == actual.columns.tolist()
+    assert actual.index.tolist() == predicted.index.tolist()
+
+    actual, predicted = actual.values.flatten(), predicted.values.flatten()
+    mask = (~np.isnan(actual)) & (~np.isnan(predicted))
+    fit = stats.linregress(actual[mask], predicted[mask])
+
+    # if antigenic_fitness.plot:
+    #     print 'generating plots'
+    #     plot_fitness_v_frequency(antigenic_fitness)
+    #     plot_rolling_frequencies(antigenic_fitness)
+    #     plot_growth_rates(antigenic_fitness)
+
+    return fit[2] #r value
+
 if __name__=="__main__":
     sns.set(style='whitegrid', font_scale=1.5)
     sns.set_palette('tab20', n_colors=20)
@@ -289,17 +318,23 @@ if __name__=="__main__":
 
     args = args.parse_args()
 
-    antigenic_fitness = AntigenicFitness(args)
-    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-        print 'calculating fitness'
-        antigenic_fitness.calculate_fitness()
-    print 'predicting frequencies'
-    antigenic_fitness.predict_rolling_frequencies()
-    print 'calculating growth rates'
-    antigenic_fitness.calc_growth_rates()
+    # clean_run_and_calc_r(args)
 
-    if antigenic_fitness.plot:
-        print 'generating plots'
-        plot_fitness_v_frequency(antigenic_fitness)
-        plot_rolling_frequencies(antigenic_fitness)
-        plot_growth_rates(antigenic_fitness)
+    def param_test_wrapper((sigma, gamma), (args)):
+        print 'running with sigma=%f, gamma=%f\n\n'%(sigma, gamma)
+        setattr(args, 'sigma', sigma)
+        setattr(args, 'gamma', gamma)
+        neg_r_value = -1.*clean_run_and_calc_r(args)
+        print 'r = ', -1.*neg_r_value
+        return neg_r_value
+
+    optimized_parameters = minimize(param_test_wrapper, x0=[-0.15, -0.25],
+                                    args=args,bounds=[(-1., 0.), (-1., 0.)],method='SLSQP')
+                 # minimizer_kwargs={'args': (args), 'bounds': },
+                 # take_step=None, accept_test=None,
+                 # callback=None, interval=10,
+                 # niter=100, T=1.0, stepsize=0.1,
+                 # disp=False, niter_success=None
+                 # )
+
+    print(optimized_parameters)
