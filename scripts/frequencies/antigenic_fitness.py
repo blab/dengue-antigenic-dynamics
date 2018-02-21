@@ -131,22 +131,15 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 class AntigenicFitness():
     def __init__(self, args):
 
-        self.date_range = args.date_range # which dates to look at
+        for k,v in args:
+            setattr(self, k, v) # copy over cmd line args
 
         # actual (observed) frequencies
-        self.frequencies = pd.read_csv(args.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
-
-        if not args.clades:
+        self.frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
+        if not self.clades:
             self.clades = self.frequencies.columns.values
-        else:
-            self.clades = args.clades # which non-overlapping clades to look at
-
         self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # restrict to clades of interest, normalize
-
         self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
-
-        self.years_forward = args.years_forward # how many years forward to try and predict (rolling)
-        self.years_back = args.years_back # how many years of exposure to account for in fitness estimations
         self.timepoints = self.frequencies.index.tolist()
         n_years = int(self.timepoints[-1]) - int(self.timepoints[0]) # number of years in the frequencies dataset
         self.tppy = int(len(self.timepoints)/n_years) # timepoints per year
@@ -157,25 +150,18 @@ class AntigenicFitness():
         # keep track of which predictions will be made based on low initial values
         self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
 
-        if args.fitness:
-            if args.fitness == 'null': # negative control: fitnesses all = 0.
+        if self.fitness:
+            if self.fitness == 'null': # negative control: fitnesses all = 0.
                 self.fitness = pd.DataFrame(index=self.timepoints, columns=self.clades)
                 self.fitness.fillna(0., inplace=True)
             else: # load from file if provided
-                self.fitness = pd.read_csv(args.fitness, index_col=0)
+                self.fitness = pd.read_csv(self.fitness, index_col=0)
         else:
             self.fitness = None
 
         # load pre-computed antigenic distances between clades
         self.titers = {(str(k1), str(k2)):v for (k1,k2),v in pd.Series.from_csv(args.dTiters_path, header=None,index_col=[0,1]).to_dict().items()}
 
-        self.sigma=args.sigma # slope of C(Dij) (protection vs. titers)
-        self.gamma=args.gamma # slope of waning(n) (time vs. titers)
-
-        self.plot=args.plot
-        self.save=args.save
-        self.name=args.name
-        self.out_path=args.out_path
         if self.save:
             assert self.name, 'ERROR: Please provide an analysis name if you wish to save output'
 
