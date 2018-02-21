@@ -131,7 +131,7 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 class AntigenicFitness():
     def __init__(self, args):
 
-        for k,v in args:
+        for k,v in vars(args).items():
             setattr(self, k, v) # copy over cmd line args
 
         # actual (observed) frequencies
