@@ -230,6 +230,8 @@ def plot_fitness_v_frequency(cls):
         plt.savefig(cls.out_path+cls.name+'_fitness.png', dpi=300)
     else:
         plt.show()
+    plt.clf()
+    plt.close()
 
 def plot_rolling_frequencies(cls):
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12,8))
@@ -248,6 +250,8 @@ def plot_rolling_frequencies(cls):
         plt.savefig(cls.out_path+cls.name+'_frequencies.png', dpi=300)
     else:
         plt.show()
+    plt.clf()
+    plt.close()
 
 def plot_growth_rates(cls):
     '''
@@ -274,6 +278,8 @@ def plot_growth_rates(cls):
         plt.savefig(cls.out_path+cls.name+'_growth_rates.png', dpi=300)
     else:
         plt.show()
+    plt.clf()
+    plt.close()
 
 if __name__=="__main__":
     sns.set(style='whitegrid', font_scale=1.5)
