@@ -9,6 +9,7 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.optimize import minimize
+from math import ceil
 
 def normalize_frequencies_by_timepoint(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
@@ -129,6 +130,21 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 
     return pd.Series(growth_rates, index=time_intervals)
 
+def predict_trajectory(cls, i, initial_timepoint):
+    '''
+    Predict the frequency of clade i at each time interval between t and t+years_forward,
+    based on its fitness and frequency at time t
+    '''
+
+    dt_values = [ (1./cls.tppy)*dt for dt in range(1, cls.tp_forward+1)] # fraction of year per timepoint * number of timepoints forward
+    predicted_timepoints = [ initial_timepoint + dt for dt in dt_values ]
+    initial_frequency = cls.frequencies[i][initial_timepoint]
+    initial_fitness = cls.fitness[i][initial_timepoint]
+
+    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+
+    return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
+
 class AntigenicFitness():
     def __init__(self, args):
 
@@ -159,6 +175,8 @@ class AntigenicFitness():
                 self.fitness = pd.read_csv(self.fitness, index_col=0)
         else:
             self.fitness = None
+
+        self.trajectories = {}
 
         # load pre-computed antigenic distances between clades
         self.titers = {(str(k1), str(k2)):v for (k1,k2),v in pd.Series.from_csv(args.dTiters_path, header=None,index_col=[0,1]).to_dict().items()}
@@ -197,6 +215,19 @@ class AntigenicFitness():
         if self.save:
             self.predicted_growth_rates.to_csv(self.out_path+self.name+'_predicted_growth_rates.csv')
             self.actual_growth_rates.to_csv(self.out_path+self.name+'_actual_growth_rates.csv')
+
+    def predict_trajectories(self,initial_timepoint):
+        '''
+        Predict the frequency of all clades at each time interval between t and t+years_forward,
+        based on their initial fitnesses and frequencies at time t.
+
+        Normalize these predicted frequencies so that they sum to 1. at each timepoint.
+        '''
+
+        all_trajectories = pd.DataFrame({ i : predict_trajectory(self, i, initial_timepoint)
+                           for i in self.clades})
+        self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
+
 
 def plot_fitness_v_frequency(cls):
 
@@ -268,6 +299,44 @@ def plot_growth_rates(cls):
     plt.clf()
     plt.close()
 
+def plot_trajectory(cls, initial_timepoint, clades, ax):
+    if ax == None:
+        fig, ax = plt.subplots(1,1,figsize=(12,4))
+    try:
+        predicted_trajectory = cls.trajectories[initial_timepoint]
+    except KeyError:
+        cls.predict_trajectories(initial_timepoint)
+        predicted_trajectory = cls.trajectories[initial_timepoint]
+
+    for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
+        actual_vals = cls.frequencies[clade][:initial_timepoint+cls.tp_forward]
+        ax.plot(actual_vals.index.values, actual_vals.values, label='Actual %s frequencies'%clade)
+        ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, linestyle='--', label='Predicted %s frequencies'%clade)
+        ax.plot(actual_vals.index.values, cls.fitness[clade][actual_vals.index.values], linestyle=':')
+    ax.set_xlim(initial_timepoint-cls.years_back, predicted_trajectory.index.values[-1])
+    ax.set_ylim(0,1)
+
+def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2):
+    sns.set(style='whitegrid', font_scale=0.8, palette='Paired')
+    if starting_timepoints == None:
+        starting_timepoints = cls.timepoints[cls.tp_forward+cls.tp_back::cls.tp_forward]
+
+    nrows = len(starting_timepoints)
+    ncols = int(ceil(len(cls.clades)/n_clades_per_plot))
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
+    clade_sets = [cls.clades[i:i + n_clades_per_plot] for i in xrange(0, len(cls.clades), n_clades_per_plot)]
+
+    for tp, row in zip(starting_timepoints, axes):
+        for clade_set, ax in zip(clade_sets, row):
+            plot_trajectory(cls, tp, clade_set, ax)
+
+    plt.tight_layout()
+    if cls.save:
+        plt.savefig(cls.out_path+cls.name+'_trajectories.png', bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
+
 def clean_run_and_calc_r(args):
     antigenic_fitness = AntigenicFitness(args)
     if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
@@ -288,12 +357,12 @@ def clean_run_and_calc_r(args):
     mask = (~np.isnan(actual)) & (~np.isnan(predicted))
     fit = stats.linregress(actual[mask], predicted[mask])
 
-    # if antigenic_fitness.plot:
+    if antigenic_fitness.plot:
     #     print 'generating plots'
-    #     plot_fitness_v_frequency(antigenic_fitness)
-    #     plot_rolling_frequencies(antigenic_fitness)
-    #     plot_growth_rates(antigenic_fitness)
-
+        plot_fitness_v_frequency(antigenic_fitness)
+        plot_rolling_frequencies(antigenic_fitness)
+        plot_growth_rates(antigenic_fitness)
+        plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=2)
     return fit[2] #r value
 
 if __name__=="__main__":
@@ -304,8 +373,9 @@ if __name__=="__main__":
     args.add_argument('-f', '--frequency_path', help='frequencies csv', default='../../data/titer-model/frequencies/southeast_asia_clade_frequencies.csv')
     args.add_argument('-t', '--dTiters_path', help='pairwise dTiters csv', default='../../data/titer-model/frequencies/clade_dtiters.csv')
     args.add_argument('--fitness', type=str, help='path to precomputed frequencies or \'null\'')
-    args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'])
+    # args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'])
     # args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=None)
+    args.add_argument('-c', '--clades', nargs='*', type=str, help='which clades to look at', default=['1859','1','1385','974'])
     args.add_argument('-d', '--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('-yb', '--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('-yf', '--years_forward', type=int, help='how many years into the future to predict', default=5)
@@ -318,8 +388,8 @@ if __name__=="__main__":
 
     args = args.parse_args()
 
-    # clean_run_and_calc_r(args)
-
+    clean_run_and_calc_r(args)
+    
     def param_test_wrapper((sigma, gamma), (args)):
         print 'running with sigma=%f, gamma=%f\n\n'%(sigma, gamma)
         setattr(args, 'sigma', sigma)
