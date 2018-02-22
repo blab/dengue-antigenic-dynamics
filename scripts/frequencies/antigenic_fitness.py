@@ -365,6 +365,27 @@ def clean_run_and_calc_r(args):
         plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=2)
     return fit[2] #r value
 
+def test_plot_parameters(sigma_vals, gamma_vals, args):
+    def param_test_wrapper(sigma, gamma, args):
+        print 'running with sigma=%f, gamma=%f\n\n'%(sigma, gamma)
+        setattr(args, 'sigma', sigma)
+        setattr(args, 'gamma', gamma)
+        return clean_run_and_calc_r(args)
+
+    param_grid = defaultdict(dict)
+    for sigma in sigma_vals:
+        for gamma in gamma_vals:
+            param_grid[sigma][gamma] = param_test_wrapper(sigma, gamma, args)
+
+    ax = sns.heatmap(pd.DataFrame(param_grid))
+    ax.set_xlabel('Sigma')
+    ax.set_ylabel('Gamma')
+
+    if args.save:
+        plt.savefig(args.out_path+args.name+'_parameters.png')
+    else:
+        plt.show()
+
 if __name__=="__main__":
     sns.set(style='whitegrid', font_scale=1.5)
     sns.set_palette('tab20', n_colors=20)
@@ -380,31 +401,15 @@ if __name__=="__main__":
     args.add_argument('-yb', '--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('-yf', '--years_forward', type=int, help='how many years into the future to predict', default=5)
     args.add_argument('-gamma', type=float, help='-1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= -0.15)
-    args.add_argument('-sigma', type=float, help='-1*probability of protection from i conferred by each log2 titer unit against i', default=-0.25)
+    args.add_argument('-sigma', type=float, help='-1*probability of protection from i conferred by each log2 titer unit against i', default=-0.4)
     args.add_argument('--plot', type=bool, help='make plots?', default=True)
     args.add_argument('--save', type=bool, help='save csv and png files?', default=False)
     args.add_argument('--name', type=str, help='analysis name')
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
-
     args = args.parse_args()
 
     clean_run_and_calc_r(args)
     
-    def param_test_wrapper((sigma, gamma), (args)):
-        print 'running with sigma=%f, gamma=%f\n\n'%(sigma, gamma)
-        setattr(args, 'sigma', sigma)
-        setattr(args, 'gamma', gamma)
-        neg_r_value = -1.*clean_run_and_calc_r(args)
-        print 'r = ', -1.*neg_r_value
-        return neg_r_value
-
-    optimized_parameters = minimize(param_test_wrapper, x0=[-0.15, -0.25],
-                                    args=args,bounds=[(-1., 0.), (-1., 0.)],method='SLSQP')
-                 # minimizer_kwargs={'args': (args), 'bounds': },
-                 # take_step=None, accept_test=None,
-                 # callback=None, interval=10,
-                 # niter=100, T=1.0, stepsize=0.1,
-                 # disp=False, niter_success=None
-                 # )
-
-    print(optimized_parameters)
+    # sigma_vals = np.linspace(-1., -0.75, 3)
+    # gamma_vals = np.linspace(-1., -0.5, 5)
+    # test_plot_parameters(sigma_vals, gamma_vals, args)
