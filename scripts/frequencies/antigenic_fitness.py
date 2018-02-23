@@ -89,11 +89,11 @@ def population_exposure(cls, i):
 
     return population_exposure
 
-def predict_timepoint(initial_frequency, initial_fitness, years_forward):
+def predict_timepoint(initial_frequency, initial_fitness, years_forward, beta):
     # if initial_frequency < 0.1:
     #     return np.nan
     # else:
-    return initial_frequency*np.exp(initial_fitness*years_forward)
+    return initial_frequency*np.exp(beta*initial_fitness*years_forward)
 
 def clade_rolling_prediction(cls, i):
     '''
@@ -108,7 +108,7 @@ def clade_rolling_prediction(cls, i):
 
     predicted_frequencies = { pred_t : predict_timepoint(initial_frequencies[init_t],
                                                          initial_fitnesses[init_t],
-                                                         cls.years_forward)
+                                                         cls.years_forward, cls.beta)
                             for (init_t, pred_t)
                             in zip(initial_timepoints, predicted_timepoints) }
 
@@ -402,6 +402,7 @@ if __name__=="__main__":
     args.add_argument('-yf', '--years_forward', type=int, help='how many years into the future to predict', default=5)
     args.add_argument('-gamma', type=float, help='-1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= -0.15)
     args.add_argument('-sigma', type=float, help='-1*probability of protection from i conferred by each log2 titer unit against i', default=-0.4)
+    args.add_argument('-beta', type=float, help='fitness = 1. - beta*population_exposure', default= 2.)
     args.add_argument('--plot', type=bool, help='make plots?', default=True)
     args.add_argument('--save', type=bool, help='save csv and png files?', default=False)
     args.add_argument('--name', type=str, help='analysis name')
@@ -409,7 +410,7 @@ if __name__=="__main__":
     args = args.parse_args()
 
     clean_run_and_calc_r(args)
-    
+
     # sigma_vals = np.linspace(-1., -0.75, 3)
     # gamma_vals = np.linspace(-1., -0.5, 5)
     # test_plot_parameters(sigma_vals, gamma_vals, args)
