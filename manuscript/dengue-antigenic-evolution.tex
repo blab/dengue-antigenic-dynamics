@@ -225,7 +225,34 @@ Figure~\ref{tree} illustrates measured titers and inferred antigenic distances a
 Importantly, each serotype of DENV contains X-X of these distinct antigenic phenotypes.
 
 \subsection*{Antigenic novelty contributes to DENV viral fitness}
-For viruses that exhibit rapid antigenic evolution, such as influenza A, this derived antigenic novelty is an important component for viral fitness and drives clade turn over.
+
+As a viral strain circulates through a population, viral fitness declines over time as more hosts become immune.
+If a new viral strain enters this population, its success will be partially determined by its ability to escape this pre-existing immunity.
+Antigenically novel strains, or strains that are more antigenically distant from previously circulating viruses, are thus more antigenically fit.
+Antigenically driven selection leads to clade turnover as as antigenically novel strains increase in frequency and antigenically stale strains die out.
+
+The strength of antigenically driven selection, and its impact on viral population dynamics, depends on the breadth of antigenic phenotypes displayed.
+For example, influenza A displays an exceptionally broad range of antigenic phenotypes that are distinct enough from one another to enable immune escape.
+This makes antigenic novelty a strong driver of influenza population dynamics.
+Contrastingly, measles displays only one antigenic phenotype.
+Antigenic novelty does not contribute to measles population dynamics.
+
+We find strong evidence for antigenic heterogeneity within dengue serotypes.
+Within each serotype, however, we observe relatively small antigenic distances between canonical genotypes (mean = X-fold) and antigenically distinct clades (mean = X-fold).
+We wanted to quantify the impact of this observed antigenic heterogeneity on real-world dengue population dynamics.
+
+To do so, we adapt a simple deterministic model from REF to directly quantify dengue antigenic fitness and its impact on clade turnover.
+We model the relative antigenic fitness of dengue clade $i$ at time $t$ ($f_i(t)$), as a function of population immunity to $i$--or the proportion of the population that is nonsusceptible to strain $i$--at time $t$, denoted $P_i(t)$.
+We estimate population immunity, $P_i(t)$, as a function of the antigenic distance between $i$ and each non-overlapping clade $j$ (denoted $D_{ij}$), weighted by the number of years since exposure, $n$, and the relative frequency of $j$, $x_j(t-n)$.
+Mathematically, this is expressed as: $$ f_i(t) = 1. - P_i(t)$$
+$$P_i(t) = \sum_{n=1}^{n=N} (w(n)  \sum_{j} x_j(t-n) * C( D_{ij})) $$
+Where $w(n)$ represents the waning of immunity over time, and $C(D_{ij})$ represents the probability of protection against $i$ given prior exposure to $j$ (both simple linear transformations; see methods).
+
+We can then use these estimates of viral fitness to predict relative clade growth and decline, :
+$$\frac{\hat{x_i}(t+N)}{x_i(t)} = e^{x_i(t) \beta f_i(t)}$$
+
+
+
 However, although DENV clades turn over every X-X years on average in hyperendemic populations, with serotypes switching every X-X years (Figure~\ref{frequencies_time}), it is not understood whether these dynamics are driven by neutral stochastic turnover and seasonal bottlenecking or by population immunity and viral antigenic novelty.
 
 \begin{figure}[h]
