@@ -156,7 +156,6 @@ class AntigenicFitness():
 
         # actual (observed) frequencies
         self.frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
-        if not self.clades:
             self.clades = self.frequencies.columns.values
         self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # restrict to clades of interest, normalize
         self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
@@ -413,10 +412,10 @@ def plot_profile_likelihoods(model_performance, args):
         ax.set_ylabel('R^2')
     plt.tight_layout()
 
-    if args.save:
-        plt.savefig(args.out_path+args.name+'_profile_likelihoods.png', bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
+    # if args.save:
+    plt.savefig(args.out_path+args.name+'_profile_likelihoods.png', bbox_inches='tight', dpi=300)
+    # else:
+    #     plt.show()
 
 def plot_param_performance(model_performance, args, small_multiples_var='sigma', ):
     small_multiples_vals = pd.unique(model_performance[small_multiples_var])
@@ -438,10 +437,10 @@ def plot_param_performance(model_performance, args, small_multiples_var='sigma',
 
     plt.tight_layout()
 
-    if args.save:
-        plt.savefig(args.out_path+args.name+'_param_performance.png', bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
+    # if args.save:
+    plt.savefig(args.out_path+args.name+'_param_performance.png', bbox_inches='tight', dpi=300)
+    # else:
+    #     plt.show()
 
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
@@ -451,7 +450,6 @@ if __name__=="__main__":
     args.add_argument('--titer_path', help='pairwise dTiters csv', default='../../data/titer-model/frequencies/clade_dtiters.csv')
     args.add_argument('--fitness_path', type=str, help='path to precomputed frequencies or \'null\'')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
-    args.add_argument('--clades', nargs='*', type=str, help='Which clades to look at. Either list of names or dataset name.', default='serotype')
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=3)
     args.add_argument('--gamma', nargs='*', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= -0.15)
@@ -464,18 +462,13 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-    dataset_clades = {'serotype': ['1859','1','1385','974'],
-                      'genotype': ['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'],
-                      # 'antigenic': None,
-                      'all': []}
-
     # dataset_mle = {'serotype': {'beta': 11, 'gamma': -1.2, 'sigma': -1.05},
     #                'genotype': {'beta': , 'gamma': , 'sigma': },
     #                'flu':      {'beta': , 'gamma': , 'sigma': }}
 
-    if args.clades[0] in dataset_clades.keys():
-        setattr(args, 'clades', dataset_clades[args.clades[0]])
-    assert len(args.clades) >= 2, "ERROR: clades must be either a dataset in ['serotype', 'genotype', 'all'] or a list of clade IDs"
+    # if args.clades[0] in dataset_clades.keys():
+    #     setattr(args, 'clades', dataset_clades[args.clades[0]])
+    # assert len(args.clades) >= 2, "ERROR: clades must be either a dataset in ['serotype', 'genotype', 'all'] or a list of clade IDs"
 
     parameter_grid = {}
     for param in ['beta', 'sigma', 'gamma']:
@@ -487,8 +480,18 @@ if __name__=="__main__":
 
     if parameter_grid != {}:
         model_performance = test_parameter_grid(parameter_grid, args)
+        setattr(args, 'plot', False)
+        setattr(args, 'save', False)
         plot_param_performance(model_performance, args)
         plot_profile_likelihoods(model_performance, args)
+
+        ml_fit = model_performance.ix[model_performance['r^2'].idxmax()]
+        setattr(args, 'beta', ml_fit['beta'])
+        setattr(args, 'gamma', ml_fit['gamma'])
+        setattr(args, 'sigma', ml_fit['sigma'])
+        setattr(args, 'save', True)
+        setattr(args, 'plot', True)
+        run_model(args)
 
     else:
         run_model(args)
