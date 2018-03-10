@@ -144,7 +144,7 @@ def predict_trajectory(cls, i, initial_timepoint):
     initial_frequency = cls.frequencies[i][initial_timepoint]
     initial_fitness = cls.fitness[i][initial_timepoint]
 
-    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt, cls.beta) for dt in dt_values ]
 
     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
@@ -468,6 +468,10 @@ if __name__=="__main__":
                       'genotype': ['2185', '2589', '2238', '2596', '1460', '1393', '1587', '1455', '975', '979', '1089', '33', '497', '117', '543', '4', '638'],
                       # 'antigenic': None,
                       'all': []}
+
+    # dataset_mle = {'serotype': {'beta': 11, 'gamma': -1.2, 'sigma': -1.05},
+    #                'genotype': {'beta': , 'gamma': , 'sigma': },
+    #                'flu':      {'beta': , 'gamma': , 'sigma': }}
 
     if args.clades[0] in dataset_clades.keys():
         setattr(args, 'clades', dataset_clades[args.clades[0]])
