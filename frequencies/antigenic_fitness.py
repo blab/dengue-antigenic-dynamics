@@ -388,11 +388,13 @@ def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2
         for tp, ax in zip(starting_timepoints, row):
             plot_trajectory(cls, tp, clade_set, ax)
         ax.legend()
-    plt.tight_layout()
+        plt.tight_layout()
     if cls.save:
         plt.savefig(cls.out_path+cls.name+'_trajectories.png', bbox_inches='tight', dpi=300)
     else:
         plt.show()
+    plt.clf()
+    plt.close()
 
 def plot_profile_likelihoods(model_performance, args):
     sns.set_palette('Set2', n_colors=10)
@@ -410,13 +412,15 @@ def plot_profile_likelihoods(model_performance, args):
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, ml_fit[p1], p2, ml_fit[p2]))
         ax.set_xlabel(param)
         ax.set_ylabel('R^2')
-    plt.tight_layout()
+        plt.tight_layout()
 
     # if args.save:
     plt.savefig(args.out_path+args.name+'_profile_likelihoods.png', bbox_inches='tight', dpi=300)
     # else:
     #     plt.show()
 
+    plt.clf()
+    plt.close()
 def plot_param_performance(model_performance, args, small_multiples_var='sigma', ):
     small_multiples_vals = pd.unique(model_performance[small_multiples_var])
     nplots = len(small_multiples_vals)
@@ -435,13 +439,15 @@ def plot_param_performance(model_performance, args, small_multiples_var='sigma',
         ax.set_ylabel(x_var)
         ax.set_xlabel(y_var)
 
-    plt.tight_layout()
+        plt.tight_layout()
 
     # if args.save:
     plt.savefig(args.out_path+args.name+'_param_performance.png', bbox_inches='tight', dpi=300)
     # else:
     #     plt.show()
 
+    plt.clf()
+    plt.close()
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
 
