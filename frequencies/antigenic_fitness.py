@@ -70,7 +70,7 @@ def sum_over_past_t(cls, i, timepoint_of_interest):
     t_to_sum = cls.timepoints[tp_idx - cls.tp_back : tp_idx] # previous timepoints to sum immunity over
 
     # proportion of titers acquired in each interval expected to remain by timepoint of interest
-    waning_over_time = [ waning(cls.gamma, t - timepoint_of_interest) for t in t_to_sum]
+    waning_over_time = [ waning(cls.gamma, timepoint_of_interest - t) for t in t_to_sum]
 
     # proportion of the population that acquired protection in each interval
     protection_over_time = [ sum_over_j(cls, i, t, p_remaining)
