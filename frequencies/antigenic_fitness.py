@@ -1,14 +1,11 @@
 import argparse
 import pandas as pd
 import numpy as np
-import baltic as bt
 from scipy import stats
 from random import choice
 from collections import defaultdict
-from pprint import pprint
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.optimize import minimize
 from math import ceil
 from itertools import product
 from copy import deepcopy
