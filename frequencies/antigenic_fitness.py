@@ -246,7 +246,7 @@ def run_model(args):
 
     actual, predicted = actual.values.flatten(), predicted.values.flatten()
     mask = (~np.isnan(actual)) & (~np.isnan(predicted))
-    fit = stats.linregress(actual[mask], predicted[mask])
+    fit = stats.spearmanr(actual[mask], predicted[mask])
 
     if antigenic_fitness.plot == True:
         print 'generating plots'
@@ -254,8 +254,8 @@ def run_model(args):
         plot_rolling_frequencies(antigenic_fitness)
         plot_growth_rates(antigenic_fitness)
         plot_trajectory_multiples(antigenic_fitness)
-    print '\n\n'
-    return fit[2]**2 #r^2 value
+    # print '\n\n'
+    return fit
 
 def test_parameter_grid(params, args):
     parameters = sorted(params.keys()) # [ 'beta', 'gamma', 'sigma' ]
