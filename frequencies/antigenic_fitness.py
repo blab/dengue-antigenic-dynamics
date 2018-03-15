@@ -186,7 +186,8 @@ class AntigenicFitness():
 
     def calculate_fitness(self):
         ''' fitness = 1.-population exposure'''
-        self.fitness = 1. - pd.DataFrame({i: population_exposure(self, i) for i in self.clades})
+        exposure = pd.DataFrame({i: population_exposure(self, i) for i in self.clades})
+        self.fitness = -1.*self.beta*exposure
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
 
