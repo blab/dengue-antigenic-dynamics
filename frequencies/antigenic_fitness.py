@@ -465,20 +465,12 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-    # dataset_mle = {'serotype': {'beta': 11, 'gamma': -1.2, 'sigma': -1.05},
-    #                'genotype': {'beta': , 'gamma': , 'sigma': },
-    #                'flu':      {'beta': , 'gamma': , 'sigma': }}
-
-    # if args.clades[0] in dataset_clades.keys():
-    #     setattr(args, 'clades', dataset_clades[args.clades[0]])
-    # assert len(args.clades) >= 2, "ERROR: clades must be either a dataset in ['serotype', 'genotype', 'all'] or a list of clade IDs"
-
     parameter_grid = {}
     for param in ['beta', 'sigma', 'gamma']:
         param_val = vars(args)[param]
-        if len(param_val) == 2:
+        if type(param_val) == list and len(param_val) == 2:
             parameter_grid[param] = np.linspace(param_val[0], param_val[1], args.n_param_vals)
-        else:
+        elif type(param_val)==list:
             setattr(args, param, param_val[0])
 
     if parameter_grid != {}:
