@@ -1,3 +1,5 @@
+import matplotlib as mpl
+mpl.use('Agg')
 import argparse
 import pandas as pd
 import numpy as np
@@ -256,7 +258,7 @@ def run_model(args):
         plot_growth_rates(antigenic_fitness)
         plot_trajectory_multiples(antigenic_fitness)
     # print '\n\n'
-    return fit
+    return fit[1]
 
 def test_parameter_grid(params, args):
     parameters = sorted(params.keys()) # [ 'beta', 'gamma', 'sigma' ]
