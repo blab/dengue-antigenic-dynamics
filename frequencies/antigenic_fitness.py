@@ -47,7 +47,7 @@ def sum_over_j(cls, i, timepoint, proportion_remaining):
         else:
             init_titers = cls.titers[tuple(sorted([i,j]))]
         remaining_titers = proportion_remaining * init_titers
-        probability_protected = max(cls.sigma*remaining_titers + 1., 0.)
+        probability_protected = max(-1.*cls.sigma*remaining_titers + 1., 0.)
         j_frequency = cls.frequencies[j][timepoint]
 
         frequency_weighted_protection += probability_protected*j_frequency
@@ -63,7 +63,7 @@ def sum_over_past_t(cls, i, timepoint_of_interest):
 
     def waning(gamma, n):
         ''' Assume immunity wanes linearly with slope gamma per year (n)'''
-        return max(gamma*n + 1., 0.)
+        return max(-1.*gamma*n + 1., 0.)
         # return max( np.exp(gamma*n), 0. )
 
     tp_idx = cls.timepoints.index(timepoint_of_interest) # index of timepoint of interest
@@ -458,9 +458,9 @@ if __name__=="__main__":
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=3)
-    args.add_argument('--gamma', nargs='*', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= -0.15)
-    args.add_argument('--sigma', nargs='*', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= -1.)
-    args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = 1. - beta*population_exposure', default= 2.)
+    args.add_argument('--gamma', nargs='*', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= 0.15)
+    args.add_argument('--sigma', nargs='*', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= 1.2)
+    args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = -1.*beta*population_exposure', default=1.)
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
     args.add_argument('--plot', help='make plots?', action='store_true')
     args.add_argument('--save', help='save csv and png files?', action='store_true')
