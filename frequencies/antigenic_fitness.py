@@ -73,7 +73,7 @@ def sum_over_past_t(cls, i, timepoint_of_interest):
     protection_over_time = [ sum_over_j(cls, i, t, p_remaining)
                           for (t, p_remaining) in zip(t_to_sum, waning_over_time) ]
 
-    accumulated_protection = sum(protection_over_time)/float(len(protection_over_time))
+    accumulated_protection = sum(protection_over_time)#/float(len(protection_over_time))
     return accumulated_protection
 
 def population_exposure(cls, i):
@@ -89,11 +89,11 @@ def population_exposure(cls, i):
 
     return population_exposure
 
-def predict_timepoint(initial_frequency, initial_fitness, years_forward, beta):
+def predict_timepoint(initial_frequency, initial_fitness, years_forward):
     # if initial_frequency < 0.1:
     #     return np.nan
     # else:
-    return initial_frequency*np.exp(beta*initial_fitness*years_forward)
+    return initial_frequency*np.exp(initial_fitness*years_forward)
 
 def clade_rolling_prediction(cls, i):
     '''
@@ -108,7 +108,7 @@ def clade_rolling_prediction(cls, i):
 
     predicted_frequencies = { pred_t : predict_timepoint(initial_frequencies[init_t],
                                                          initial_fitnesses[init_t],
-                                                         cls.years_forward, cls.beta)
+                                                         cls.years_forward)
                             for (init_t, pred_t)
                             in zip(initial_timepoints, predicted_timepoints) }
 
@@ -141,7 +141,7 @@ def predict_trajectory(cls, i, initial_timepoint):
     initial_frequency = cls.frequencies[i][initial_timepoint]
     initial_fitness = cls.fitness[i][initial_timepoint]
 
-    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt, cls.beta) for dt in dt_values ]
+    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
 
     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
