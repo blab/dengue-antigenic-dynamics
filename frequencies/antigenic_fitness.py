@@ -155,7 +155,7 @@ class AntigenicFitness():
 
         # actual (observed) frequencies
         self.frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
-            self.clades = self.frequencies.columns.values
+        self.clades = self.frequencies.columns.values
         self.frequencies = normalize_frequencies_by_timepoint(self.frequencies[self.clades]) # restrict to clades of interest, normalize
         self.frequencies = self.frequencies.loc[(self.frequencies.index >= self.date_range[0]) & (self.frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
         self.timepoints = self.frequencies.index.tolist()
