@@ -241,7 +241,9 @@ def run_model(args):
     print 'calculating growth rates'
     antigenic_fitness.calc_growth_rates()
 
-    actual, predicted = antigenic_fitness.actual_growth_rates, antigenic_fitness.predicted_growth_rates
+    actual, predicted = antigenic_fitness.frequencies, antigenic_fitness.predicted_rolling_frequencies
+
+    # actual, predicted = antigenic_fitness.actual_growth_rates, antigenic_fitness.predicted_growth_rates
     actual = actual.loc[actual.index.isin(predicted.index.values)]
 
     assert predicted.columns.tolist() == actual.columns.tolist()
@@ -249,7 +251,8 @@ def run_model(args):
 
     actual, predicted = actual.values.flatten(), predicted.values.flatten()
     mask = (~np.isnan(actual)) & (~np.isnan(predicted))
-    fit = stats.spearmanr(actual[mask], predicted[mask])
+    # fit = stats.spearmanr(actual[mask], predicted[mask])
+    abs_error = sum([abs(a - p) for (a,p) in zip(actual[mask], predicted[mask])]) / float(len(actual[mask]))
 
     if antigenic_fitness.plot == True:
         print 'generating plots'
@@ -257,8 +260,8 @@ def run_model(args):
         plot_rolling_frequencies(antigenic_fitness)
         plot_growth_rates(antigenic_fitness)
         plot_trajectory_multiples(antigenic_fitness)
-    # print '\n\n'
-    return fit[0]
+
+    return abs_error
 
 def test_parameter_grid(params, args):
     parameters = sorted(params.keys()) # [ 'beta', 'gamma', 'sigma' ]
@@ -274,7 +277,7 @@ def test_parameter_grid(params, args):
         model_performance[set_values]= run_model(test_args)
 
     model_performance = pd.Series(model_performance).reset_index() # tuple(param1_value, param2_value) -> pd.Series(index=(param1_value, param2_value)) -> pd.DataFrame()
-    model_performance.columns = sorted(params.keys())+['r^2']
+    model_performance.columns = sorted(params.keys())+['abs_error']
 
     return model_performance
 
@@ -399,19 +402,19 @@ def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2
 def plot_profile_likelihoods(model_performance, args):
     sns.set_palette('Set2', n_colors=10)
 
-    fit_params = [p for p in model_performance.columns.values if p != 'r^2']
+    fit_params = [p for p in model_performance.columns.values if p != 'abs_error']
 
-    ml_fit = model_performance.ix[model_performance['r^2'].idxmax()]
-    print 'MLE: ', ml_fit
+    best_fit = model_performance.ix[model_performance['abs_error'].idxmin()]
+    print 'Best fit: ', best_fit
     fig, axes = plt.subplots(ncols=len(fit_params), nrows=1, figsize=(3*len(fit_params), 3))
     for param,ax in zip(fit_params, axes):
         p1,p2 = [p for p in fit_params if p != param]
-        plot_vals = model_performance.loc[(model_performance[p1]==ml_fit[p1]) & (model_performance[p2]==ml_fit[p2])]
+        plot_vals = model_performance.loc[(model_performance[p1]==best_fit[p1]) & (model_performance[p2]==best_fit[p2])]
 
-        sns.regplot(param, 'r^2', data=plot_vals, fit_reg=False, ax=ax)
-        ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, ml_fit[p1], p2, ml_fit[p2]))
+        sns.regplot(param, 'abs_error', data=plot_vals, fit_reg=False, ax=ax)
+        ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
-        ax.set_ylabel('R^2')
+        ax.set_ylabel('abs error')
         plt.tight_layout()
 
     # if args.save:
@@ -428,13 +431,13 @@ def plot_param_performance(model_performance, args, small_multiples_var='sigma',
 
     fig, axes = plt.subplots(ncols=min(5, nplots), nrows=nrows, figsize=(3*5, 3*nrows))
 
-    x_var, y_var = sorted([v for v in model_performance.columns.values if v not in ['r^2', small_multiples_var]])
-    vmin, vmax = model_performance['r^2'].min(), model_performance['r^2'].max()
+    x_var, y_var = sorted([v for v in model_performance.columns.values if v not in ['abs_error', small_multiples_var]])
+    vmin, vmax = model_performance['abs_error'].min(), model_performance['abs_error'].max()
 
     for value, ax in zip(small_multiples_vals, axes.flatten()):
         plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
-        plot_values = plot_values.pivot(index=x_var, columns=y_var, values='r^2')
-        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'R^2'})
+        plot_values = plot_values.pivot(index=x_var, columns=y_var, values='abs_error')
+        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'abs error'})
         ax.set_title('%s = %f'%(small_multiples_var, value))
         ax.set_ylabel(x_var)
         ax.set_xlabel(y_var)
@@ -483,10 +486,10 @@ if __name__=="__main__":
         plot_param_performance(model_performance, args)
         plot_profile_likelihoods(model_performance, args)
 
-        ml_fit = model_performance.ix[model_performance['r^2'].idxmax()]
-        setattr(args, 'beta', ml_fit['beta'])
-        setattr(args, 'gamma', ml_fit['gamma'])
-        setattr(args, 'sigma', ml_fit['sigma'])
+        best_fit = model_performance.ix[model_performance['abs_error'].idxmax()]
+        setattr(args, 'beta', best_fit['beta'])
+        setattr(args, 'gamma', best_fit['gamma'])
+        setattr(args, 'sigma', best_fit['sigma'])
         setattr(args, 'save', True)
         setattr(args, 'plot', True)
         run_model(args)
