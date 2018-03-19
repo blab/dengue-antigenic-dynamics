@@ -371,7 +371,7 @@ def plot_growth_rates(cls):
     ax=sns.regplot(actual[mask], predicted[mask])
     ax.set_xlabel('Actual growth rate')#, X(t+%d)/X(t)'%years_forward)
     ax.set_ylabel('Predicted growth rate')#, X(t+%d)/X(t)'%years_forward)
-    ax.text(0,0.2,'r^2 = %.2f'%fit[2]**2, )
+    ax.text(0,0.2,'r^2 = %.2f'%fit[2]**2, transform=ax.transAxes)
     plt.tight_layout()
 
     if cls.save:
