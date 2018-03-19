@@ -97,6 +97,24 @@ def predict_timepoint(initial_frequency, initial_fitness, years_forward):
     # else:
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
+def information_gain(cls, starting_timepoint):
+    ''' How much better were our predictions than the null model for time t+N? '''
+    valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
+    m = float(len(valid_clades))
+
+    def entropy(cls, i, starting_timepoint, null):
+        ''' Relative / Kullback-Leibler entropy '''
+        actual_frequency = cls.frequencies[i][starting_timepoint + cls.years_forward]
+        if null == True:
+            predicted_frequency = cls.frequencies[i][starting_timepoint]
+        else:
+            predicted_frequency = cls.predicted_rolling_frequencies[i][starting_timepoint + cls.years_forward]
+        return actual_frequency * np.log(actual_frequency / predicted_frequency)
+
+    model_entropy = [ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ]
+    null_entropy =  [ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ]
+    return sum([ m*(-1.*Hmodel + Hnull) for (Hmodel, Hnull) in zip(model_entropy, null_entropy)])
+
 def clade_rolling_prediction(cls, i):
     '''
     For each timepoint t, predict the frequency of i based on
@@ -231,6 +249,12 @@ class AntigenicFitness():
                            for i in self.clades})
         self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
 
+    def calc_information_gain(self):
+        assert hasattr(self, 'predicted_rolling_frequencies')
+        initial_timepoints = self.timepoints[self.tp_back: -1*cls.tp_forward]
+        self.cumulative_information_gain = sum([information_gain(self, t) for t in initial_timepoints])
+        return self.cumulative_information_gain
+
 def run_model(args):
     antigenic_fitness = AntigenicFitness(args)
     if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
@@ -252,7 +276,9 @@ def run_model(args):
     actual, predicted = actual.values.flatten(), predicted.values.flatten()
     mask = (~np.isnan(actual)) & (~np.isnan(predicted))
     # fit = stats.spearmanr(actual[mask], predicted[mask])
-    abs_error = sum([abs(a - p) for (a,p) in zip(actual[mask], predicted[mask])]) / float(len(actual[mask]))
+    # abs_error = sum([abs(a - p) for (a,p) in zip(actual[mask], predicted[mask])]) / float(len(actual[mask]))
+
+    information_gain = antigenic_fitness.calc_information_gain()
 
     if antigenic_fitness.plot == True:
         print 'generating plots'
@@ -261,7 +287,7 @@ def run_model(args):
         plot_growth_rates(antigenic_fitness)
         plot_trajectory_multiples(antigenic_fitness)
 
-    return abs_error
+    return information_gain
 
 def test_parameter_grid(params, args):
     parameters = sorted(params.keys()) # [ 'beta', 'gamma', 'sigma' ]
@@ -277,14 +303,14 @@ def test_parameter_grid(params, args):
         model_performance[set_values]= run_model(test_args)
 
     model_performance = pd.Series(model_performance).reset_index() # tuple(param1_value, param2_value) -> pd.Series(index=(param1_value, param2_value)) -> pd.DataFrame()
-    model_performance.columns = sorted(params.keys())+['abs_error']
+    model_performance.columns = sorted(params.keys())+['info_gain']
 
     return model_performance
 
 def plot_fitness_v_frequency(cls):
     sns.set_palette('tab20', n_colors=20)
 
-    fig, axes = plt.subplots(2,1,figsize=(8,6))
+    fig, axes = plt.subplots(2,1,figsize=(8,6), sharex=True)
 
     fitness=cls.fitness
     frequencies = cls.frequencies
@@ -307,7 +333,7 @@ def plot_fitness_v_frequency(cls):
 def plot_rolling_frequencies(cls):
     sns.set_palette('tab20', n_colors=20)
 
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12,8))
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12,8), sharex=True)
     for clade, predicted_freqs in cls.predicted_rolling_frequencies.iteritems():
         date_min, date_max = predicted_freqs.index.min(), predicted_freqs.index.max()
         axes[0].plot(predicted_freqs.index.values,predicted_freqs.values, linestyle='--', label='Predicted %s frequencies'%clade)
@@ -360,7 +386,7 @@ def plot_trajectory(cls, initial_timepoint, clades, ax):
     colors = { clade: cmap[i] for i, clade in enumerate(clades)}
 
     if ax == None:
-        fig, ax = plt.subplots(1,1,figsize=(12,4))
+        fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
     try:
         predicted_trajectory = cls.trajectories[initial_timepoint]
     except KeyError:
@@ -402,16 +428,16 @@ def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2
 def plot_profile_likelihoods(model_performance, args):
     sns.set_palette('Set2', n_colors=10)
 
-    fit_params = [p for p in model_performance.columns.values if p != 'abs_error']
+    fit_params = [p for p in model_performance.columns.values if p != 'info_gain']
 
-    best_fit = model_performance.ix[model_performance['abs_error'].idxmin()]
+    best_fit = model_performance.ix[model_performance['info_gain'].idxmax()]
     print 'Best fit: ', best_fit
     fig, axes = plt.subplots(ncols=len(fit_params), nrows=1, figsize=(3*len(fit_params), 3))
     for param,ax in zip(fit_params, axes):
         p1,p2 = [p for p in fit_params if p != param]
         plot_vals = model_performance.loc[(model_performance[p1]==best_fit[p1]) & (model_performance[p2]==best_fit[p2])]
 
-        sns.regplot(param, 'abs_error', data=plot_vals, fit_reg=False, ax=ax)
+        sns.regplot(param, 'info_gain', data=plot_vals, fit_reg=False, ax=ax)
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
         ax.set_ylabel('abs error')
@@ -431,12 +457,12 @@ def plot_param_performance(model_performance, args, small_multiples_var='sigma',
 
     fig, axes = plt.subplots(ncols=min(5, nplots), nrows=nrows, figsize=(3*5, 3*nrows))
 
-    x_var, y_var = sorted([v for v in model_performance.columns.values if v not in ['abs_error', small_multiples_var]])
-    vmin, vmax = model_performance['abs_error'].min(), model_performance['abs_error'].max()
+    x_var, y_var = sorted([v for v in model_performance.columns.values if v not in ['info_gain', small_multiples_var]])
+    vmin, vmax = model_performance['info_gain'].min(), model_performance['info_gain'].max()
 
     for value, ax in zip(small_multiples_vals, axes.flatten()):
         plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
-        plot_values = plot_values.pivot(index=x_var, columns=y_var, values='abs_error')
+        plot_values = plot_values.pivot(index=x_var, columns=y_var, values='info_gain')
         sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'abs error'})
         ax.set_title('%s = %f'%(small_multiples_var, value))
         ax.set_ylabel(x_var)
@@ -486,7 +512,7 @@ if __name__=="__main__":
         plot_param_performance(model_performance, args)
         plot_profile_likelihoods(model_performance, args)
 
-        best_fit = model_performance.ix[model_performance['abs_error'].idxmax()]
+        best_fit = model_performance.ix[model_performance['info_gain'].idxmax()]
         setattr(args, 'beta', best_fit['beta'])
         setattr(args, 'gamma', best_fit['gamma'])
         setattr(args, 'sigma', best_fit['sigma'])
