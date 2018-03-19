@@ -251,7 +251,7 @@ class AntigenicFitness():
 
     def calc_information_gain(self):
         assert hasattr(self, 'predicted_rolling_frequencies')
-        initial_timepoints = self.timepoints[self.tp_back: -1*cls.tp_forward]
+        initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
         self.cumulative_information_gain = sum([information_gain(self, t) for t in initial_timepoints])
         return self.cumulative_information_gain
 
@@ -440,7 +440,7 @@ def plot_profile_likelihoods(model_performance, args):
         sns.regplot(param, 'info_gain', data=plot_vals, fit_reg=False, ax=ax)
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
-        ax.set_ylabel('abs error')
+        ax.set_ylabel('Information Gain")
         plt.tight_layout()
 
     # if args.save:
@@ -463,7 +463,7 @@ def plot_param_performance(model_performance, args, small_multiples_var='sigma',
     for value, ax in zip(small_multiples_vals, axes.flatten()):
         plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
         plot_values = plot_values.pivot(index=x_var, columns=y_var, values='info_gain')
-        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'abs error'})
+        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'Info. Gain'})
         ax.set_title('%s = %f'%(small_multiples_var, value))
         ax.set_ylabel(x_var)
         ax.set_xlabel(y_var)
