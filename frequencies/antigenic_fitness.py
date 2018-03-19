@@ -440,7 +440,7 @@ def plot_profile_likelihoods(model_performance, args):
         sns.regplot(param, 'info_gain', data=plot_vals, fit_reg=False, ax=ax)
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
-        ax.set_ylabel('Information Gain")
+        ax.set_ylabel('Information Gain')
         plt.tight_layout()
 
     # if args.save:
