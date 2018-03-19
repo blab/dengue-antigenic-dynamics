@@ -14,7 +14,7 @@ for n in N:
 			titer_path = './%s_Dij.csv'%antigenic_resolution
 			out_path = './%s/%s/'%(region, clade_resolution)
 			name = '%s_%s_%s_N%d'%(region, clade_resolution, antigenic_resolution, n)
-			cmd = 'python ./antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back %d --years_forward 1 --beta 0 2 --gamma 0 2 --sigma 0 2 --n_param_vals 20'%(frequency_path, titer_path, out_path, name, n)
+			cmd = 'python ./antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back %d --years_forward 1 --beta 0 5 --gamma 0 5 --sigma 0 5 --n_param_vals 10'%(frequency_path, titer_path, out_path, name, n)
 			print cmd
 			os.system("sbatch --wrap='%s'"%cmd)
 
