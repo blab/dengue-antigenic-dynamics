@@ -11,6 +11,7 @@ import seaborn as sns
 from math import ceil
 from itertools import product
 from copy import deepcopy
+from pprint import pprint
 
 def normalize_frequencies_by_timepoint(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
@@ -97,24 +98,6 @@ def predict_timepoint(initial_frequency, initial_fitness, years_forward):
     # else:
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
-def information_gain(cls, starting_timepoint):
-    ''' How much better were our predictions than the null model for time t+N? '''
-    valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
-    m = float(len(valid_clades))
-
-    def entropy(cls, i, starting_timepoint, null):
-        ''' Relative / Kullback-Leibler entropy '''
-        actual_frequency = cls.frequencies[i][starting_timepoint + cls.years_forward]
-        if null == True:
-            predicted_frequency = cls.frequencies[i][starting_timepoint]
-        else:
-            predicted_frequency = cls.predicted_rolling_frequencies[i][starting_timepoint + cls.years_forward]
-        return actual_frequency * np.log(actual_frequency / predicted_frequency)
-
-    model_entropy = [ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ]
-    null_entropy =  [ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ]
-    return sum([ m*(-1.*Hmodel + Hnull) for (Hmodel, Hnull) in zip(model_entropy, null_entropy)])
-
 def clade_rolling_prediction(cls, i):
     '''
     For each timepoint t, predict the frequency of i based on
@@ -164,6 +147,69 @@ def predict_trajectory(cls, i, initial_timepoint):
     predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
 
     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
+
+def calc_information_gain(cls):
+    ''' How much better were our predictions than the null model for time t+N? '''
+
+    def entropy(cls, i, starting_timepoint, null):
+        ''' Relative / Kullback-Leibler entropy '''
+        actual_frequency = cls.frequencies[i][starting_timepoint + cls.years_forward]
+        if null == True:
+            predicted_frequency = cls.frequencies[i][starting_timepoint]
+        else:
+            predicted_frequency = cls.predicted_rolling_frequencies[i][starting_timepoint + cls.years_forward]
+        return actual_frequency * np.log2(actual_frequency / predicted_frequency)
+
+    information_gain = 0.
+    for starting_timepoint in cls.timepoints[cls.tp_back: -1*cls.tp_forward]:
+        valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
+        m = float(len(valid_clades))
+        model_entropy = [ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ]
+        null_entropy =  [ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ]
+        information_gain += sum([ m*(-1.*Hmodel + Hnull) for (Hmodel, Hnull) in zip(model_entropy, null_entropy)])
+    return information_gain
+
+def calc_accuracy(cls):
+
+    def clade_accuracy(i):
+        mask = (~np.isnan(cls.actual_growth_rates[i]) & (~np.isnan(cls.predicted_growth_rates[i])))
+        actual, predicted = cls.actual_growth_rates[i][mask], cls.predicted_growth_rates[i][mask]
+
+        correct_predictions = 0.
+        for (a,p) in zip(actual, predicted):
+            if (a >= 1. and p>=1.) or (a < 1. and p < 1.):
+                correct_predictions += 1.
+        return {'n_correct': correct_predictions, 'n_total': float(len(actual))}
+
+    n_correct = 0.
+    n_total = 0.
+    for i in cls.clades:
+        accuracy = clade_accuracy(i)
+        n_correct += accuracy['n_correct']
+        n_total += accuracy['n_total']
+    return n_correct / n_total
+
+def calc_model_performance(cls, metric=None):
+
+    def remove_nan(actual, predicted):
+        actual = actual.loc[actual.index.isin(predicted.index.values)]
+        assert predicted.columns.tolist() == actual.columns.tolist()
+        assert actual.index.tolist() == predicted.index.tolist()
+        actual, predicted = actual.values.flatten(), predicted.values.flatten()
+        mask = (~np.isnan(actual)) & (~np.isnan(predicted))
+        return actual[mask], predicted[mask]
+
+    actual_freq, predicted_freq = remove_nan(cls.frequencies, cls.predicted_rolling_frequencies)
+    actual_growth, predicted_growth = remove_nan(cls.actual_growth_rates, cls.predicted_growth_rates)
+
+    performance = {
+    'pearson_r2': stats.linregress(actual_growth, predicted_growth)[2]**2,
+    'spearman_r': stats.spearmanr(actual_growth, predicted_growth)[0],
+    'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(actual_freq)),
+    'information_gain': calc_information_gain(cls),
+    'accuracy': calc_accuracy(cls)}
+
+    return performance
 
 class AntigenicFitness():
     def __init__(self, args):
@@ -248,64 +294,6 @@ class AntigenicFitness():
         all_trajectories = pd.DataFrame({ i : predict_trajectory(self, i, initial_timepoint)
                            for i in self.clades})
         self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
-
-    def calc_information_gain(self):
-        assert hasattr(self, 'predicted_rolling_frequencies')
-        initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
-        self.cumulative_information_gain = sum([information_gain(self, t) for t in initial_timepoints])
-        return self.cumulative_information_gain
-
-def run_model(args):
-    antigenic_fitness = AntigenicFitness(args)
-    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-        print 'calculating fitness'
-        antigenic_fitness.calculate_fitness()
-    print 'predicting frequencies'
-    antigenic_fitness.predict_rolling_frequencies()
-    print 'calculating growth rates'
-    antigenic_fitness.calc_growth_rates()
-
-    actual, predicted = antigenic_fitness.frequencies, antigenic_fitness.predicted_rolling_frequencies
-
-    # actual, predicted = antigenic_fitness.actual_growth_rates, antigenic_fitness.predicted_growth_rates
-    actual = actual.loc[actual.index.isin(predicted.index.values)]
-
-    assert predicted.columns.tolist() == actual.columns.tolist()
-    assert actual.index.tolist() == predicted.index.tolist()
-
-    actual, predicted = actual.values.flatten(), predicted.values.flatten()
-    mask = (~np.isnan(actual)) & (~np.isnan(predicted))
-    # fit = stats.spearmanr(actual[mask], predicted[mask])
-    # abs_error = sum([abs(a - p) for (a,p) in zip(actual[mask], predicted[mask])]) / float(len(actual[mask]))
-
-    information_gain = antigenic_fitness.calc_information_gain()
-
-    if antigenic_fitness.plot == True:
-        print 'generating plots'
-        plot_fitness_v_frequency(antigenic_fitness)
-        plot_rolling_frequencies(antigenic_fitness)
-        plot_growth_rates(antigenic_fitness)
-        plot_trajectory_multiples(antigenic_fitness)
-
-    return information_gain
-
-def test_parameter_grid(params, args):
-    parameters = sorted(params.keys()) # [ 'beta', 'gamma', 'sigma' ]
-    value_ranges = [params[p] for p in parameters] #[ [betamin, ... betamax], [gammamin, ..., gammamax], etc.]
-    model_parameterizations = product(*value_ranges) # [(b0, g0, s0), (b0, g0, s1), ....]
-
-    model_performance = {}
-    for set_values in model_parameterizations:
-        test_args = deepcopy(args)
-        for param, value in zip(parameters, set_values):
-            setattr(test_args, param, value)
-        print 'Running model with parameters:\n', zip(parameters, set_values), '\n'
-        model_performance[set_values]= run_model(test_args)
-
-    model_performance = pd.Series(model_performance).reset_index() # tuple(param1_value, param2_value) -> pd.Series(index=(param1_value, param2_value)) -> pd.DataFrame()
-    model_performance.columns = sorted(params.keys())+['info_gain']
-
-    return model_performance
 
 def plot_fitness_v_frequency(cls):
     sns.set_palette('tab20', n_colors=20)
@@ -425,58 +413,126 @@ def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2
     plt.clf()
     plt.close()
 
-def plot_profile_likelihoods(model_performance, args):
-    sns.set_palette('Set2', n_colors=10)
+def plot_profile_likelihoods(model_performance, metric, args):
+    fit_params = ['beta', 'gamma', 'sigma']
 
-    fit_params = [p for p in model_performance.columns.values if p != 'info_gain']
+    if metric != 'abs_error':
+        best_fit = model_performance.ix[model_performance[metric].idxmax()]
+    else:
+        best_fit = model_performance.ix[model_performance[metric].idxmin()]
 
-    best_fit = model_performance.ix[model_performance['info_gain'].idxmax()]
     print 'Best fit: ', best_fit
     fig, axes = plt.subplots(ncols=len(fit_params), nrows=1, figsize=(3*len(fit_params), 3))
     for param,ax in zip(fit_params, axes):
         p1,p2 = [p for p in fit_params if p != param]
         plot_vals = model_performance.loc[(model_performance[p1]==best_fit[p1]) & (model_performance[p2]==best_fit[p2])]
 
-        sns.regplot(param, 'info_gain', data=plot_vals, fit_reg=False, ax=ax)
+        sns.regplot(param, metric, data=plot_vals, fit_reg=False, ax=ax)
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
-        ax.set_ylabel('Information Gain')
+        ax.set_ylabel('%s'%metric)
         plt.tight_layout()
 
-    # if args.save:
-    plt.savefig(args.out_path+args.name+'_profile_likelihoods.png', bbox_inches='tight', dpi=300)
-    # else:
-    #     plt.show()
+    if args.save:
+        plt.savefig(args.out_path+args.name+'_profile_likelihoods_%s.png'%metric, bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
 
     plt.clf()
     plt.close()
-def plot_param_performance(model_performance, args, small_multiples_var='sigma', ):
+
+def plot_model_performance(model_performance, metric, args, small_multiples_var='sigma', ):
     small_multiples_vals = pd.unique(model_performance[small_multiples_var])
     nplots = len(small_multiples_vals)
     nrows = max(int(ceil(nplots/5)), 1)
 
     fig, axes = plt.subplots(ncols=min(5, nplots), nrows=nrows, figsize=(3*5, 3*nrows))
 
-    x_var, y_var = sorted([v for v in model_performance.columns.values if v not in ['info_gain', small_multiples_var]])
-    vmin, vmax = model_performance['info_gain'].min(), model_performance['info_gain'].max()
+    fit_params = ['beta', 'gamma', 'sigma']
+    x_var, y_var = sorted([v for v in fit_params if v not in [metric, small_multiples_var]])
+    vmin, vmax = model_performance[metric].min(), model_performance[metric].max()
 
     for value, ax in zip(small_multiples_vals, axes.flatten()):
         plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
-        plot_values = plot_values.pivot(index=x_var, columns=y_var, values='info_gain')
-        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': 'Info. Gain'})
+        plot_values = plot_values.pivot(index=x_var, columns=y_var, values=metric)
+        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': '%s'%metric})
         ax.set_title('%s = %f'%(small_multiples_var, value))
         ax.set_ylabel(x_var)
         ax.set_xlabel(y_var)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
-    # if args.save:
-    plt.savefig(args.out_path+args.name+'_param_performance.png', bbox_inches='tight', dpi=300)
-    # else:
-    #     plt.show()
+    if args.save:
+        plt.savefig(args.out_path+args.name+'_param_performance_%s.png'%metric, bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
 
     plt.clf()
     plt.close()
+
+def run_model(args):
+    antigenic_fitness = AntigenicFitness(args)
+    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
+        print 'calculating fitness'
+        antigenic_fitness.calculate_fitness()
+    print 'predicting frequencies'
+    antigenic_fitness.predict_rolling_frequencies()
+    print 'calculating growth rates'
+    antigenic_fitness.calc_growth_rates()
+
+    if antigenic_fitness.plot == True:
+        print 'generating plots'
+        plot_fitness_v_frequency(antigenic_fitness)
+        plot_rolling_frequencies(antigenic_fitness)
+        plot_growth_rates(antigenic_fitness)
+        plot_trajectory_multiples(antigenic_fitness)
+
+    return calc_model_performance(antigenic_fitness, args.metric)
+
+def test_parameter_grid(args):
+
+    def get_range(parameter):
+        p = vars(args)[parameter]
+        if type(p) == list and len(p) == 2:
+            return np.linspace(p[0], p[1], args.n_param_vals)
+        elif type(p) == list:
+            return p[0]
+        else:
+            return p
+
+    fit_params = ['beta', 'gamma', 'sigma']
+    def run_with_parameterization(parameterization):
+        args_copy = deepcopy(args)
+        setattr(args_copy, 'save', False)
+        setattr(args_copy, 'plot', False)
+        for attr, val in zip(fit_params, parameterization):
+            setattr(args_copy, attr, val)
+        print 'Running model with parameters:\n', zip(fit_params, parameterization), '\n'
+
+        results = run_model(args_copy)
+        results.update({k: v for k,v in zip(fit_params, parameterization)})
+        print results, '\n\n'
+        return results
+
+    beta_vals, gamma_vals, sigma_vals = get_range('beta'), get_range('gamma'), get_range('sigma')
+    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals) # [(b0, g0, s0), (b0, g0, s1), ....]
+
+    model_performance = pd.DataFrame([ run_with_parameterization(parameterization)
+                          for parameterization in model_parameterizations]).round(3)
+
+    if args.save:
+        model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
+
+    if args.plot:
+        metrics_to_plot = [args.metric] if args.metric else model_performance.columns.values
+        print metrics_to_plot
+        for metric in metrics_to_plot:
+            if metric not in fit_params:
+                plot_profile_likelihoods(model_performance, metric, args)
+                plot_model_performance(model_performance, metric, args)
+
+    return model_performance
+
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
 
@@ -491,34 +547,31 @@ if __name__=="__main__":
     args.add_argument('--sigma', nargs='*', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= 1.2)
     args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = -1.*beta*population_exposure', default=1.)
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
+    args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy'], default=None)
     args.add_argument('--plot', help='make plots?', action='store_true')
     args.add_argument('--save', help='save csv and png files?', action='store_true')
     args.add_argument('--name', type=str, help='analysis name')
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-    parameter_grid = {}
-    for param in ['beta', 'sigma', 'gamma']:
-        param_val = vars(args)[param]
-        if type(param_val) == list and len(param_val) == 2:
-            parameter_grid[param] = np.linspace(param_val[0], param_val[1], args.n_param_vals)
-        elif type(param_val)==list:
-            setattr(args, param, param_val[0])
 
-    if parameter_grid != {}:
-        model_performance = test_parameter_grid(parameter_grid, args)
-        setattr(args, 'plot', False)
-        setattr(args, 'save', False)
-        plot_param_performance(model_performance, args)
-        plot_profile_likelihoods(model_performance, args)
+    ## If given a range of parameters, test all combinations.
+    if any([ type(args.beta) == list and len(args.beta) == 2,
+             type(args.gamma) == list and len(args.gamma) == 2,
+             type(args.sigma) == list and len(args.sigma) == 2  ]):
 
-        best_fit = model_performance.ix[model_performance['info_gain'].idxmax()]
-        setattr(args, 'beta', best_fit['beta'])
-        setattr(args, 'gamma', best_fit['gamma'])
-        setattr(args, 'sigma', best_fit['sigma'])
-        setattr(args, 'save', True)
-        setattr(args, 'plot', True)
-        run_model(args)
+        model_performance = test_parameter_grid(args)
 
-    else:
-        run_model(args)
+        if args.metric: # If evaluation metric specified, use this to select the best fit and do a clean run of the model
+            if args.metric != 'abs_error':
+                best_fit = model_performance.ix[model_performance[args.metric].idxmax()]
+            else:
+                best_fit = model_performance.ix[model_performance[args.metric].idxmin()]
+            setattr(args, 'beta', best_fit['beta'])
+            setattr(args, 'gamma', best_fit['gamma'])
+            setattr(args, 'sigma', best_fit['sigma'])
+            run_model(args)
+
+    else: # If given specific values for paramters, just run the model and print performance metrics.
+        model_performance = run_model(args)
+        print(model_performance)
