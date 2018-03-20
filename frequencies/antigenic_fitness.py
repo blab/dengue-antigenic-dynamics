@@ -150,8 +150,6 @@ def predict_trajectory(cls, i, initial_timepoint):
 
 def calc_information_gain(cls):
     ''' How much better were our predictions than the null model for time t+N? '''
-    valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
-    m = float(len(valid_clades))
 
     def entropy(cls, i, starting_timepoint, null):
         ''' Relative / Kullback-Leibler entropy '''
@@ -164,6 +162,8 @@ def calc_information_gain(cls):
 
     information_gain = 0.
     for starting_timepoint in cls.timepoints[cls.tp_back: -1*cls.tp_forward]:
+        valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
+        m = float(len(valid_clades))
         model_entropy = [ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ]
         null_entropy =  [ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ]
         information_gain += sum([ m*(-1.*Hmodel + Hnull) for (Hmodel, Hnull) in zip(model_entropy, null_entropy)])
@@ -175,13 +175,16 @@ def calc_accuracy(cls):
         mask = (~np.isnan(cls.actual_growth_rates[i]) & (~np.isnan(cls.predicted_growth_rates[i])))
         actual, predicted = cls.actual_growth_rates[i][mask], cls.predicted_growth_rates[i][mask]
 
-        correct_predictions = sum([1. for (a,p) in zip(actual, predicted) if (a >= 1. and p>=1.) or (a < 1. and p < 1.) else 0.])
-        return {'n_correct': correct_predictions, 'n_total': float(len(actual))
+        correct_predictions = 0.
+        for (a,p) in zip(actual, predicted):
+            if (a >= 1. and p>=1.) or (a < 1. and p < 1.):
+                correct_predictions += 1.
+        return {'n_correct': correct_predictions, 'n_total': float(len(actual))}
 
     n_correct = 0.
     n_total = 0.
     for i in cls.clades:
-        accuracy = clade_accuracy[i]
+        accuracy = clade_accuracy(i)
         n_correct += accuracy['n_correct']
         n_total += accuracy['n_total']
     return n_correct / n_total
@@ -291,63 +294,6 @@ class AntigenicFitness():
         all_trajectories = pd.DataFrame({ i : predict_trajectory(self, i, initial_timepoint)
                            for i in self.clades})
         self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
-
-def run_model(args):
-    antigenic_fitness = AntigenicFitness(args)
-    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-        print 'calculating fitness'
-        antigenic_fitness.calculate_fitness()
-    print 'predicting frequencies'
-    antigenic_fitness.predict_rolling_frequencies()
-    print 'calculating growth rates'
-    antigenic_fitness.calc_growth_rates()
-
-    if antigenic_fitness.plot == True:
-        print 'generating plots'
-        plot_fitness_v_frequency(antigenic_fitness)
-        plot_rolling_frequencies(antigenic_fitness)
-        plot_growth_rates(antigenic_fitness)
-        plot_trajectory_multiples(antigenic_fitness)
-
-    return calc_model_performance(antigenic_fitness, args.metric)
-
-def test_parameter_grid(args):
-
-    def get_range(parameter):
-        p = vars(args)[parameter]
-        if type(p) == list and len(p) == 2:
-            return np.linspace(p[0], p[1], args.n_param_vals)
-        elif type(p) == list:
-            return p[0]
-        else:
-            return p
-
-    def run_with_parameterization(parameterization):
-        args_copy = deepcopy(args)
-        set_attr(args_copy, 'save', False)
-        set_attr(args_copy, 'plot', False)
-        setattr(args_copy, 'beta', parameterization[0])
-        setattr(args_copy, 'gamma', parameterization[1])
-        setattr(args_copy, 'sigma', parameterization[2])
-        print 'Running model with parameters:\n', zip(['beta', 'gamma', 'sigma'], parameterization), '\n'
-        results = run_model(args_copy)
-        print results, '\n\n'
-        return results
-
-    beta_vals, gamma_vals, sigma_vals = get_range('beta'), get_range('gamma'), get_range('sigma')
-    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals) # [(b0, g0, s0), (b0, g0, s1), ....]
-
-    model_performance = pd.DataFrame([ run_with_parameterization(parameterization)
-                          for parameterization in model_parameterizations])
-
-    if args.save:
-        model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
-
-    if args.metric and args.plot:
-        plot_profile_likelihoods(model_performance, args)
-        plot_model_performance(model_performance, args)
-
-    return model_performance
 
 def plot_fitness_v_frequency(cls):
     sns.set_palette('tab20', n_colors=20)
@@ -467,13 +413,13 @@ def plot_trajectory_multiples(cls, starting_timepoints=None, n_clades_per_plot=2
     plt.clf()
     plt.close()
 
-def plot_profile_likelihoods(model_performance, args):
+def plot_profile_likelihoods(model_performance, metric, args):
     fit_params = ['beta', 'gamma', 'sigma']
 
-    if args.metric != 'abs_error':
-        best_fit = model_performance.ix[model_performance[args.metric].idxmax()]
+    if metric != 'abs_error':
+        best_fit = model_performance.ix[model_performance[metric].idxmax()]
     else:
-        best_fit = model_performance.ix[model_performance[args.metric].idxmin()]
+        best_fit = model_performance.ix[model_performance[metric].idxmin()]
 
     print 'Best fit: ', best_fit
     fig, axes = plt.subplots(ncols=len(fit_params), nrows=1, figsize=(3*len(fit_params), 3))
@@ -481,18 +427,21 @@ def plot_profile_likelihoods(model_performance, args):
         p1,p2 = [p for p in fit_params if p != param]
         plot_vals = model_performance.loc[(model_performance[p1]==best_fit[p1]) & (model_performance[p2]==best_fit[p2])]
 
-        sns.regplot(param, args.metric, data=plot_vals, fit_reg=False, ax=ax)
+        sns.regplot(param, metric, data=plot_vals, fit_reg=False, ax=ax)
         ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
         ax.set_xlabel(param)
-        ax.set_ylabel('%s'%args.metric)
+        ax.set_ylabel('%s'%metric)
         plt.tight_layout()
 
-    plt.savefig(args.out_path+args.name+'_profile_likelihoods.png', bbox_inches='tight', dpi=300)
+    if args.save:
+        plt.savefig(args.out_path+args.name+'_profile_likelihoods_%s.png'%metric, bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
 
     plt.clf()
     plt.close()
 
-def plot_model_performance(model_performance, args, small_multiples_var='sigma', ):
+def plot_model_performance(model_performance, metric, args, small_multiples_var='sigma', ):
     small_multiples_vals = pd.unique(model_performance[small_multiples_var])
     nplots = len(small_multiples_vals)
     nrows = max(int(ceil(nplots/5)), 1)
@@ -500,22 +449,89 @@ def plot_model_performance(model_performance, args, small_multiples_var='sigma',
     fig, axes = plt.subplots(ncols=min(5, nplots), nrows=nrows, figsize=(3*5, 3*nrows))
 
     fit_params = ['beta', 'gamma', 'sigma']
-    x_var, y_var = sorted([v for v in fit_params if v not in [args.metric, small_multiples_var]])
-    vmin, vmax = model_performance[args.metric].min(), model_performance[args.metric].max()
+    x_var, y_var = sorted([v for v in fit_params if v not in [metric, small_multiples_var]])
+    vmin, vmax = model_performance[metric].min(), model_performance[metric].max()
 
     for value, ax in zip(small_multiples_vals, axes.flatten()):
         plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
-        plot_values = plot_values.pivot(index=x_var, columns=y_var, values=args.metric)
-        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': '%s'%args.metric})
+        plot_values = plot_values.pivot(index=x_var, columns=y_var, values=metric)
+        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': '%s'%metric})
         ax.set_title('%s = %f'%(small_multiples_var, value))
         ax.set_ylabel(x_var)
         ax.set_xlabel(y_var)
 
     plt.tight_layout()
-    plt.savefig(args.out_path+args.name+'_param_performance.png', bbox_inches='tight', dpi=300)
+
+    if args.save:
+        plt.savefig(args.out_path+args.name+'_param_performance_%s.png'%metric, bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
 
     plt.clf()
     plt.close()
+
+def run_model(args):
+    antigenic_fitness = AntigenicFitness(args)
+    if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
+        print 'calculating fitness'
+        antigenic_fitness.calculate_fitness()
+    print 'predicting frequencies'
+    antigenic_fitness.predict_rolling_frequencies()
+    print 'calculating growth rates'
+    antigenic_fitness.calc_growth_rates()
+
+    if antigenic_fitness.plot == True:
+        print 'generating plots'
+        plot_fitness_v_frequency(antigenic_fitness)
+        plot_rolling_frequencies(antigenic_fitness)
+        plot_growth_rates(antigenic_fitness)
+        plot_trajectory_multiples(antigenic_fitness)
+
+    return calc_model_performance(antigenic_fitness, args.metric)
+
+def test_parameter_grid(args):
+
+    def get_range(parameter):
+        p = vars(args)[parameter]
+        if type(p) == list and len(p) == 2:
+            return np.linspace(p[0], p[1], args.n_param_vals)
+        elif type(p) == list:
+            return p[0]
+        else:
+            return p
+
+    fit_params = ['beta', 'gamma', 'sigma']
+    def run_with_parameterization(parameterization):
+        args_copy = deepcopy(args)
+        setattr(args_copy, 'save', False)
+        setattr(args_copy, 'plot', False)
+        for attr, val in zip(fit_params, parameterization):
+            setattr(args_copy, attr, val)
+        print 'Running model with parameters:\n', zip(fit_params, parameterization), '\n'
+
+        results = run_model(args_copy)
+        results.update({k: v for k,v in zip(fit_params, parameterization)})
+        print results, '\n\n'
+        return results
+
+    beta_vals, gamma_vals, sigma_vals = get_range('beta'), get_range('gamma'), get_range('sigma')
+    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals) # [(b0, g0, s0), (b0, g0, s1), ....]
+
+    model_performance = pd.DataFrame([ run_with_parameterization(parameterization)
+                          for parameterization in model_parameterizations]).round(3)
+
+    if args.save:
+        model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
+
+    if args.plot:
+        metrics_to_plot = [args.metric] if args.metric else model_performance.columns.values
+        print metrics_to_plot
+        for metric in metrics_to_plot:
+            if metric not in fit_params:
+                plot_profile_likelihoods(model_performance, metric, args)
+                plot_model_performance(model_performance, metric, args)
+
+    return model_performance
 
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
