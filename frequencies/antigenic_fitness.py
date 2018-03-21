@@ -31,66 +31,32 @@ def normalize_frequencies_by_timepoint(frequencies):
         normalized_frequencies = frequencies.apply(normalize, axis=1)
         return normalized_frequencies
 
-def sum_over_j(cls, i, timepoint, proportion_remaining):
-    '''
-    Look at all a single time point.
-    At that timepoint, look at all clades, j, that are cocirculating with i.
-    Pull the titers between i and j (D_ij) and adjust for waning immunity (proportion_remaining).
-    Use this to calculate a frequency-weighted estimate sum of the probability of protection against i given prior exposure to j.
-    '''
+def clade_population_immunity(cls, i):
+    ''' for clade i, estimate the relative population immunity at each timepoint based on
+    which clades (j) have circulated previously;
+    how antigenically distant i is from j;
+    and the relative frequency of j'''
 
-    frequency_weighted_protection = 0.
+    def sum_over_j(i, past_timepoint):
+        ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
+        antigenic_distance = [ cls.titers[tuple(sorted([i,j]))] if i != j else 0. for j in cls.clades] # Pull precomputed antigenic distance between i and j
+        probability_protected = [ max(-1.*cls.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
+        j_frequencies = [ cls.frequencies[j][past_timepoint] for j in cls.clades] # Pull relative frequency of each clade j at the timepoint of interest
+        return sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
 
-    for j in cls.clades:
-        if i==j:
-            init_titers = 0.
-        else:
-            init_titers = cls.titers[tuple(sorted([i,j]))]
-        remaining_titers = proportion_remaining * init_titers
-        probability_protected = max(-1.*cls.sigma*remaining_titers + 1., 0.)
-        j_frequency = cls.frequencies[j][timepoint]
+    def sum_over_past_t(i, current_timepoint):
+        ''' For each timepoint, look at the past `tp_back` number of timepoints and add up the relative immunity acquired in each interval.
+        Adjust for how long ago the population was exposed by assuming that immunity wanes linearly with slope gamma per year (n)'''
 
-        frequency_weighted_protection += probability_protected*j_frequency
-
-    return frequency_weighted_protection
-
-def sum_over_past_t(cls, i, timepoint_of_interest):
-    '''
-    For a given time point of interest, look at what the population has acquired protection to
-    over the past `tp_back` timepoints.
-    For each previous timepoint, sum_over_j to calculate the accumulated immunity.
-    '''
-
-    def waning(gamma, n):
-        ''' Assume immunity wanes linearly with slope gamma per year (n)'''
-        return max(-1.*gamma*n + 1., 0.)
-        # return max( np.exp(gamma*n), 0. )
-
-    tp_idx = cls.timepoints.index(timepoint_of_interest) # index of timepoint of interest
-    t_to_sum = cls.timepoints[tp_idx - cls.tp_back : tp_idx] # previous timepoints to sum immunity over
-
-    # proportion of titers acquired in each interval expected to remain by timepoint of interest
-    waning_over_time = [ waning(cls.gamma, timepoint_of_interest - t) for t in t_to_sum]
-
-    # proportion of the population that acquired protection in each interval
-    protection_over_time = [ sum_over_j(cls, i, t, p_remaining)
-                          for (t, p_remaining) in zip(t_to_sum, waning_over_time) ]
-
-    accumulated_protection = sum(protection_over_time)#/float(len(protection_over_time))
-    return accumulated_protection
-
-def population_exposure(cls, i):
-    ''' estimate the proportion of the population that is immune to i at the beginning of season t
-    '''
+        tp_idx = cls.timepoints.index(current_timepoint) # index of timepoint of interest
+        past_timepoints = cls.timepoints[tp_idx - cls.tp_back : tp_idx] # previous timepoints to sum immunity over
+        exposure = [ sum_over_j(i, t) for t in past_timepoints ] # total protection acquired at each past timepoint, t: sum over all clades for each past timepoint
+        waning = [max(-1.*cls.gamma*(current_timepoint - t) + 1., 0.) for t in past_timepoints] # proportion of protection originally acquired at time t expected to remain by the current_timepoint
+        return sum( [ w*e for (w,e) in zip(waning, exposure)] ) # sum up the total waning-adjusted population immunity as of the timepoint_of_interest
 
     valid_timepoints = cls.timepoints[cls.tp_back:]
-
-    # if antigenic_resolution == 'null':
-    #     return { t: 0. for t in valid_timepoints }
-    # else:
-    population_exposure = { t: sum_over_past_t(cls, i, t) for t in valid_timepoints}
-
-    return population_exposure
+    exposure = { t: sum_over_past_t(i, t) for t in valid_timepoints }
+    return exposure
 
 def predict_timepoint(initial_frequency, initial_fitness, years_forward):
     # if initial_frequency < 0.1:
@@ -133,7 +99,7 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
 
     return pd.Series(growth_rates, index=time_intervals)
 
-def predict_trajectory(cls, i, initial_timepoint):
+def predict_clade_trajectory(cls, i, initial_timepoint):
     '''
     Predict the frequency of clade i at each time interval between t and t+years_forward,
     based on its fitness and frequency at time t
@@ -252,7 +218,7 @@ class AntigenicFitness():
 
     def calculate_fitness(self):
         ''' fitness = 1.-population exposure'''
-        exposure = pd.DataFrame({i: population_exposure(self, i) for i in self.clades})
+        exposure = pd.DataFrame({i: clade_population_immunity(self, i) for i in self.clades})
         self.fitness = -1.*self.beta*exposure
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
@@ -291,7 +257,7 @@ class AntigenicFitness():
         Normalize these predicted frequencies so that they sum to 1. at each timepoint.
         '''
 
-        all_trajectories = pd.DataFrame({ i : predict_trajectory(self, i, initial_timepoint)
+        all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
                            for i in self.clades})
         self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
 
@@ -545,7 +511,7 @@ if __name__=="__main__":
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=3)
     args.add_argument('--gamma', nargs='*', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= 0.15)
     args.add_argument('--sigma', nargs='*', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= 1.2)
-    args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = -1.*beta*population_exposure', default=1.)
+    args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=1.)
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
     args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy'], default=None)
     args.add_argument('--plot', help='make plots?', action='store_true')
