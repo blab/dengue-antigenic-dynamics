@@ -503,8 +503,8 @@ if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
 
     args = argparse.ArgumentParser()
-    args.add_argument('--frequency_path', help='frequencies csv', default='../../data/titer-model/frequencies/southeast_asia_clade_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../../data/titer-model/frequencies/clade_dtiters.csv')
+    args.add_argument('--frequency_path', help='frequencies csv', default='southeast_asia/serotype/southeast_asia_serotype_frequencies.csv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='all_effects_Dij.csv')
     args.add_argument('--fitness_path', type=str, help='path to precomputed frequencies or \'null\'')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
