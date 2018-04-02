@@ -124,15 +124,15 @@ def calc_information_gain(cls):
             predicted_frequency = cls.frequencies[i][starting_timepoint]
         else:
             predicted_frequency = cls.predicted_rolling_frequencies[i][starting_timepoint + cls.years_forward]
-        return actual_frequency * np.log2(actual_frequency / predicted_frequency)
+        return actual_frequency * np.log(actual_frequency / predicted_frequency)
 
     information_gain = 0.
     for starting_timepoint in cls.timepoints[cls.tp_back: -1*cls.tp_forward]:
         valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
         m = float(len(valid_clades))
-        model_entropy = [ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ]
-        null_entropy =  [ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ]
-        information_gain += sum([ m*(-1.*Hmodel + Hnull) for (Hmodel, Hnull) in zip(model_entropy, null_entropy)])
+        model_entropy = sum([ entropy(cls, i, starting_timepoint, null=False) for i in valid_clades ])
+        null_entropy =  sum([ entropy(cls, i, starting_timepoint, null=True) for i in valid_clades ])
+        information_gain +=  m*(-1.*Hmodel + Hnull)
     return information_gain
 
 def calc_accuracy(cls):
