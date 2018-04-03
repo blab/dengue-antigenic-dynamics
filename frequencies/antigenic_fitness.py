@@ -132,10 +132,10 @@ def calc_information_gain(cls):
     information_gain = 0.
     for starting_timepoint in cls.timepoints[cls.tp_back: -1*cls.tp_forward]:
         valid_clades = [c for c in cls.clades if cls.frequencies[c][starting_timepoint] >= 0.1 ]
-        m = float(len(valid_clades))
+        effective_sample_size = float(len(valid_clades))
         model_kl_div = kl_divergence(cls, valid_clades, starting_timepoint, null=False)
         null_kl_div = kl_divergence(cls, valid_clades, starting_timepoint, null=True)
-        information_gain +=  m*(-1.*model_kl_div + null_kl_div)
+        information_gain +=  effective_sample_size * (-1.*model_kl_div + null_kl_div)
     return information_gain
 
 def calc_accuracy(cls):
