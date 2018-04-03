@@ -184,7 +184,10 @@ class AntigenicFitness():
     def __init__(self, args):
 
         for k,v in vars(args).items():
-            setattr(self, k, v) # copy over cmd line args
+            if k in ['beta', 'gamma', 'sigma'] and type(v) == list:
+                setattr(self, k, float(v[0])) # hack around the argparse type issue
+            else:
+                setattr(self, k, v) # copy over cmd line args
 
         # actual (observed) frequencies
         self.frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative frequencies)
@@ -463,11 +466,11 @@ def test_parameter_grid(args):
     def get_range(parameter):
         p = vars(args)[parameter]
         if type(p) == list and len(p) == 2:
-            return np.linspace(p[0], p[1], args.n_param_vals)
+            return np.linspace(float(p[0]), float(p[1]), args.n_param_vals)
         elif type(p) == list:
-            return p[0]
+            return [float(p[0])]
         else:
-            return p
+            return [float(p)]
 
     fit_params = ['beta', 'gamma', 'sigma']
     def run_with_parameterization(parameterization):
@@ -512,9 +515,9 @@ if __name__=="__main__":
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=3)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=3)
-    args.add_argument('--gamma', nargs='*', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= 0.15)
-    args.add_argument('--sigma', nargs='*', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= 1.2)
-    args.add_argument('--beta', nargs='*', type=float, help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=1.)
+    args.add_argument('--gamma', nargs='*', help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= [1.4])
+    args.add_argument('--sigma', nargs='*', help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= [1.8])
+    args.add_argument('--beta', nargs='*', help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=[2.1])
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
     args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy'], default=None)
     args.add_argument('--plot', help='make plots?', action='store_true')
@@ -524,11 +527,8 @@ if __name__=="__main__":
     args = args.parse_args()
 
 
-    ## If given a range of parameters, test all combinations.
-    if any([ type(args.beta) == list and len(args.beta) == 2,
-             type(args.gamma) == list and len(args.gamma) == 2,
-             type(args.sigma) == list and len(args.sigma) == 2  ]):
-
+    ## If given a range of parameters, test all combinations. 
+    if any([len(args.beta) > 1, len(args.gamma) > 1, len(args.sigma) > 1]):
         model_performance = test_parameter_grid(args)
 
         if args.metric: # If evaluation metric specified, use this to select the best fit and do a clean run of the model
@@ -539,8 +539,9 @@ if __name__=="__main__":
             setattr(args, 'beta', best_fit['beta'])
             setattr(args, 'gamma', best_fit['gamma'])
             setattr(args, 'sigma', best_fit['sigma'])
-            run_model(args)
+            best_performance = run_model(args)
+            print best_performance
 
-    else: # If given specific values for paramters, just run the model and print performance metrics.
+    else: # If given specific values for parameters, just run the model and print performance metrics.
         model_performance = run_model(args)
         print(model_performance)
