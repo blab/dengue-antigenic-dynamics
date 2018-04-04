@@ -126,7 +126,9 @@ def calc_information_gain(cls):
                 predicted_frequency = cls.frequencies[clade][starting_timepoint]
             else:
                 predicted_frequency = cls.predicted_rolling_frequencies[clade][starting_timepoint + cls.years_forward]
-            kl_div += actual_frequency * np.log(actual_frequency / predicted_frequency)
+            H = actual_frequency * np.log(actual_frequency / predicted_frequency)
+            if not np.isnan(H):
+                kl_div += H
         return kl_div
 
     information_gain = 0.
@@ -527,7 +529,7 @@ if __name__=="__main__":
     args = args.parse_args()
 
 
-    ## If given a range of parameters, test all combinations. 
+    ## If given a range of parameters, test all combinations.
     if any([len(args.beta) > 1, len(args.gamma) > 1, len(args.sigma) > 1]):
         model_performance = test_parameter_grid(args)
 
