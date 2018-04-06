@@ -83,6 +83,12 @@ def clade_rolling_prediction(cls, i):
 
     return predicted_frequencies
 
+def safe_ratio(num, denom):
+    if denom > 0:
+        return float(num) / (denom)
+    else:
+        return np.nan
+
 def clade_rolling_growth_rate(cls,i,predicted=True):
 
     initial_timepoints = cls.timepoints[cls.tp_back: -1*cls.tp_forward]
@@ -95,7 +101,7 @@ def clade_rolling_growth_rate(cls,i,predicted=True):
         final_frequencies = cls.frequencies[i][final_timepoints]
 
     time_intervals = [ str(f)+'/'+str(i) for (i, f) in zip(initial_timepoints, final_timepoints)]
-    growth_rates = [ f / i for (i,f) in zip(initial_frequencies, final_frequencies)]
+    growth_rates = [ safe_ratio(f, i) for (i,f) in zip(initial_frequencies, final_frequencies)]
 
     return pd.Series(growth_rates, index=time_intervals)
 
