@@ -13,4 +13,4 @@ for antigenic_resolution in antigenic_resolutions:
 		name = 'seasia_%s_%s'%(clade_resolution, antigenic_resolution)
 		cmd = 'python ./antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 1 --beta 0 3 --gamma 0 2 --sigma 0 3 --n_param_vals 12 --metric sse --plot --save'%(frequency_path, titer_path, out_path, name)
 		print cmd
-		# os.system("sbatch --wrap='%s'"%cmd)
+		os.system("sbatch --wrap='%s'"%cmd)
