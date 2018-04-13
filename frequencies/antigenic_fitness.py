@@ -564,7 +564,7 @@ if __name__=="__main__":
     args.add_argument('--sigma', nargs='*', help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= [1.8])
     args.add_argument('--beta', nargs='*', help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=[2.1])
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
-    args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy'], default=None)
+    args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy', 'delta_sse'], default=None)
     args.add_argument('--plot', help='make plots?', action='store_true')
     args.add_argument('--save', help='save csv and png files?', action='store_true')
     args.add_argument('--name', type=str, help='analysis name')
