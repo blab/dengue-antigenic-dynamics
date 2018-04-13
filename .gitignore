@@ -28,3 +28,11 @@ environment*
 *.blg
 *.out
 *.pdfsync
+
+manuscript/template\.tex
+
+*.gz
+
+*.fls
+
+*.fdb_latexmk
