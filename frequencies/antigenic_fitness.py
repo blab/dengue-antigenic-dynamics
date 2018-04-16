@@ -13,22 +13,23 @@ from itertools import product
 from copy import deepcopy
 from pprint import pprint
 
+
+def normalize_timepoint(row):
+    total = row.sum()
+    if np.isnan(total) or total == 0:
+        return row
+    else:
+        return row.map( lambda x: x / total)
+
 def normalize_frequencies_by_timepoint(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
-    def normalize(row):
-        total = row.sum()
-        if np.isnan(total) or total == 0:
-            return row
-        else:
-            return row.map( lambda x: x / total)
-
     if isinstance(frequencies, dict):
         frequencies = pd.DataFrame(frequencies)
-        normalized_frequencies = frequencies.apply(normalize, axis=1)
+        normalized_frequencies = frequencies.apply(normalize_timepoint, axis=1)
         return normalized_frequencies.to_dict()
 
     else:
-        normalized_frequencies = frequencies.apply(normalize, axis=1)
+        normalized_frequencies = frequencies.apply(normalize_timepoint, axis=1)
         return normalized_frequencies
 
 def timepoint_population_immunity(af, current_timepoint):
@@ -56,29 +57,24 @@ def timepoint_population_immunity(af, current_timepoint):
     exposure = { i: sum_over_past_t(i) for i in af.clades }
     return exposure
 
-def predict_timepoint(initial_frequency, initial_fitness, years_forward):
+def predict_frequency(initial_frequency, initial_fitness, years_forward):
     # if initial_frequency < 0.1:
     #     return np.nan
     # else:
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
-def clade_prediction(af, i):
+def timepoint_prediction(af, current_timepoint, final_timepoint):
     '''
-    For each timepoint t, predict the frequency of i based on
+    For each clade i, predict the frequency of i based on
     its fitness and initial frequency at time t-years_forward
     '''
-
-    initial_fitnesses = af.fitness[i]
-    initial_frequencies = af.actual_frequencies[i]
-    initial_timepoints = af.timepoints[af.tp_back: -1*af.tp_forward]
-    predicted_timepoints = af.timepoints[af.tp_forward+af.tp_back:]
-
-    predicted_frequencies = { pred_t : predict_timepoint(initial_frequencies[init_t],
-                                                         initial_fitnesses[init_t],
-                                                         af.years_forward)
-                            for (init_t, pred_t)
-                            in zip(initial_timepoints, predicted_timepoints) }
-
+    initial_fitnesses = af.fitness.loc[current_timepoint]
+    initial_frequencies = af.actual_frequencies.loc[current_timepoint]
+    predicted_frequencies = { i : predict_frequency(initial_frequencies[i],
+                                                    initial_fitnesses[i],
+                                                    final_timepoint - current_timepoint)
+                            for i in af.clades }
+    predicted_frequencies = normalize_timepoint(pd.Series(predicted_frequencies, name=final_timepoint))
     return predicted_frequencies
 
 def safe_ratio(num, denom):
@@ -103,20 +99,20 @@ def clade_growth_rate(af,i,predicted=True):
 
     return pd.Series(growth_rates, index=time_intervals)
 
-def predict_clade_trajectory(af, i, initial_timepoint):
-    '''
-    Predict the frequency of clade i at each time interval between t and t+years_forward,
-    based on its fitness and frequency at time t
-    '''
-
-    dt_values = [ (1./af.tppy)*dt for dt in range(1, af.tp_forward+1)] # fraction of year per timepoint * number of timepoints forward
-    predicted_timepoints = [ initial_timepoint + dt for dt in dt_values ]
-    initial_frequency = af.actual_frequencies[i][initial_timepoint]
-    initial_fitness = af.fitness[i][initial_timepoint]
-
-    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
-
-    return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
+# def predict_clade_trajectory(af, i, initial_timepoint):
+#     '''
+#     Predict the frequency of clade i at each time interval between t and t+years_forward,
+#     based on its fitness and frequency at time t
+#     '''
+#
+#     dt_values = [ (1./af.tppy)*dt for dt in range(1, af.tp_forward+1)] # fraction of year per timepoint * number of timepoints forward
+#     predicted_timepoints = [ initial_timepoint + dt for dt in dt_values ]
+#     initial_frequency = af.actual_frequencies[i][initial_timepoint]
+#     initial_fitness = af.fitness[i][initial_timepoint]
+#
+#     predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+#
+#     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
 def calc_information_gain(af):
     ''' How much better were our predictions than the null model for time t+N? '''
@@ -284,11 +280,14 @@ class AntigenicFitness():
                             values = predicted frequency at time t+dt, based on frequency & fitness at time t )
         Xi(t+dt) = Xi(t) * e^( Fi(t) * dt), where Xi is frequency and Fi is fitness of i
         '''
-        all_predicted_frequencies = pd.DataFrame({ i : clade_prediction(self, i)
-                                    for i in self.clades })
 
-        self.predicted_frequencies = normalize_frequencies_by_timepoint(all_predicted_frequencies) # normalize based on ALL tips
-        self.predicted_frequencies = self.predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
+        initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
+        predicted_timepoints = self.timepoints[self.tp_forward+self.tp_back:]
+
+        all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : timepoint_prediction(self, initial_timepoint, predicted_timepoint)
+                                    for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
+
+        self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
         if self.save:
             self.predicted_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
@@ -300,17 +299,17 @@ class AntigenicFitness():
             self.predicted_growth_rates.to_csv(self.out_path+self.name+'_predicted_growth_rates.csv')
             self.actual_growth_rates.to_csv(self.out_path+self.name+'_actual_growth_rates.csv')
 
-    def predict_trajectories(self,initial_timepoint):
-        '''
-        Predict the frequency of all clades at each time interval between t and t+years_forward,
-        based on their initial fitnesses and actual_frequencies at time t.
-
-        Normalize these predicted actual_frequencies so that they sum to 1. at each timepoint.
-        '''
-
-        all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
-                           for i in self.clades})
-        self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
+    # def predict_trajectories(self,initial_timepoint):
+    #     '''
+    #     Predict the frequency of all clades at each time interval between t and t+years_forward,
+    #     based on their initial fitnesses and actual_frequencies at time t.
+    #
+    #     Normalize these predicted actual_frequencies so that they sum to 1. at each timepoint.
+    #     '''
+    #
+    #     all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
+    #                        for i in self.clades})
+    #     self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
 
 def plot_fitness_v_frequency(af):
     sns.set_palette('tab20', n_colors=20)
@@ -386,49 +385,49 @@ def plot_growth_rates(af):
     plt.clf()
     plt.close()
 
-def plot_trajectory(af, initial_timepoint, clades, ax):
-    cmap = sns.color_palette('Set2', len(clades))
-    colors = { clade: cmap[i] for i, clade in enumerate(clades)}
-
-    if ax == None:
-        fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
-    try:
-        predicted_trajectory = af.trajectories[initial_timepoint]
-    except KeyError:
-        af.predict_trajectories(initial_timepoint)
-        predicted_trajectory = af.trajectories[initial_timepoint]
-
-    for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
-        actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
-        ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual actual_frequencies')
-        ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted actual_frequencies')
-        ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
-    ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
-    ax.set_ylim(0,1)
-
-def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=2):
-    sns.set(style='whitegrid', font_scale=0.8)
-
-    if starting_timepoints == None:
-        starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
-
-    ncols = len(starting_timepoints)
-    nrows = int(ceil(len(af.clades)/n_clades_per_plot))
-
-    fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
-    clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
-
-    for clade_set, row in zip(clade_sets, axes):
-        for tp, ax in zip(starting_timepoints, row):
-            plot_trajectory(af, tp, clade_set, ax)
-        ax.legend()
-        plt.tight_layout()
-    if af.save:
-        plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
-    plt.clf()
-    plt.close()
+# def plot_trajectory(af, initial_timepoint, clades, ax):
+#     cmap = sns.color_palette('Set2', len(clades))
+#     colors = { clade: cmap[i] for i, clade in enumerate(clades)}
+# 
+#     if ax == None:
+#         fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
+#     try:
+#         predicted_trajectory = af.trajectories[initial_timepoint]
+#     except KeyError:
+#         af.predict_trajectories(initial_timepoint)
+#         predicted_trajectory = af.trajectories[initial_timepoint]
+#
+#     for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
+#         actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
+#         ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual actual_frequencies')
+#         ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted actual_frequencies')
+#         ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
+#     ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
+#     ax.set_ylim(0,1)
+#
+# def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=2):
+#     sns.set(style='whitegrid', font_scale=0.8)
+#
+#     if starting_timepoints == None:
+#         starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
+#
+#     ncols = len(starting_timepoints)
+#     nrows = int(ceil(len(af.clades)/n_clades_per_plot))
+#
+#     fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
+#     clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
+#
+#     for clade_set, row in zip(clade_sets, axes):
+#         for tp, ax in zip(starting_timepoints, row):
+#             plot_trajectory(af, tp, clade_set, ax)
+#         ax.legend()
+#         plt.tight_layout()
+#     if af.save:
+#         plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
+#     else:
+#         plt.show()
+#     plt.clf()
+#     plt.close()
 
 def plot_profile_likelihoods(model_performance, metric, args):
     fit_params = ['beta', 'gamma', 'sigma']
@@ -502,7 +501,7 @@ def run_model(args):
         plot_fitness_v_frequency(antigenic_fitness)
         plot_frequencies(antigenic_fitness)
         plot_growth_rates(antigenic_fitness)
-        plot_trajectory_multiples(antigenic_fitness)
+        # plot_trajectory_multiples(antigenic_fitness)
 
     return calc_model_performance(antigenic_fitness, args.metric)
 
