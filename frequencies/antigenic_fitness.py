@@ -13,13 +13,13 @@ from itertools import product
 from copy import deepcopy
 from pprint import pprint
 
-
 def normalize_timepoint(row):
     total = row.sum()
-    if np.isnan(total) or total == 0:
+    try:
+        assert not np.isnan(total)
+        return row.map(lambda x: x / total)
+    except: # np.nan or zerodivision
         return row
-    else:
-        return row.map( lambda x: x / total)
 
 def normalize_frequencies_by_timepoint(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
@@ -32,17 +32,20 @@ def normalize_frequencies_by_timepoint(frequencies):
         normalized_frequencies = frequencies.apply(normalize_timepoint, axis=1)
         return normalized_frequencies
 
-def timepoint_population_immunity(af, current_timepoint):
+def timepoint_population_immunity(af, current_timepoint, frequencies=None):
     ''' for a given timepoint, estimate the relative population immunity of each clade, i, based on
     which clades (j) have circulated previously;
     how antigenically distant i is from j;
     and the relative frequency of j'''
 
+    if frequencies is None:
+        frequencies = af.actual_frequencies
+
     def sum_over_j(i, past_timepoint):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
         antigenic_distance = [ af.titers[tuple(sorted([i,j]))] if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between i and j
         probability_protected = [ max(-1.*af.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
-        j_frequencies = [ af.actual_frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
+        j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
         return sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
 
     def sum_over_past_t(i):
@@ -57,23 +60,69 @@ def timepoint_population_immunity(af, current_timepoint):
     exposure = { i: sum_over_past_t(i) for i in af.clades }
     return exposure
 
+
+def predict_distant_frequency(af, i, current_timepoint):
+    years_back, years_forward= af.years_back, af.years_forward
+    tp_back, tp_forward = af.tp_back, af.tp_forward
+    interval_years, interval_tp = 1, 4 # number of timepoints forward per interval
+
+    x0 = current_timepoint
+    x0_idx = af.timepoints.index(x0) # index of x0
+    interval_starts = af.timepoints[x0_idx - interval_tp +1 : x0_idx+tp_forward-interval_tp +1] # assess fitness at each timepoint from X0 to <interval tp> before Xn
+    interval_ends = [start+interval_years for start in interval_starts] # based on fitness at each start timepoint, predict each final timepoint
+    intervals = zip(interval_starts, interval_ends)
+
+    known_timepoints = af.timepoints[ :x0_idx+1] # we can pull empirical frequency and fitness values for timepoints at or before x0
+    fitness = deepcopy(af.fitness.loc[known_timepoints])
+    frequencies = deepcopy(af.actual_frequencies.loc[known_timepoints])
+
+    for (start, end) in intervals:
+        start_idx = af.timepoints.index(start)
+        past_timepoints = af.timepoints[start_idx - tp_back : start_idx] # previous timepoints to sum immunity over
+        # assert all([t in frequencies.index.values for t in past_timepoints]), (past_timepoints, frequencies.tail()) # check we've already pulled or predicted frequencies for each past timepoint
+        exposure = pd.Series(timepoint_population_immunity(af, current_timepoint=start, frequencies=frequencies), name=start)
+        fitness = fitness.append(-1.*af.beta*exposure)
+        fitness.sort_index(inplace=True)
+        interval_frequencies = timepoint_prediction(af, current_timepoint=start, final_timepoint=end, fitness=fitness, frequencies=frequencies)
+        frequencies = frequencies.append(interval_frequencies)
+        frequencies.sort_index(inplace=True)
+
+
+    print 'x0', x0
+    print 'Xf', x0+years_forward
+    print 'fitness', fitness
+
+    x0_frequencies = af.actual_frequencies.loc[x0]
+    # intermediate_fitnesses =
+    summed_fitnesses = fitness.sum()
+    import sys
+    sys.exit()
+
+
 def predict_frequency(initial_frequency, initial_fitness, years_forward):
-    # if initial_frequency < 0.1:
-    #     return np.nan
-    # else:
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
-def timepoint_prediction(af, current_timepoint, final_timepoint):
+def timepoint_prediction(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
     '''
     For each clade i, predict the frequency of i based on
     its fitness and initial frequency at time t-years_forward
     '''
-    initial_fitnesses = af.fitness.loc[current_timepoint]
-    initial_frequencies = af.actual_frequencies.loc[current_timepoint]
-    predicted_frequencies = { i : predict_frequency(initial_frequencies[i],
-                                                    initial_fitnesses[i],
-                                                    final_timepoint - current_timepoint)
-                            for i in af.clades }
+    if fitness is None:
+        fitness = af.fitness
+    if frequencies is None:
+        frequencies = af.actual_frequencies
+
+    years_forward = final_timepoint - current_timepoint
+    if years_forward <= 1.0:
+        initial_fitnesses = fitness.loc[current_timepoint]
+        initial_frequencies = frequencies.loc[current_timepoint]
+        predicted_frequencies = { i : predict_frequency(initial_frequencies[i],
+                                                        initial_fitnesses[i],
+                                                        final_timepoint - current_timepoint)
+                                for i in af.clades }
+    else:
+        predicted_frequencies = { i : predict_distant_frequency(af, i, current_timepoint) for i in af.clades }
+
     predicted_frequencies = normalize_timepoint(pd.Series(predicted_frequencies, name=final_timepoint))
     return predicted_frequencies
 
@@ -388,7 +437,7 @@ def plot_growth_rates(af):
 # def plot_trajectory(af, initial_timepoint, clades, ax):
 #     cmap = sns.color_palette('Set2', len(clades))
 #     colors = { clade: cmap[i] for i, clade in enumerate(clades)}
-# 
+#
 #     if ax == None:
 #         fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
 #     try:
