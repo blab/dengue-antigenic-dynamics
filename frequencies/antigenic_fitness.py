@@ -31,8 +31,8 @@ def normalize_frequencies_by_timepoint(frequencies):
         normalized_frequencies = frequencies.apply(normalize, axis=1)
         return normalized_frequencies
 
-def clade_population_immunity(af, i):
-    ''' for clade i, estimate the relative population immunity at each timepoint based on
+def timepoint_population_immunity(af, current_timepoint):
+    ''' for a given timepoint, estimate the relative population immunity of each clade, i, based on
     which clades (j) have circulated previously;
     how antigenically distant i is from j;
     and the relative frequency of j'''
@@ -44,18 +44,16 @@ def clade_population_immunity(af, i):
         j_frequencies = [ af.actual_frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
         return sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
 
-    def sum_over_past_t(i, current_timepoint):
+    def sum_over_past_t(i):
         ''' For each timepoint, look at the past `tp_back` number of timepoints and add up the relative immunity acquired in each interval.
         Adjust for how long ago the population was exposed by assuming that immunity wanes linearly with slope gamma per year (n)'''
-
         tp_idx = af.timepoints.index(current_timepoint) # index of timepoint of interest
         past_timepoints = af.timepoints[tp_idx - af.tp_back : tp_idx] # previous timepoints to sum immunity over
         exposure = [ sum_over_j(i, t) for t in past_timepoints ] # total protection acquired at each past timepoint, t: sum over all clades for each past timepoint
         waning = [max(-1.*af.gamma*(current_timepoint - t) + 1., 0.) for t in past_timepoints] # proportion of protection originally acquired at time t expected to remain by the current_timepoint
         return sum( [ w*e for (w,e) in zip(waning, exposure)] ) # sum up the total waning-adjusted population immunity as of the timepoint_of_interest
 
-    valid_timepoints = af.timepoints[af.tp_back:]
-    exposure = { t: sum_over_past_t(i, t) for t in valid_timepoints }
+    exposure = { i: sum_over_past_t(i) for i in af.clades }
     return exposure
 
 def predict_timepoint(initial_frequency, initial_fitness, years_forward):
@@ -269,7 +267,9 @@ class AntigenicFitness():
 
     def calculate_fitness(self):
         ''' fitness = 1.-population exposure'''
-        exposure = pd.DataFrame({i: clade_population_immunity(self, i) for i in self.clades})
+        valid_timepoints = self.timepoints[self.tp_back:]
+
+        exposure = pd.DataFrame.from_dict({t: timepoint_population_immunity(self, t) for t in valid_timepoints}, orient='index')
         self.fitness = -1.*self.beta*exposure
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
