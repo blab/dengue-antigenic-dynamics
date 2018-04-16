@@ -541,8 +541,6 @@ def test_parameter_grid(args):
         model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
 
     if args.plot:
-        metrics_to_plot = [args.metric] if args.metric else model_performance.columns.values
-        print metrics_to_plot
         for metric in metrics_to_plot:
             if metric not in fit_params:
                 plot_profile_likelihoods(model_performance, metric, args)
