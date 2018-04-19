@@ -60,8 +60,10 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
     exposure = { i: sum_over_past_t(i) for i in af.clades }
     return exposure
 
+def predict_frequency(initial_frequency, initial_fitness, years_forward):
+    return initial_frequency*np.exp(initial_fitness*years_forward)
 
-def predict_distant_frequency(af, i, current_timepoint):
+def predict_distant_frequency(af, current_timepoint):
     years_back, years_forward= af.years_back, af.years_forward # total
     tp_back, tp_forward = af.tp_back, af.tp_forward # total
     interval_years, interval_tp = 0.25, 1 # interval length (yrs), number of timepoints forward per interval
@@ -73,25 +75,25 @@ def predict_distant_frequency(af, i, current_timepoint):
     fitness = deepcopy(af.fitness.loc[known_timepoints])
     frequencies = deepcopy(af.actual_frequencies.loc[known_timepoints])
 
-    intermediate_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
-    for tp_idx, numdate in enumerate(intermediate_timepoints, start=x0_idx):
+    ### Step through each intermediate timepoint, calculating known frequencies --> fitness --> predicted frequencies --> fitness
+    interval_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
+    for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
 
         past_timepoints = af.timepoints[tp_idx - tp_back : tp_idx] # previous timepoints to sum immunity over
-        interval_exposure = pd.Series(timepoint_population_immunity(af, current_timepoint=numdate, frequencies=frequencies), name=numdate)
-        interval_fitness = -1*af.beta*interval_exposure
-        fitness = fitness.append(interval_fitness)
-        interval_frequencies = timepoint_prediction(af, current_timepoint=numdate,
+        interval_exposure = pd.Series( timepoint_population_immunity(af, current_timepoint=numdate, frequencies=frequencies),
+                                       name=numdate) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
+        interval_fitness = -1*af.beta*interval_exposure ## convert from population exposure to fitness
+        fitness = fitness.append(interval_fitness)      ## record calculated fitness vals
+
+        interval_frequencies = timepoint_prediction(af, current_timepoint=numdate, ## predict frequencies for each interval
                                                         final_timepoint=numdate+interval_years,
                                                         fitness=fitness, frequencies=frequencies)
-        frequencies = frequencies.append(interval_frequencies)
+        frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
-    # x0_frequencies = af.actual_frequencies.loc[x0]
-    # # intermediate_fitnesses =
-    # summed_fitnesses = fitness.sum()
-
-
-def predict_frequency(initial_frequency, initial_fitness, years_forward):
-    return initial_frequency*np.exp(initial_fitness*years_forward)
+    initial_frequencies = af.actual_frequencies.loc[x0]
+    interval_weighted_fitness = fitness.loc[interval_timepoints].applymap(lambda f: f*interval_years).sum()
+    predicted_final_frequencies = {i: initial_frequencies[i]*np.exp(interval_weighted_fitness[i]) for i in af.clades}
+    return predicted_final_frequencies
 
 def timepoint_prediction(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
     '''
@@ -112,9 +114,10 @@ def timepoint_prediction(af, current_timepoint, final_timepoint, fitness=None, f
                                                         final_timepoint - current_timepoint)
                                 for i in af.clades }
     else:
-        predicted_frequencies = { i : predict_distant_frequency(af, i, current_timepoint) for i in af.clades }
+        predicted_frequencies = predict_distant_frequency(af, current_timepoint)
 
-    predicted_frequencies = normalize_timepoint(pd.Series(predicted_frequencies, name=final_timepoint))
+    predicted_frequencies = pd.Series(predicted_frequencies, name=final_timepoint)
+    predicted_frequencies = normalize_timepoint(predicted_frequencies)
     return predicted_frequencies
 
 def safe_ratio(num, denom):
@@ -531,7 +534,7 @@ def run_model(args):
     if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
         print 'calculating fitness'
         antigenic_fitness.calculate_fitness()
-    print 'predicting actual_frequencies'
+    print 'predicting frequencies'
     antigenic_fitness.predict_frequencies()
     print 'calculating growth rates'
     antigenic_fitness.calc_growth_rates()
