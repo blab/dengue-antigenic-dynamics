@@ -78,12 +78,12 @@ def predict_distant_frequency(af, current_timepoint):
     ### Step through each intermediate timepoint, calculating known frequencies --> fitness --> predicted frequencies --> fitness
     interval_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
     for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
-
-        past_timepoints = af.timepoints[tp_idx - tp_back : tp_idx] # previous timepoints to sum immunity over
-        interval_exposure = pd.Series( timepoint_population_immunity(af, current_timepoint=numdate, frequencies=frequencies),
-                                       name=numdate) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
-        interval_fitness = -1*af.beta*interval_exposure ## convert from population exposure to fitness
-        fitness = fitness.append(interval_fitness)      ## record calculated fitness vals
+        if numdate not in fitness.index:
+            past_timepoints = af.timepoints[tp_idx - tp_back : tp_idx] # previous timepoints to sum immunity over
+            interval_exposure = pd.Series( timepoint_population_immunity(af, current_timepoint=numdate, frequencies=frequencies),
+                                           name=numdate) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
+            interval_fitness = -1*af.beta*interval_exposure ## convert from population exposure to fitness
+            fitness = fitness.append(interval_fitness)      ## record calculated fitness vals
 
         interval_frequencies = timepoint_prediction(af, current_timepoint=numdate, ## predict frequencies for each interval
                                                         final_timepoint=numdate+interval_years,
