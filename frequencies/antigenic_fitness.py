@@ -283,7 +283,7 @@ class AntigenicFitness():
         self.tp_forward = self.tppy*self.years_forward # number of timepoints forward
         self.tp_back = self.tppy*self.years_back # number of timepoints back
 
-        self.noisy_predictions_mask = self.actual_frequencies < 0.1 # log which initial values were low
+        self.noisy_predictions_mask = self.actual_frequencies < 0.05 # log which initial values were low
         # keep track of which predictions will be made based on low initial values
         self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
 
@@ -330,8 +330,8 @@ class AntigenicFitness():
 
         all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : timepoint_prediction(self, initial_timepoint, predicted_timepoint)
                                     for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
-        self.predicted_frequencies = all_predicted_frequencies
-        # self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
+        # self.predicted_frequencies = all_predicted_frequencies
+        self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
         if self.save:
             self.predicted_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
