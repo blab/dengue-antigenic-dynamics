@@ -330,8 +330,8 @@ class AntigenicFitness():
 
         all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : timepoint_prediction(self, initial_timepoint, predicted_timepoint)
                                     for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
-
-        self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
+        self.predicted_frequencies = all_predicted_frequencies
+        # self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
         if self.save:
             self.predicted_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
@@ -547,7 +547,7 @@ def run_model(args):
         plot_fitness_v_frequency(antigenic_fitness)
         plot_frequencies(antigenic_fitness)
         plot_growth_rates(antigenic_fitness)
-        plot_trajectory_multiples(antigenic_fitness)
+        # plot_trajectory_multiples(antigenic_fitness)
 
     return calc_model_performance(antigenic_fitness, args.metric)
 
