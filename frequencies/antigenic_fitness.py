@@ -44,8 +44,8 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
     def sum_over_j(i, past_timepoint):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
         antigenic_distance = [ af.titers[tuple(sorted([i,j]))] if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between i and j
-        # probability_protected = [ max(-1.*af.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
-        probability_protected = [ np.exp(-1.*af.sigma*Dij) for Dij in antigenic_distance]
+        probability_protected = [ max(-1.*af.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
+        # probability_protected = [ np.exp(-1.*af.sigma*Dij) for Dij in antigenic_distance]
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
         return sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
 
@@ -55,8 +55,8 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
         tp_idx = af.timepoints.index(current_timepoint) # index of timepoint of interest
         past_timepoints = af.timepoints[tp_idx - af.tp_back : tp_idx] # previous timepoints to sum immunity over
         exposure = [ sum_over_j(i, t) for t in past_timepoints ] # total protection acquired at each past timepoint, t: sum over all clades for each past timepoint
-        waning = [ np.exp(-1.*af.gamma*(current_timepoint-t)) for t in past_timepoints]
-        # waning = [max(-1.*af.gamma*(current_timepoint - t) + 1., 0.) for t in past_timepoints] # proportion of protection originally acquired at time t expected to remain by the current_timepoint
+        # waning = [ np.exp(-1.*af.gamma*(current_timepoint-t)) for t in past_timepoints]
+        waning = [max(-1.*af.gamma*(current_timepoint - t) + 1., 0.) for t in past_timepoints] # proportion of protection originally acquired at time t expected to remain by the current_timepoint
         return sum( [ w*e for (w,e) in zip(waning, exposure)] ) # sum up the total waning-adjusted population immunity as of the timepoint_of_interest
 
     exposure = { i: sum_over_past_t(i) for i in af.clades }
