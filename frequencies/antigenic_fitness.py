@@ -12,6 +12,7 @@ from math import ceil
 from itertools import product
 from copy import deepcopy
 from pprint import pprint
+import pickle
 
 def normalize_timepoint(row):
     total = row.sum()
@@ -47,7 +48,14 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
         probability_protected = [ max(-1.*af.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
         # probability_protected = [ np.exp(-1.*af.sigma*Dij) for Dij in antigenic_distance]
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
-        return sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
+        cumulative_immunity = sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
+
+        if af.incidence_correction:
+            annual_incidence = 110./100000.
+            pivot_incidence = annual_incidence / af.tppy
+            return pivot_incidence * cumulative_immunity
+        else:
+            return cumulative_immunity
 
     def sum_over_past_t(i):
         ''' For each timepoint, look at the past `tp_back` number of timepoints and add up the relative immunity acquired in each interval.
@@ -156,7 +164,7 @@ def predict_clade_trajectory(af, i, initial_timepoint):
     initial_frequency = af.actual_frequencies[i][initial_timepoint]
     initial_fitness = af.fitness[i][initial_timepoint]
 
-    predicted_trajectory = [ predict_timepoint(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+    predicted_trajectory = [ predict_frequency(initial_frequency, initial_fitness, dt) for dt in dt_values ]
 
     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
@@ -312,7 +320,14 @@ class AntigenicFitness():
         valid_timepoints = self.timepoints[self.tp_back:]
 
         exposure = pd.DataFrame.from_dict({t: timepoint_population_immunity(self, t) for t in valid_timepoints}, orient='index')
-        self.fitness = -1.*self.beta*exposure
+
+        fitness = {}
+        for strain, exp in exposure.iteritems():
+            serotype = int(strain[4]) # 'denv4' -> 4
+            f0 = getattr(self, 'DENV%d_f0'%serotype)
+            strain_fitness = exp.map(lambda e: f0 - self.beta*e)
+            fitness[strain] = strain_fitness
+        self.fitness = pd.DataFrame(fitness)
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
 
@@ -332,7 +347,6 @@ class AntigenicFitness():
 
         all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : timepoint_prediction(self, initial_timepoint, predicted_timepoint)
                                     for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
-        # self.predicted_frequencies = all_predicted_frequencies
         self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
         if self.save:
@@ -432,8 +446,12 @@ def plot_growth_rates(af):
     plt.close()
 
 def plot_trajectory(af, initial_timepoint, clades, ax):
-    cmap = sns.color_palette('Set2', len(clades))
-    colors = { clade: cmap[i] for i, clade in enumerate(clades)}
+    try:
+        colors = pickle.load(open('../figures/colors.p', 'rb'))
+        colors.update({k.upper() : colors[k] for k in ['denv1', 'denv2', 'denv3', 'denv4']})
+    except Error as e:
+        cmap = sns.color_palette('Set2', len(clades))
+        colors = { clade: cmap[i] for i, clade in enumerate(clades)}
 
     if ax == None:
         fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
@@ -441,15 +459,16 @@ def plot_trajectory(af, initial_timepoint, clades, ax):
         predicted_trajectory = af.trajectories[initial_timepoint]
     except KeyError:
         if af.years_forward <= 1.0:
-            pass
+            af.predict_trajectories(initial_timepoint)	#         af.predict_trajectories(initial_timepoint)
+            predicted_trajectory = af.trajectories[initial_timepoint]	#         predicted_trajectory = af.trajectories[initial_timepoint]        else:
         else:
             return
 
     for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
         actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
-        ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual actual_frequencies')
-        ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted actual_frequencies')
-        ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
+        ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual %s frequencies'%clade)
+        ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted %s frequencies'%clade)
+        # ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
     ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
     ax.set_ylim(0,1)
 
@@ -460,16 +479,22 @@ def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4)
         starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
 
     ncols = len(starting_timepoints)
-    nrows = int(ceil(len(af.clades)/n_clades_per_plot))
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
-    clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
+    if len(af.clades) > n_clades_per_plot:
+        nrows = int(ceil(len(af.clades)/n_clades_per_plot))
+        fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
+        clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
+        zipped = zip(clade_sets, axes)
+    else:
+        fig, axes = plt.subplots(1, ncols, figsize=(3*ncols, 2),sharex=False, sharey=True)
+        zipped = [(af.clades, axes)]
 
-    for clade_set, row in zip(clade_sets, axes):
+    for clade_set, row in zipped:
         for tp, ax in zip(starting_timepoints, row):
             plot_trajectory(af, tp, clade_set, ax)
-        ax.legend()
-        plt.tight_layout()
+
+    ax.legend()
+    plt.tight_layout()
     if af.save:
         plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
     else:
@@ -549,14 +574,15 @@ def run_model(args):
         plot_fitness_v_frequency(antigenic_fitness)
         plot_frequencies(antigenic_fitness)
         plot_growth_rates(antigenic_fitness)
-        # plot_trajectory_multiples(antigenic_fitness)
+        plot_trajectory_multiples(antigenic_fitness)
 
     return calc_model_performance(antigenic_fitness, args.metric)
 
 def test_parameter_grid(args):
+    fit_params = ['beta', 'gamma', 'sigma', 'DENV1_f0', 'DENV2_f0', 'DENV3_f0', 'DENV4_f0']
 
-    def get_range(parameter):
-        p = vars(args)[parameter]
+    def get_range(param):
+        p = vars(args)[param]
         if type(p) == list and len(p) == 2:
             return np.linspace(float(p[0]), float(p[1]), args.n_param_vals)
         elif type(p) == list:
@@ -564,22 +590,21 @@ def test_parameter_grid(args):
         else:
             return [float(p)]
 
-    fit_params = ['beta', 'gamma', 'sigma']
     def run_with_parameterization(parameterization):
         args_copy = deepcopy(args)
         setattr(args_copy, 'save', False)
         setattr(args_copy, 'plot', False)
         for attr, val in zip(fit_params, parameterization):
             setattr(args_copy, attr, val)
-        print 'Running model with parameters:\n', zip(fit_params, parameterization), '\n'
+        print 'Running model with  parameters:\n', zip(fit_params, parameterization), '\n'
 
         results = run_model(args_copy)
         results.update({k: v for k,v in zip(fit_params, parameterization)})
         print results, '\n\n'
         return results
 
-    beta_vals, gamma_vals, sigma_vals = get_range('beta'), get_range('gamma'), get_range('sigma')
-    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals) # [(b0, g0, s0), (b0, g0, s1), ....]
+    beta_vals, gamma_vals, sigma_vals, d1_vals, d2_vals, d3_vals, d4_vals = get_range('beta'), get_range('gamma'), get_range('sigma'), get_range('DENV1_f0'), get_range('DENV2_f0'), get_range('DENV3_f0'), get_range('DENV4_f0')
+    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals, d1_vals, d2_vals, d3_vals, d4_vals)
 
     model_performance = pd.DataFrame([ run_with_parameterization(parameterization)
                           for parameterization in model_parameterizations]).round(3)
@@ -587,11 +612,13 @@ def test_parameter_grid(args):
     if args.save:
         model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
 
-    if args.plot:
-        for metric in metrics_to_plot:
-            if metric not in fit_params:
-                plot_profile_likelihoods(model_performance, metric, args)
-                plot_model_performance(model_performance, metric, args)
+    # metrics_to_plot = ['delta_sse', 'pearson_r2']
+    # fit_params = ['f0']
+    # if args.plot:
+    #     for metric in metrics_to_plot:
+    #         if metric not in fit_params:
+    #             plot_profile_likelihoods(model_performance, metric, args)
+    #             plot_model_performance(model_performance, metric, args)
 
     return model_performance
 
@@ -608,6 +635,11 @@ if __name__=="__main__":
     args.add_argument('--gamma', nargs='*', help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= [1.])
     args.add_argument('--sigma', nargs='*', help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= [0.5])
     args.add_argument('--beta', nargs='*', help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=[1.6])
+    args.add_argument('--DENV1_f0', nargs='*', help='Relative f0 values for DENV1', default = [0.])
+    args.add_argument('--DENV2_f0', nargs='*', help='Relative f0 values for DENV2', default = [0.])
+    args.add_argument('--DENV3_f0', nargs='*', help='Relative f0 values for DENV3', default = [0.])
+    args.add_argument('--DENV4_f0', nargs='*', help='Relative f0 values for DENV4', default = [0.])
+    args.add_argument('--incidence_correction', action='store_true', help='Correct for attack rate?')
     args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
     args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy', 'delta_sse'], default=None)
     args.add_argument('--plot', help='make plots?', action='store_true')
@@ -616,9 +648,10 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-
     ## If given a range of parameters, test all combinations.
-    if any([len(args.beta) > 1, len(args.gamma) > 1, len(args.sigma) > 1]):
+    free_parameters = [args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0, args.DENV4_f0]
+
+    if any([len(param) > 1 for param in free_parameters]):
         model_performance = test_parameter_grid(args)
 
         if args.metric: # If evaluation metric specified, use this to select the best fit and do a clean run of the model
