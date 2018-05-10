@@ -452,6 +452,27 @@ These parameter values are then used to predict the titer distance between all p
 We assess performance by comparing predicted to known titer values in our test data set, and present test error (aggregated from 10-fold cross-validation) throughout the manuscript.
 
 \subsection*{Viral Clade Dynamics}
+
+\textbf{Empirical Clade Frequencies}\\
+As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to present based on observed relative abundance of each clade in the "slice" of the phylogeny corresponding to each quarterly timepoint.
+
+Briefly, the frequency trajectory of each clade in the phylogeny is modeled according to a Brownian motion diffusion process discretized to three-month intervals.
+Relative to a simple Brownian motion, the expectation includes an "inertia" term that adds velocity to the diffusion and the variance includes a term $x(1-x)$ to scale variance according to frequency following a Wright-Fisher population genetic process.
+This results in the following diffusion process:
+$$x(t+dt) = \mathcal{N}(x(t) + \epsilon dx, dt \sigma^2 x(t) (1-x(t)))$$
+
+with ‘volatility’ parameter $\sigma^2$.
+The term $dx$ is the increment in the previous timestep, so that $dx = x(t) - x(t-dt)$.
+We used $\epsilon = 0.7$ and $\sigma = 2.0$ to maximize fit to empirical trajectory behavior.
+
+We also include an Bernoulli observation model for clade presence / absence among sampled viruses at timestep $t$.
+This observation model follows
+$$f(x,t) = \Pi_{v \in V} x(t) \Pi_{v \notin V} (1-x(t))$$
+where $v \in V$ represents the set of viruses that belong to the clade and $v \notin V$ represents the set of viruses that do not belong to the clade.
+Each frequency trajectory is estimated by simultaneously
+maximizing the likelihood of the process model and the likelihood
+of the observation model via adjusting frequency trajectory $\vec{x} = (x_1, ... x_n)$.
+
 \textbf{Population Immunity}\\
 For antigenically diverse pathogens, antigenic novelty represents a fitness advantage.
 This means that strains that are antigenically distinct from previously-circulating strains are able to access more susceptible hosts, allowing the antigenically novel lineage to expand.
@@ -469,29 +490,32 @@ $$f_i(t) = f_0-\beta P_i(t)$$
 where $\beta$ and $f_0$ are fit parameters representing the slope of the linear relationship between immunity and fitness, and the intrinsic relative fitness of each serotype, respectively.
 
 \textbf{Frequency Predictions}\\
-As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to present based on observed relative abundance of each clade in the "slice" of the phylogeny corresponding to each quarterly timepoint.
-These empirical estimates of clade growth and decline are smoothed with a simple diffusion model as described in Lee et al.
-
-Predicted clade frequencies at time $t + dt$ are estimated as
+Similar to the model implemented in Luckzsa and Lassig, we estimate predicted clade frequencies at time $t + dt$ as
 $$\hat{x_i}(t+dt) = x_i(t) e^{f_i(t) dt}$$
 for short-term predictions (where $dt < 1$).
+
 For long-term predictions, we must account for immunity accrued at each intermediate timepoint between $t$ and $dt$.
-To do so, we compound immunity based on predicted clade frequencies at each intermediate timepoint, such that:
-$$\hat{x_i}(t+dt) = x_i(t) e^{\sum_{n=0}^{n=dt}(\hat{f_i}(t+n))dt}$$
+We divide the interval between $t$ and $dt$ into a total of $U$ 3 month timepoints, $[t+u, t+2u, ... t+U]$, where $t+U=dt$.
+We then compound immunity based on predicted clade frequencies at each intermediate timepoint:
+$$\hat{x_i}(t+u) = x_i(t)e^{f_i(t) u}$$
+$$\hat{x_i}(t+2u) = \hat{x_i}(t+u) e^{f_i(t+u)u}$$
+$$...$$
+$$\hat{x_i}(t+U) = x_i(t) e^{f_i(t)u} e^{f_i(t+u)u} e^{f_i(t+2u)u} ... e^{f_i(t+U)u}$$
+$$\hat{x_i}(t+dt) = \hat{x_i}(t+U) = x_i(t) e^{\sum_{u}f_i(t+u)u}$$
 
 We can then calculate clade growth rates, defined as the fold-change in relative clade frequency between time $t$ and time $t+dt$:
-$$\frac{\hat{x_i}(t+dt)}{x_i(t)} = e^{\sum_{n=0}^{n=dt}(\hat{f_i}(t+n))dt}$$
+$$\frac{\hat{x_i}(t+dt)}{x_i(t)}$$
 
 \textbf{Null model and model performance}\\
 To quantify the impact of antigenic fitness on DENV clade success, we compare our antigenically-informed model to a null model wherein all strains have equal antigenic fitness at all timepoints:
-$$f_i(t) = 0$$
-$$\hat{x_i}(t+dt) = x_i(t) e^0 = x_i(t)$$
+$$f_i^{null}(t) = 0$$
+$$\hat{x_i}^{null}(t+dt) = x_i(t) e^0 = x_i(t)$$
 
 For both the null model and the antigenically-informed model, we can assess predictive power as the sum of squared error between predicted and empirical clade growth rates:
-$$SSE = \sum_{i,t} (\frac{\hat{x_i}(t+dt)}{x_i(t)} - \frac{x_i(t+dt)}{x_i(t)})^2$$
+$$SSE = \sum_{i,t} (\frac{\hat{x_i}(t+dt)}{x_i(t)} - \frac{\hat{x_i}^{null}(t+dt)}{x_i(t)})^2$$
 
 We can then estimate how much more error is present in the null model than the antigenically-informed model:
-$$\Delta SSE = SSE_{null} - SSE_{model}$$
+$$\Delta SSE = SSE^{null} - SSE^{model}$$
 
 Our frequency prediction model has a total of 8 free parameters:
 \begin{table}[h!]
