@@ -491,7 +491,7 @@ where $\beta$ and $f_0$ are fit parameters representing the slope of the linear 
 
 \textbf{Frequency Predictions}\\
 Similar to the model implemented in Luckzsa and Lassig, we estimate predicted clade frequencies at time $t + dt$ as
-$$\hat{x_i}(t+dt) = x_i(t) e^{f_i(t) dt}$$
+$$\hat{x_i}(t+dt) = \frac{x_i(t) e^{f_i(t) dt}}{\sum_{i}x_i(t)}$$
 for short-term predictions (where $dt < 1$).
 
 For long-term predictions, we must account for immunity accrued at each intermediate timepoint between $t$ and $dt$.
