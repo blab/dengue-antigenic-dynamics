@@ -36,3 +36,5 @@ manuscript/template\.tex
 *.fls
 
 *.fdb_latexmk
+
+raw-titer-analysis/png/
