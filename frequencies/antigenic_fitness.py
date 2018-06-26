@@ -49,13 +49,7 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
         # probability_protected = [ np.exp(-1.*af.sigma*Dij) for Dij in antigenic_distance]
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
         cumulative_immunity = sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
-
-        if af.incidence_correction:
-            annual_incidence = 110./100000.
-            pivot_incidence = annual_incidence / af.tppy
-            return pivot_incidence * cumulative_immunity
-        else:
-            return cumulative_immunity
+        return cumulative_immunity
 
     def sum_over_past_t(i):
         ''' For each timepoint, look at the past `tp_back` number of timepoints and add up the relative immunity acquired in each interval.
@@ -250,7 +244,7 @@ def calc_accuracy(af):
         n_total += accuracy['n_total']
     return n_correct / n_total
 
-def calc_model_performance(af, metric=None):
+def calc_model_performance(af):
 
     def remove_nan(actual, predicted):
         actual = actual.loc[actual.index.isin(predicted.index.values)]
@@ -277,10 +271,7 @@ class AntigenicFitness():
     def __init__(self, args):
 
         for k,v in vars(args).items():
-            if k in ['beta', 'gamma', 'sigma'] and type(v) == list:
-                setattr(self, k, float(v[0])) # hack around the argparse type issue
-            else:
-                setattr(self, k, v) # copy over cmd line args
+            setattr(self, k, v) # copy over cmd line args
 
         # actual (observed) actual_frequencies
         self.actual_frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative actual_frequencies)
@@ -502,64 +493,29 @@ def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4)
     plt.clf()
     plt.close()
 
-def plot_profile_likelihoods(model_performance, metric, args):
-    fit_params = ['beta', 'gamma', 'sigma']
+if __name__=="__main__":
+    sns.set(style='whitegrid')#, font_scale=1.5)
 
-    if metric != 'abs_error':
-        best_fit = model_performance.ix[model_performance[metric].idxmax()]
-    else:
-        best_fit = model_performance.ix[model_performance[metric].idxmin()]
+    args = argparse.ArgumentParser()
+    args.add_argument('--frequency_path', help='actual_frequencies csv', default='./source/southeast_asia_serotype_frequencies.csv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='./source/all_effects_Dij.csv')
+    args.add_argument('--fitness_path', type=str, help='path to precomputed actual_frequencies or \'null\'')
+    args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
+    args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
+    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
+    args.add_argument('--gamma', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=1.)
+    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.5)
+    args.add_argument('--beta', type=float, help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=1.6)
+    args.add_argument('--DENV1_f0', type=float, help='Relative f0 values for DENV1', default = 0.)
+    args.add_argument('--DENV2_f0', type=float, help='Relative f0 values for DENV2', default = 0.)
+    args.add_argument('--DENV3_f0', type=float, help='Relative f0 values for DENV3', default = 0.)
+    args.add_argument('--DENV4_f0', type=float, help='Relative f0 values for DENV4', default = 0.)
+    args.add_argument('--plot', help='make plots?', action='store_true')
+    args.add_argument('--save', help='save csv and png files?', action='store_true')
+    args.add_argument('--name', type=str, help='analysis name')
+    args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
+    args = args.parse_args()
 
-    print 'Best fit: ', best_fit
-    fig, axes = plt.subplots(ncols=len(fit_params), nrows=1, figsize=(3*len(fit_params), 3), sharey=True)
-    for param,ax in zip(fit_params, axes):
-        p1,p2 = [p for p in fit_params if p != param]
-        plot_vals = model_performance.loc[(model_performance[p1]==best_fit[p1]) & (model_performance[p2]==best_fit[p2])]
-
-        sns.regplot(param, metric, data=plot_vals, fit_reg=False, ax=ax)
-        ax.set_title('Fixed params:\n%s = %.1f,\n%s=%.1f'%(p1, best_fit[p1], p2, best_fit[p2]))
-        ax.set_xlabel(param)
-        ax.set_ylabel('%s'%metric)
-        plt.tight_layout()
-
-    if args.save:
-        plt.savefig(args.out_path+args.name+'_profile_likelihoods_%s.png'%metric, bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
-
-    plt.clf()
-    plt.close()
-
-def plot_model_performance(model_performance, metric, args, small_multiples_var='sigma', ):
-    small_multiples_vals = pd.unique(model_performance[small_multiples_var])
-    nplots = len(small_multiples_vals)
-    nrows = max(int(ceil(nplots/5)), 1)
-
-    fig, axes = plt.subplots(ncols=min(5, nplots), nrows=nrows, figsize=(3*5, 3*nrows))
-
-    fit_params = ['beta', 'gamma', 'sigma']
-    x_var, y_var = sorted([v for v in fit_params if v not in [metric, small_multiples_var]])
-    vmin, vmax = model_performance[metric].min(), model_performance[metric].max()
-
-    for value, ax in zip(small_multiples_vals, axes.flatten()):
-        plot_values = model_performance.loc[model_performance[small_multiples_var] == value]
-        plot_values = plot_values.pivot(index=x_var, columns=y_var, values=metric)
-        sns.heatmap(plot_values, vmin=vmin, vmax=vmax, ax=ax,cbar_kws={'label': '%s'%metric})
-        ax.set_title('%s = %f'%(small_multiples_var, value))
-        ax.set_ylabel(x_var)
-        ax.set_xlabel(y_var)
-
-    plt.tight_layout()
-
-    if args.save:
-        plt.savefig(args.out_path+args.name+'_param_performance_%s.png'%metric, bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
-
-    plt.clf()
-    plt.close()
-
-def run_model(args):
     antigenic_fitness = AntigenicFitness(args)
     if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
         print 'calculating fitness'
@@ -569,102 +525,9 @@ def run_model(args):
     print 'calculating growth rates'
     antigenic_fitness.calc_growth_rates()
 
-    if antigenic_fitness.plot == True:
-        print 'generating plots'
-        plot_fitness_v_frequency(antigenic_fitness)
-        plot_frequencies(antigenic_fitness)
-        plot_growth_rates(antigenic_fitness)
-        plot_trajectory_multiples(antigenic_fitness)
-
-    return calc_model_performance(antigenic_fitness, args.metric)
-
-def test_parameter_grid(args):
-    fit_params = ['beta', 'gamma', 'sigma', 'DENV1_f0', 'DENV2_f0', 'DENV3_f0', 'DENV4_f0']
-
-    def get_range(param):
-        p = vars(args)[param]
-        if type(p) == list and len(p) == 2:
-            return np.linspace(float(p[0]), float(p[1]), args.n_param_vals)
-        elif type(p) == list:
-            return [float(p[0])]
-        else:
-            return [float(p)]
-
-    def run_with_parameterization(parameterization):
-        args_copy = deepcopy(args)
-        setattr(args_copy, 'save', False)
-        setattr(args_copy, 'plot', False)
-        for attr, val in zip(fit_params, parameterization):
-            setattr(args_copy, attr, val)
-        print 'Running model with  parameters:\n', zip(fit_params, parameterization), '\n'
-
-        results = run_model(args_copy)
-        results.update({k: v for k,v in zip(fit_params, parameterization)})
-        print results, '\n\n'
-        return results
-
-    beta_vals, gamma_vals, sigma_vals, d1_vals, d2_vals, d3_vals, d4_vals = get_range('beta'), get_range('gamma'), get_range('sigma'), get_range('DENV1_f0'), get_range('DENV2_f0'), get_range('DENV3_f0'), get_range('DENV4_f0')
-    model_parameterizations = product(beta_vals, gamma_vals, sigma_vals, d1_vals, d2_vals, d3_vals, d4_vals)
-
-    model_performance = pd.DataFrame([ run_with_parameterization(parameterization)
-                          for parameterization in model_parameterizations]).round(3)
-
-    if args.save:
-        model_performance.to_csv(args.out_path+args.name+'_model_performance.csv')
-
-    # metrics_to_plot = ['delta_sse', 'pearson_r2']
-    # fit_params = ['f0']
-    # if args.plot:
-    #     for metric in metrics_to_plot:
-    #         if metric not in fit_params:
-    #             plot_profile_likelihoods(model_performance, metric, args)
-    #             plot_model_performance(model_performance, metric, args)
-
-    return model_performance
-
-if __name__=="__main__":
-    sns.set(style='whitegrid')#, font_scale=1.5)
-
-    args = argparse.ArgumentParser()
-    args.add_argument('--frequency_path', help='actual_frequencies csv', default='southeast_asia/serotype/southeast_asia_serotype_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='all_effects_Dij.csv')
-    args.add_argument('--fitness_path', type=str, help='path to precomputed actual_frequencies or \'null\'')
-    args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
-    args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
-    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
-    args.add_argument('--gamma', nargs='*', help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default= [1.])
-    args.add_argument('--sigma', nargs='*', help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default= [0.5])
-    args.add_argument('--beta', nargs='*', help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=[1.6])
-    args.add_argument('--DENV1_f0', nargs='*', help='Relative f0 values for DENV1', default = [0.])
-    args.add_argument('--DENV2_f0', nargs='*', help='Relative f0 values for DENV2', default = [0.])
-    args.add_argument('--DENV3_f0', nargs='*', help='Relative f0 values for DENV3', default = [0.])
-    args.add_argument('--DENV4_f0', nargs='*', help='Relative f0 values for DENV4', default = [0.])
-    args.add_argument('--incidence_correction', action='store_true', help='Correct for attack rate?')
-    args.add_argument('--n_param_vals', type=int, help='Number of values to test for each parameter if fitting model', default=3)
-    args.add_argument('--metric', help='Metric to use when fitting parameters', choices=['pearson_r2', 'spearman_r', 'abs_error', 'information_gain', 'accuracy', 'delta_sse'], default=None)
-    args.add_argument('--plot', help='make plots?', action='store_true')
-    args.add_argument('--save', help='save csv and png files?', action='store_true')
-    args.add_argument('--name', type=str, help='analysis name')
-    args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
-    args = args.parse_args()
-
-    ## If given a range of parameters, test all combinations.
-    free_parameters = [args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0, args.DENV4_f0]
-
-    if any([len(param) > 1 for param in free_parameters]):
-        model_performance = test_parameter_grid(args)
-
-        if args.metric: # If evaluation metric specified, use this to select the best fit and do a clean run of the model
-            if args.metric != 'abs_error':
-                best_fit = model_performance.ix[model_performance[args.metric].idxmax()]
-            else:
-                best_fit = model_performance.ix[model_performance[args.metric].idxmin()]
-            setattr(args, 'beta', best_fit['beta'])
-            setattr(args, 'gamma', best_fit['gamma'])
-            setattr(args, 'sigma', best_fit['sigma'])
-            best_performance = run_model(args)
-            print best_performance
-
-    else: # If given specific values for parameters, just run the model and print performance metrics.
-        model_performance = run_model(args)
-        print(model_performance)
+    model_performance = calc_model_performance(antigenic_fitness)
+    model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0, 'DENV4_f0': args.DENV4_f0})
+    sorted_param_vals = sorted(model_performance.keys())
+    print sorted_param_vals
+    model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
+    open(args.out_path+args.name+'.csv', 'w').write(model_performance_str)
