@@ -27,6 +27,6 @@ for antigenic_resolution in antigenic_resolutions:
 			cmd = 'python ./antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 5 --beta %f --gamma %f --sigma %f --DENV1_f0 1 --DENV2_f0 %f --DENV3_f0 %f'%(frequency_path, titer_path, out_path, name, b,g,s,d2,d3)
 			# cmd = 'python ./antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 5 --beta %f --gamma %f --sigma %f --DENV1_f0 1 --DENV2_f0 %f --DENV3_f0 %f --DENV4_f0 %f'%(frequency_path, titer_path, out_path, name, b,g,s,d2,d3,d4)
 
-			os.system(cmd)
+			os.system('sbatch -t 20 --wrap="%s"'%cmd)
 			import sys
 			sys.exit()
