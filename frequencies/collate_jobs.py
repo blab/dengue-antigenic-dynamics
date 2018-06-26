@@ -9,16 +9,17 @@ all_values = []
 files = glob('./*.csv')
 
 for file in files:
-    if 'model_performance' not in f:
+    if 'model_performance' not in file:
         with open(file, 'r') as f:
-            vals = f.readline().strip().split(',')
-            vals = { param : v for (param, v) in zip(parameters, vals)}
-            all_values.append(vals)
+            for line in f:
+                vals = line.strip().split(',')
+                vals = { param : v for (param, v) in zip(parameters, vals)}
+                all_values.append(vals)
 
 if len(all_values):
     collated = pd.DataFrame(all_values)
     collated.to_csv('model_performance.csv')
-    
+
 for f in files:
     if 'model_performance' not in f:
         os.remove(f)
