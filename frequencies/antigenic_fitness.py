@@ -516,12 +516,15 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-
+    d2_vals = np.linspace(0,2,8)
+    d3_vals = np.linspace(0,2,8)
     d4_vals = np.linspace(0,2,8)
 
     output = []
-    for d4 in d4_vals:
+    for (d2,d3,d4) in product(d2_vals, d3_vals, d4_vals):
         args = deepcopy(args)
+        setattr(args, 'DENV2_f0', d2)
+        setattr(args, 'DENV3_f0', d3)
         setattr(args, 'DENV4_f0', d4)
         antigenic_fitness = AntigenicFitness(args)
         if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
