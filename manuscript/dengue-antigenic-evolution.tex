@@ -240,7 +240,7 @@ From this, we conclude that there is significant antigenic evolution within each
 \end{figure}
 
 
-\subsection{Full-tree model does not/slightly improve/s predictions of genotype success}
+\subsection{Full-tree model does not improve predictions of genotype success}
 % Figure 6: predicted vs. actual genotype growth rates (all models)
 \begin{figure}[h]
 \centering
@@ -249,8 +249,24 @@ From this, we conclude that there is significant antigenic evolution within each
      \label{genotype_growth_rates}
 \end{figure}
 
-
-
+\begin{centering}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
+  \hline
+  Genetic resolution & Antigenic resolution & Metric & Metric value & \beta & \gamma & \sigma & DENV1 f_0 & DENV2 f_0 & DENV3 f_0 & DENV4_f_0 \\
+  \hline
+  Serotype           & Interserotype        & \Delta SSE &  9.03    & 0.43  & 0.29   & 1.29   & 1.00      & 0.00      & 2.00      & 0.00 \\
+  Serotype           & Interserotype        & Pearson R^2&  0.38    & 0.42  & 2.00   & 3.00   & 1.00      & 0.86      & 0.00      & 0.00 \\
+  \hline
+  Genotype           & Interserotype        & \Delta SSE&   12.02   & 1.29  & 0.57   & 1.29   & 1.00      & 0.00      & 0.00      & 0.00 \\ % Note: f0 params have ~ no effect here; which vals to report?
+  Genotype           & Interserotype        & Pearson R^2&  0.20    & 0.43  & 2.00   & 2.14   & 1.00      & 1.71      & 0.00      & 0.00 \\
+  \hline
+  Genotype           & Full Tree            & \Delta SSE&   11.89   & 1.29  & 0.57   & 0.43   & 1.00      & 0.00      & 0.00      & 0.00  \\ % These f0 params don't matter either
+  Genotype           & Full Tree            & Pearson R^2&  0.25    & 0.43  & 2.00   & 0.43   & 1.00      & 1.14      & 0.00      & 0.00 \\
+  \hline
+\end{tabular}
+}
+\end{centering}
 
 \section*{Discussion}
 
