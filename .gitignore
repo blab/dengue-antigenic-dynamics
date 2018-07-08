@@ -3,6 +3,7 @@ papers/*
 slides/*
 recombination/
 titer-analysis/png/
+frequencies/flu/
 scripts/frequencies/scratchwork/
 manuscript/\.latex/
 manuscript/\.latex\.json
