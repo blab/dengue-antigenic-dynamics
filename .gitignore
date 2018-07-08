@@ -8,6 +8,7 @@ manuscript/\.latex/
 manuscript/\.latex\.json
 
 dengue-antigenic-evolution.pdf
+*draft*
 
 *.fasta
 *.trees
