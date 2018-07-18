@@ -14,6 +14,12 @@ from copy import deepcopy
 from pprint import pprint
 import pickle
 
+def safe_ratio(num, denom):
+    if denom > 0:
+        return float(num) / (denom)
+    else:
+        return np.nan
+
 def normalize_timepoint(row):
     total = row.sum()
     try:
@@ -22,7 +28,7 @@ def normalize_timepoint(row):
     except: # np.nan or zerodivision
         return row
 
-def normalize_frequencies_by_timepoint(frequencies):
+def normalize_all_timepoints(frequencies):
     ''' Normalize each row so that the sum of all frequencies at a single timepoint = 1'''
     if isinstance(frequencies, dict):
         frequencies = pd.DataFrame(frequencies)
@@ -33,7 +39,7 @@ def normalize_frequencies_by_timepoint(frequencies):
         normalized_frequencies = frequencies.apply(normalize_timepoint, axis=1)
         return normalized_frequencies
 
-def timepoint_population_immunity(af, current_timepoint, frequencies=None):
+def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
     ''' for a given timepoint, estimate the relative population immunity of each clade, i, based on
     which clades (j) have circulated previously;
     how antigenically distant i is from j;
@@ -64,6 +70,10 @@ def timepoint_population_immunity(af, current_timepoint, frequencies=None):
     exposure = { i: sum_over_past_t(i) for i in af.clades }
     return exposure
 
+def calc_timepoint_fitness(af, exposure):
+    fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) - af.beta*exposure for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+    return fitness
+
 def predict_frequency(initial_frequency, initial_fitness, years_forward):
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
@@ -84,12 +94,12 @@ def predict_distant_frequency(af, current_timepoint):
     for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
         if numdate not in fitness.index:
             past_timepoints = af.timepoints[tp_idx - tp_back : tp_idx] # previous timepoints to sum immunity over
-            interval_exposure = pd.Series( timepoint_population_immunity(af, current_timepoint=numdate, frequencies=frequencies),
-                                           name=numdate) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
-            interval_fitness = -1*af.beta*interval_exposure ## convert from population exposure to fitness
+            interval_exposure =calc_timepoint_exposure(af, current_timepoint=numdate, frequencies=frequencies) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
+            interval_fitness = calc_timepoint_fitness(af, interval_exposure) ## convert from population exposure to fitness
+            interval_fitness = pd.Series(interval_fitness, name = numdate)
             fitness = fitness.append(interval_fitness)      ## record calculated fitness vals
 
-        interval_frequencies = timepoint_prediction(af, current_timepoint=numdate, ## predict frequencies for each interval
+        interval_frequencies = predict_timepoint_frequencies(af, current_timepoint=numdate, ## predict frequencies for each interval
                                                         final_timepoint=numdate+interval_years,
                                                         fitness=fitness, frequencies=frequencies)
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
@@ -100,7 +110,7 @@ def predict_distant_frequency(af, current_timepoint):
     predicted_final_frequencies = {i: initial_frequencies[i]*np.exp(interval_weighted_fitness[i]) for i in af.clades}
     return predicted_final_frequencies
 
-def timepoint_prediction(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
+def predict_timepoint_frequencies(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
     '''
     For each clade i, predict the frequency of i based on
     its fitness and initial frequency at time t-years_forward
@@ -125,13 +135,8 @@ def timepoint_prediction(af, current_timepoint, final_timepoint, fitness=None, f
     predicted_frequencies = normalize_timepoint(predicted_frequencies)
     return predicted_frequencies
 
-def safe_ratio(num, denom):
-    if denom > 0:
-        return float(num) / (denom)
-    else:
-        return np.nan
 
-def clade_growth_rate(af,i,predicted=True):
+def calc_timepoint_growth_rates(af,i,predicted=True):
 
     initial_timepoints = af.timepoints[af.tp_back: -1*af.tp_forward]
     initial_frequencies = af.actual_frequencies[i][initial_timepoints]
@@ -276,7 +281,7 @@ class AntigenicFitness():
         # actual (observed) actual_frequencies
         self.actual_frequencies = pd.read_csv(self.frequency_path, index_col=0) # pd.DataFrame(index=timepoints, columns=clades, values=relative actual_frequencies)
         self.clades = self.actual_frequencies.columns.values
-        self.actual_frequencies = normalize_frequencies_by_timepoint(self.actual_frequencies[self.clades]) # restrict to clades of interest, normalize
+        self.actual_frequencies = normalize_all_timepoints(self.actual_frequencies[self.clades]) # restrict to clades of interest, normalize
         self.actual_frequencies = self.actual_frequencies.loc[(self.actual_frequencies.index >= self.date_range[0]) & (self.actual_frequencies.index <= self.date_range[1])] # restrict to timepoints of interest
         self.timepoints = self.actual_frequencies.index.tolist()
         n_years = int(self.timepoints[-1]) - int(self.timepoints[0]) # number of years in the actual_frequencies dataset
@@ -305,20 +310,12 @@ class AntigenicFitness():
         if self.save == True:
             assert self.name, 'ERROR: Please provide an analysis name if you wish to save output'
 
-
     def calculate_fitness(self):
         ''' fitness = 1.-population exposure'''
         valid_timepoints = self.timepoints[self.tp_back:]
-
-        exposure = pd.DataFrame.from_dict({t: timepoint_population_immunity(self, t) for t in valid_timepoints}, orient='index')
-
-        fitness = {}
-        for strain, exp in exposure.iteritems():
-            serotype = int(strain[4]) # 'denv4' -> 4
-            f0 = getattr(self, 'DENV%d_f0'%serotype)
-            strain_fitness = exp.map(lambda e: f0 - self.beta*e)
-            fitness[strain] = strain_fitness
-        self.fitness = pd.DataFrame(fitness)
+        exposure = {t: calc_timepoint_exposure(self, t) for t in valid_timepoints}
+        fitness = { t: calc_timepoint_fitness(e) for t, e in e.iteritems()}
+        self.fitness = pd.DataFrame.from_dict(fitness, orient='index')
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
 
@@ -336,7 +333,7 @@ class AntigenicFitness():
         initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
         predicted_timepoints = self.timepoints[self.tp_forward+self.tp_back:]
 
-        all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : timepoint_prediction(self, initial_timepoint, predicted_timepoint)
+        all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : predict_timepoint_frequencies(self, initial_timepoint, predicted_timepoint)
                                     for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
         self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
@@ -344,8 +341,8 @@ class AntigenicFitness():
             self.predicted_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
 
     def calc_growth_rates(self):
-        self.predicted_growth_rates = pd.DataFrame({i:clade_growth_rate(self, i, predicted=True) for i in self.clades})
-        self.actual_growth_rates = pd.DataFrame({i:clade_growth_rate(self, i, predicted=False) for i in self.clades})
+        self.predicted_growth_rates = pd.DataFrame({i:calc_timepoint_growth_rates(self, i, predicted=True) for i in self.clades})
+        self.actual_growth_rates = pd.DataFrame({i:calc_timepoint_growth_rates(self, i, predicted=False) for i in self.clades})
         if self.save:
             self.predicted_growth_rates.to_csv(self.out_path+self.name+'_predicted_growth_rates.csv')
             self.actual_growth_rates.to_csv(self.out_path+self.name+'_actual_growth_rates.csv')
@@ -360,7 +357,7 @@ class AntigenicFitness():
 
         all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
                            for i in self.clades})
-        self.trajectories[initial_timepoint] = normalize_frequencies_by_timepoint(all_trajectories)
+        self.trajectories[initial_timepoint] = normalize_all_timepoints(all_trajectories)
 
 def plot_fitness_v_frequency(af):
     sns.set_palette('tab20', n_colors=20)
