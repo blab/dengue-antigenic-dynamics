@@ -155,20 +155,26 @@ def calc_timepoint_growth_rates(af,i,predicted=True):
 
     return pd.Series(growth_rates, index=time_intervals)
 
-def predict_clade_trajectory(af, i, initial_timepoint):
+def predict_trajectories(af, initial_timepoint):
     '''
-    Predict the frequency of clade i at each time interval between t and t+years_forward,
-    based on its fitness and frequency at time t
+    return predicted frequencies at all timepoints between t and t+dt
     '''
 
-    dt_values = [ (1./af.tppy)*dt for dt in range(1, af.tp_forward+1)] # fraction of year per timepoint * number of timepoints forward
-    predicted_timepoints = [ initial_timepoint + dt for dt in dt_values ]
-    initial_frequency = af.actual_frequencies[i][initial_timepoint]
-    initial_fitness = af.fitness[i][initial_timepoint]
+    if af.years_forward > 1:
+        if initial_timepoint not in af.trajectories:
+            predict_timepoint_distant_frequency(af, initial_timepoint)
 
-    predicted_trajectory = [ predict_single_frequency(initial_frequency, initial_fitness, dt) for dt in dt_values ]
-
-    return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
+        return af.trajectories[initial_timepoint]
+    else:
+        raise ValueError, 'Oops. Currently only doing trajectories for dt > 1'
+    # dt_values = [ (1./af.tppy)*dt for dt in range(1, af.tp_forward+1)] # fraction of year per timepoint * number of timepoints forward
+    # predicted_timepoints = [ initial_timepoint + dt for dt in dt_values ]
+    # initial_frequency = af.actual_frequencies[i][initial_timepoint]
+    # initial_fitness = af.fitness[i][initial_timepoint]
+    #
+    # predicted_trajectory = [ predict_single_frequency(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+    #
+    # return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
 def calc_information_gain(af):
     ''' How much better were our predictions than the null model for time t+N? '''
@@ -350,17 +356,17 @@ class AntigenicFitness():
             self.predicted_growth_rates.to_csv(self.out_path+self.name+'_predicted_growth_rates.csv')
             self.actual_growth_rates.to_csv(self.out_path+self.name+'_actual_growth_rates.csv')
 
-    def predict_trajectories(self,initial_timepoint):
-        '''
-        Predict the frequency of all clades at each time interval between t and t+years_forward,
-        based on their initial fitnesses and actual_frequencies at time t.
-
-        Normalize these predicted actual_frequencies so that they sum to 1. at each timepoint.
-        '''
-
-        all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
-                           for i in self.clades})
-        self.trajectories[initial_timepoint] = normalize_all_timepoints(all_trajectories)
+    # def predict_trajectories(self,initial_timepoint):
+    #     '''
+    #     Predict the frequency of all clades at each time interval between t and t+years_forward,
+    #     based on their initial fitnesses and actual_frequencies at time t.
+    #
+    #     Normalize these predicted actual_frequencies so that they sum to 1. at each timepoint.
+    #     '''
+    #
+    #     all_trajectories = pd.DataFrame({ i : predict_clade_trajectory(self, i, initial_timepoint)
+    #                        for i in self.clades})
+    #     self.trajectories[initial_timepoint] = normalize_all_timepoints(all_trajectories)
 
 def plot_fitness_v_frequency(af):
     sns.set_palette('tab20', n_colors=20)
@@ -436,62 +442,62 @@ def plot_growth_rates(af):
     plt.clf()
     plt.close()
 
-def plot_trajectory(af, initial_timepoint, clades, ax):
-    try:
-        colors = pickle.load(open('../figures/colors.p', 'rb'))
-        colors.update({k.upper() : colors[k] for k in ['denv1', 'denv2', 'denv3', 'denv4']})
-    except Error as e:
-        cmap = sns.color_palette('Set2', len(clades))
-        colors = { clade: cmap[i] for i, clade in enumerate(clades)}
-
-    if ax == None:
-        fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
-    try:
-        predicted_trajectory = af.trajectories[initial_timepoint]
-    except KeyError:
-        if af.years_forward <= 1.0:
-            af.predict_trajectories(initial_timepoint)	#         af.predict_trajectories(initial_timepoint)
-            predicted_trajectory = af.trajectories[initial_timepoint]	#         predicted_trajectory = af.trajectories[initial_timepoint]        else:
-        else:
-            return
-
-    for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
-        actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
-        ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual %s frequencies'%clade)
-        ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted %s frequencies'%clade)
-        # ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
-    ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
-    ax.set_ylim(0,1)
-
-def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4):
-    sns.set(style='whitegrid', font_scale=0.8)
-
-    if starting_timepoints == None:
-        starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
-
-    ncols = len(starting_timepoints)
-
-    if len(af.clades) > n_clades_per_plot:
-        nrows = int(ceil(len(af.clades)/n_clades_per_plot))
-        fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
-        clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
-        zipped = zip(clade_sets, axes)
-    else:
-        fig, axes = plt.subplots(1, ncols, figsize=(3*ncols, 2),sharex=False, sharey=True)
-        zipped = [(af.clades, axes)]
-
-    for clade_set, row in zipped:
-        for tp, ax in zip(starting_timepoints, row):
-            plot_trajectory(af, tp, clade_set, ax)
-
-    ax.legend()
-    plt.tight_layout()
-    if af.save:
-        plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
-    else:
-        plt.show()
-    plt.clf()
-    plt.close()
+# def plot_trajectory(af, initial_timepoint, clades, ax):
+#     try:
+#         colors = pickle.load(open('../figures/colors.p', 'rb'))
+#         colors.update({k.upper() : colors[k] for k in ['denv1', 'denv2', 'denv3', 'denv4']})
+#     except Error as e:
+#         cmap = sns.color_palette('Set2', len(clades))
+#         colors = { clade: cmap[i] for i, clade in enumerate(clades)}
+#
+#     if ax == None:
+#         fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
+#     try:
+#         predicted_trajectory = af.trajectories[initial_timepoint]
+#     except KeyError:
+#         if af.years_forward <= 1.0:
+#             af.predict_trajectories(initial_timepoint)	#         af.predict_trajectories(initial_timepoint)
+#             predicted_trajectory = af.trajectories[initial_timepoint]	#         predicted_trajectory = af.trajectories[initial_timepoint]        else:
+#         else:
+#             return
+#
+#     for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
+#         actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
+#         ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual %s frequencies'%clade)
+#         ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted %s frequencies'%clade)
+#         # ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
+#     ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
+#     ax.set_ylim(0,1)
+#
+# def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4):
+#     sns.set(style='whitegrid', font_scale=0.8)
+#
+#     if starting_timepoints == None:
+#         starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
+#
+#     ncols = len(starting_timepoints)
+#
+#     if len(af.clades) > n_clades_per_plot:
+#         nrows = int(ceil(len(af.clades)/n_clades_per_plot))
+#         fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
+#         clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
+#         zipped = zip(clade_sets, axes)
+#     else:
+#         fig, axes = plt.subplots(1, ncols, figsize=(3*ncols, 2),sharex=False, sharey=True)
+#         zipped = [(af.clades, axes)]
+#
+#     for clade_set, row in zipped:
+#         for tp, ax in zip(starting_timepoints, row):
+#             plot_trajectory(af, tp, clade_set, ax)
+#
+#     ax.legend()
+#     plt.tight_layout()
+#     if af.save:
+#         plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
+#     else:
+#         plt.show()
+#     plt.clf()
+#     plt.close()
 
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
