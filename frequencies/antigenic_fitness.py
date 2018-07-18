@@ -74,10 +74,10 @@ def calc_timepoint_fitness(af, exposure):
     fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) - af.beta*exposure for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
     return fitness
 
-def predict_frequency(initial_frequency, initial_fitness, years_forward):
+def predict_single_frequency(initial_frequency, initial_fitness, years_forward):
     return initial_frequency*np.exp(initial_fitness*years_forward)
 
-def predict_distant_frequency(af, current_timepoint):
+def predict_timepoint_distant_frequency(af, current_timepoint):
     years_back, years_forward= af.years_back, af.years_forward # total
     tp_back, tp_forward = af.tp_back, af.tp_forward # total
     interval_years, interval_tp = 0.25, 1 # interval length (yrs), number of timepoints forward per interval
@@ -91,17 +91,20 @@ def predict_distant_frequency(af, current_timepoint):
 
     ### Step through each intermediate timepoint, calculating known frequencies --> fitness --> predicted frequencies --> fitness
     interval_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
+
     for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
-        if numdate not in fitness.index:
+        if tp_idx == x0_idx: ## we already know fitness for x0; just predict forward
+            interval_fitness = fitness.loc[x0]
+        else:
             past_timepoints = af.timepoints[tp_idx - tp_back : tp_idx] # previous timepoints to sum immunity over
             interval_exposure =calc_timepoint_exposure(af, current_timepoint=numdate, frequencies=frequencies) ## calculate fitness based on known [before x0] and predicted [after x0] frequencies
             interval_fitness = calc_timepoint_fitness(af, interval_exposure) ## convert from population exposure to fitness
             interval_fitness = pd.Series(interval_fitness, name = numdate)
             fitness = fitness.append(interval_fitness)      ## record calculated fitness vals
 
-        interval_frequencies = predict_timepoint_frequencies(af, current_timepoint=numdate, ## predict frequencies for each interval
-                                                        final_timepoint=numdate+interval_years,
-                                                        fitness=fitness, frequencies=frequencies)
+        interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
+                                                                final_timepoint=numdate+interval_years,
+                                                                fitness=fitness, frequencies=frequencies)
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
     af.trajectories[current_timepoint] = frequencies.loc[x0:]
@@ -110,7 +113,7 @@ def predict_distant_frequency(af, current_timepoint):
     predicted_final_frequencies = {i: initial_frequencies[i]*np.exp(interval_weighted_fitness[i]) for i in af.clades}
     return predicted_final_frequencies
 
-def predict_timepoint_frequencies(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
+def predict_timepoint_close_frequency(af, current_timepoint, final_timepoint, fitness=None, frequencies=None):
     '''
     For each clade i, predict the frequency of i based on
     its fitness and initial frequency at time t-years_forward
@@ -124,12 +127,12 @@ def predict_timepoint_frequencies(af, current_timepoint, final_timepoint, fitnes
     if years_forward <= 1.0:
         initial_fitnesses = fitness.loc[current_timepoint]
         initial_frequencies = frequencies.loc[current_timepoint]
-        predicted_frequencies = { i : predict_frequency(initial_frequencies[i],
+        predicted_frequencies = { i : predict_single_frequency(initial_frequencies[i],
                                                         initial_fitnesses[i],
                                                         final_timepoint - current_timepoint)
                                 for i in af.clades }
     else:
-        predicted_frequencies = predict_distant_frequency(af, current_timepoint)
+        predicted_frequencies = predict_timepoint_distant_frequency(af, current_timepoint)
 
     predicted_frequencies = pd.Series(predicted_frequencies, name=final_timepoint)
     predicted_frequencies = normalize_timepoint(predicted_frequencies)
@@ -163,7 +166,7 @@ def predict_clade_trajectory(af, i, initial_timepoint):
     initial_frequency = af.actual_frequencies[i][initial_timepoint]
     initial_fitness = af.fitness[i][initial_timepoint]
 
-    predicted_trajectory = [ predict_frequency(initial_frequency, initial_fitness, dt) for dt in dt_values ]
+    predicted_trajectory = [ predict_single_frequency(initial_frequency, initial_fitness, dt) for dt in dt_values ]
 
     return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
@@ -314,7 +317,7 @@ class AntigenicFitness():
         ''' fitness = 1.-population exposure'''
         valid_timepoints = self.timepoints[self.tp_back:]
         exposure = {t: calc_timepoint_exposure(self, t) for t in valid_timepoints}
-        fitness = { t: calc_timepoint_fitness(e) for t, e in e.iteritems()}
+        fitness = { t: calc_timepoint_fitness(self, e) for t, e in exposure.iteritems()}
         self.fitness = pd.DataFrame.from_dict(fitness, orient='index')
         if self.save:
             self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
@@ -333,7 +336,7 @@ class AntigenicFitness():
         initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
         predicted_timepoints = self.timepoints[self.tp_forward+self.tp_back:]
 
-        all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : predict_timepoint_frequencies(self, initial_timepoint, predicted_timepoint)
+        all_predicted_frequencies = pd.DataFrame.from_dict({predicted_timepoint : predict_timepoint_close_frequency(self, initial_timepoint, predicted_timepoint)
                                     for (initial_timepoint, predicted_timepoint) in zip(initial_timepoints, predicted_timepoints)}, orient='index')
         self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
