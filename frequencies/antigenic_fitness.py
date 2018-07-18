@@ -442,32 +442,31 @@ def plot_growth_rates(af):
     plt.clf()
     plt.close()
 
-# def plot_trajectory(af, initial_timepoint, clades, ax):
-#     try:
-#         colors = pickle.load(open('../figures/colors.p', 'rb'))
-#         colors.update({k.upper() : colors[k] for k in ['denv1', 'denv2', 'denv3', 'denv4']})
-#     except Error as e:
-#         cmap = sns.color_palette('Set2', len(clades))
-#         colors = { clade: cmap[i] for i, clade in enumerate(clades)}
-#
-#     if ax == None:
-#         fig, ax = plt.subplots(1,1,figsize=(12,4), sharey=True)
-#     try:
-#         predicted_trajectory = af.trajectories[initial_timepoint]
-#     except KeyError:
-#         if af.years_forward <= 1.0:
-#             af.predict_trajectories(initial_timepoint)	#         af.predict_trajectories(initial_timepoint)
-#             predicted_trajectory = af.trajectories[initial_timepoint]	#         predicted_trajectory = af.trajectories[initial_timepoint]        else:
-#         else:
-#             return
-#
-#     for clade, predicted_trajectory in predicted_trajectory[clades].iteritems():
-#         actual_vals = af.actual_frequencies[clade][:initial_timepoint+af.tp_forward]
-#         ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label='Actual %s frequencies'%clade)
-#         ax.plot(predicted_trajectory.index.values, predicted_trajectory.values, c=colors[clade], linestyle='--', label='Predicted %s frequencies'%clade)
-#         # ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':', label='Fitness')
-#     ax.set_xlim(initial_timepoint-af.years_back, predicted_trajectory.index.values[-1])
-#     ax.set_ylim(0,1)
+def plot_trajectory(af, trajectory, ax=None):
+
+    if not ax:
+        fig, ax = plt.subplots(figsize=(8,5))
+    cmap = sns.color_palette('Set2', len(trajectory.columns.values))
+    colors = { clade: cmap[i] for i, clade in enumerate(trajectory.columns.values)}
+
+    initial_timepoint = trajectory.index.values[0]
+    initial_tp_idx = af.timepoints.index(initial_timepoint)
+    past_timepoints = af.timepoints[initial_tp_idx-af.tp_back : initial_tp_idx+1]
+
+    for clade, clade_trajectory in trajectory.iteritems():
+        actual_vals = af.actual_frequencies[clade][past_timepoints]
+        ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label=clade)
+        ax.plot(clade_trajectory.index.values, clade_trajectory.values, c=colors[clade], linestyle='--')
+        ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':')
+    ax.set_xlim(past_timepoints[0], trajectory.index.values[-1])
+    # ax.set_ylim(-0.05,1.05)
+
+    plt.legend()
+    plt.tight_layout()
+    if af.save:
+        plt.savefig(af.out_path + af.name + '%.1f_trajectory.png'%initial_timepoint, dpi=300, bbox_inches='tight')
+    else:
+        plt.show()
 #
 # def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4):
 #     sns.set(style='whitegrid', font_scale=0.8)
@@ -516,6 +515,7 @@ if __name__=="__main__":
     args.add_argument('--DENV2_f0', type=float, help='Relative f0 values for DENV2', default = 0.)
     args.add_argument('--DENV3_f0', type=float, help='Relative f0 values for DENV3', default = 0.)
     args.add_argument('--DENV4_f0', type=float, help='Relative f0 values for DENV4', default = 0.)
+    args.add_argument('--trajectory', type=float, nargs='*', help='timepoint(s) to compute trajectories for')
     args.add_argument('--plot', help='make plots?', action='store_true')
     args.add_argument('--save', help='save csv and png files?', action='store_true')
     args.add_argument('--name', type=str, help='analysis name')
@@ -548,9 +548,17 @@ if __name__=="__main__":
     #     model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
     #     output.append(model_performance_str)
 
-    # open(args.out_path+args.name+'.csv', 'w').write('\n'.join(output))
-
     antigenic_fitness = AntigenicFitness(args)
     antigenic_fitness.calculate_fitness()
     antigenic_fitness.predict_frequencies()
     antigenic_fitness.calc_growth_rates()
+
+    if args.trajectory:
+        assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
+        for t in args.trajectory:
+            closest_timepoint = sorted(list(antigenic_fitness.timepoints), key = lambda tp: abs(t - tp))[0]
+            trajectory = predict_trajectories(antigenic_fitness, closest_timepoint)
+            if args.save:
+                trajectory.to_csv('%s_%s_%.1f_trajectory.csv'%(args.out_path, args.name, t))
+            if args.plot:
+                plot_trajectory(antigenic_fitness, trajectory)
