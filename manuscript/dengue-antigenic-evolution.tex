@@ -250,22 +250,22 @@ From this, we conclude that there is significant antigenic evolution within each
 \end{figure}
 
 \begin{centering}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
-  \hline
-  Genetic resolution & Antigenic resolution & Metric & Metric value & \beta & \gamma & \sigma & DENV1 f_0 & DENV2 f_0 & DENV3 f_0 & DENV4_f_0 \\
-  \hline
-  Serotype & Interserotype & \Delta SSE & 14.90 & 1.29 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-  Serotype & Interserotype & Pearson R^2 & 0.62 & 1.71 & 0.57 & 2.14 & 1.00 & 0.86 & 0.00 & 0.00 \\
-  \hline
-  Genotype & Interserotype & \Delta SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-  Genotype & Interserotype & Pearson R^2 & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-  \hline
-  Genotype & Full Tree & Delta SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-  Genotype & Full tree & Pearson R^2 & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-  \hline
-\end{tabular}
-}
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
+      \hline
+      Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
+      \hline
+      Serotype & Interserotype & $\Delta$ SSE & 14.90 & 1.29 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Serotype & Interserotype & Pearson $R^2$ & 0.62 & 1.71 & 0.57 & 2.14 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+    \end{tabular}
+  }
 \end{centering}
 
 \section*{Discussion}
@@ -314,7 +314,7 @@ Relative to a simple Brownian motion, the expectation includes an "inertia" term
 This results in the following diffusion process:
 $$x(t+dt) = \mathcal{N}(x(t) + \epsilon dx, dt \sigma^2 x(t) (1-x(t)))$$
 
-with ‘volatility’ parameter $\sigma^2$.
+with `volatility' parameter $\sigma^2$.
 The term $dx$ is the increment in the previous timestep, so that $dx = x(t) - x(t-dt)$.
 We used $\epsilon = 0.7$ and $\sigma = 2.0$ to maximize fit to empirical trajectory behavior.
 
