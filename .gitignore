@@ -21,6 +21,7 @@ environment*
 \.Icon
 \.swp
 \.Icon\.swp
+Icon?
 
 # LaTeX intermediaries #
 ########################
