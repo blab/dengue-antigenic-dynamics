@@ -119,16 +119,13 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 % Figure 1A: titer heat map
 
 \begin{figure}[h]
- \centering
-    \includegraphics[width=\linewidth]{../figures/png/titer_heatmap.png}
+\begin{centering}
+\includegraphics[width=0.7\textwidth]{../figures/png/titer_heatmap.png}
     \caption{\textbf{Normalized antigenic distance between pairs of dengue virus strains and sera.}}
      \label{titer_heatmap}
+\end{centering}
 \end{figure}
-\begin{figure}[h]
-  \centering \includegraphics[width=\linewidth]{../figures/png/genetic_antigenic_distance.png}
-  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.}}
-  	\label{genetic_antigenic_distance}
-\end{figure}
+
 
 Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro.
 
@@ -152,6 +149,14 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \subsection{Dengue antigenic evolution corresponds to phylogenetic divergence}
 %Figure 1B: genetic vs. antigenic divergence
 
+\begin{figure}[h]
+  \begin{centering}
+  \includegraphics[width=0.6\textwidth]{../figures/png/genetic_antigenic_distance.png}
+  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.}}
+  	\label{genetic_antigenic_distance}
+  \end{centering}
+\end{figure}
+
 Titer measurements are prone to noise, and there is a limited amount of available data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect changes in antigenic phenotype to be driven by underlying changes in viral genotype.
 Figure ~\ref{genetic_antigenic_distance} shows the relationship between genetic (patristic) and antigenic distance between each pair of viruses in our dataset.
@@ -159,6 +164,14 @@ Notably, increasing genetic divergence generally corresponds to increased antige
 
 \subsection{Within-serotype antigenic evolution better explains observed antigenic relationships}
 %Figure 2: titer model formulations + performance
+\begin{figure}[h]
+  \begin{centering}
+    \includegraphics[width=.8\textwidth]{../figures/png/titer_model_performance.png}
+        \caption{\textbf{Titer model formulations and performance.}}
+         \label{titer_model_performance}
+  \end{centering}
+\end{figure}
+
 We then sought to fully map the relationship between DENV genetic and antigenic evolution.
 To do so, we adapted a phylogenetics-based model originally developed for influenza. %neher et al reference
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
@@ -185,68 +198,87 @@ Importantly, all reported error metrics refer to performance on test data, so th
 The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset, and to the error observed when this model was used to characterize an influenza dataset.
 From this, we conclude that there is significant antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.75\textwidth]{../figures/png/titer_model_performance.png}
-    \caption{\textbf{Titer model formulations and performance.}}
-     \label{titer_model_performance}
-\end{figure}
 
-
-\subsection{There are at least N distinct antigenic phenotypes of dengue}
+\subsection{There are at least 12 distinct antigenic phenotypes of dengue}
 % Figure 3A: Antigenic tree
 
 
-% \begin{figure}[h]
-%  \centering
-% \begin{subfigure}[t]{0.4\textwidth}
-%     \centering
-%     \includegraphics[width=\linewidth]{../figures/png/antigenic_tree.png}
-%     \caption{\textbf{Tree of dengue antigenic phenotypes.}}
-%      \label{antigenic_tree}
-% \end{subfigure}
-% \hfill
-% \begin{subfigure}[t]{0.4\textwidth}
-%     \centering
-%     \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
-%   	\caption{\textbf{Tree of canonical dengue genotypes.}}
-%   	\label{genotype_tree}
-% \end{subfigure}
-% \end{figure}
 
+\begin{figure}[h]
+  \begin{centering}
+    \includegraphics[width=.8\linewidth]{../figures/png/antigenic_tree.png}
+    \caption{\textbf{Tree of dengue antigenic phenotypes.}}
+     \label{antigenic_tree}
+  \end{centering}
+\end{figure}
 
-\subsection{Antigenic phenotypes largely correspond to canonical genotypes}
-% Figure 3B: Genotype tree
+\begin{figure}[h]
+  \begin{centering}
+    \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
+  	\caption{\textbf{Tree of canonical dengue genotypes.}}
+  	\label{genotype_tree}
+  \end{centering}
+\end{figure}
 
+Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue.
+On average, intraserotype antigenic phenotypes are N titer units apart; interserotype antigenic phenotypes are N titer units apart.
+Notably, many of the titer values in this datset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart.
+Thus, we expect that our model systematically underestimates titer distances overall.
+DENV4 genotypes I and II are estimated to be 0.4 log2 titer units apart; these strains were recently shown to be sufficiently antigenically distinct to differentiate secondary case outcomes in vivo.
 
 \subsection{Antigenic novelty predicts serotype success}
 % Figure 4: Serotype frequencies + fitness + trajectories example
+We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
+However, antibody neutralization is only one of many factors that contribute to secondary infection outcomes.
+We thus wanted to know whether the observed antigenic diversity influences dengue population dynamics in the real world.
+If so, we would expect that as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other strains antigenically similar to $i$--decreases over time as more people acquire immunity.
+Thus, if antigenic novelty constitutes a fitness advantage, then we would expect antigenic distance from recently circulating strains to correlate with high growth rates.
+
+To test this hypothesis, we estimate the antigenic fitness of virus $i$ as a function of the antigenic distance from each strain $j$ that has circulated in a given population over the past 2 years, weighted by the relative frequency of $j$ and adjusted for linearly waning immunity.
+We then predict their relative growth rate over the next 5 years (at time $t = t_0 + 5$) as a function of initial frequency (at time $t=t_0$), serotype-specific intrinsic fitness, and antigenic fitness (with accumulated immunity compounded every 3 months). % this needs a ton more explanation and clarification, but it's a start.
+
+We applied this model to dengue dynamics in Southeast Asia from 1970 to 2015, with relative clade frequencies estimated from available sequence data (see methods).
+
+This model predicts serotype growth vs decline correctly for 79\% of predictions.
+Antigenic novelty explains 59\% of the observed variation in serotype growth rates.
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.75\textwidth]{../figures/png/serotype_fitness.png}
-    \caption{\textbf{Relative frequencies and fitness of dengue serotypes, 1970-2015.}}
-     \label{serotype_fitness}
+  \begin{centering}
+    \includegraphics[width=\linewidth]{../figures/png/serotype_fitness_model.png}
+  	\caption{\textbf{Antigenic novelty predicts serotype success.}}
+  	\label{serotype_fitness_model}
+  \end{centering}
 \end{figure}
 
 
 \subsection{Antigenic novelty also partially predicts genotype success}
 % Figure 5: Genotype frequencies + fitness
+We also find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation.
+When clades are resolved and predicted at the level of canonical genotypes, we find that antigenic fitness correctly predicts growth vs. decline approximately for X\% of predictions.
+Overall, antigenic novelty explains approximately 25\% of the observed variation in observed genotype growth rates.
+
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.75\textwidth]{../figures/png/genotype-fitness.png}
+  \begin{centering}
+\includegraphics[width=\linewidth]{../figures/png/genotype_fitness.png}
     \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}}
      \label{genotype_fitness}
+   \end{centering}
 \end{figure}
 
 
 \subsection{Full-tree model does not improve predictions of genotype success}
 % Figure 6: predicted vs. actual genotype growth rates (all models)
+
+We can use this predictive framework to investigate 
+
+
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.75\textwidth]{../figures/png/genotype_growth_rates.png}
+\includegraphics[width=0.7\linewidth]{../figures/png/genotype_fitness_model_compare.png}
+\begin{centering}
     \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}}
      \label{genotype_growth_rates}
+\end{centering}
 \end{figure}
 
 \begin{centering}
