@@ -214,7 +214,6 @@ def calc_delta_sse(af):
     ''' How much better were our predictions than the null model for time t+N? '''
 
     def calc_sse(af, valid_clades, starting_timepoint, null):
-        ''' Kullback-Leibler divergence '''
         sse = 0.
         for clade in valid_clades:
             actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
@@ -522,16 +521,16 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-    d2_vals = np.linspace(0,2,8)
-    d3_vals = np.linspace(0,2,8)
-    d4_vals = np.linspace(0,2,8)
+    d1_vals = np.linspace(0,5,6)
+    d2_vals = np.linspace(0,5,6)
+    d3_vals = np.linspace(0,5,6)
 
     output = []
-    for (d2,d3,d4) in product(d2_vals, d3_vals, d4_vals):
+    for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
         args = deepcopy(args)
+        setattr(args, 'DENV1_f0', d1)
         setattr(args, 'DENV2_f0', d2)
         setattr(args, 'DENV3_f0', d3)
-        setattr(args, 'DENV4_f0', d4)
         antigenic_fitness = AntigenicFitness(args)
         if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
             print 'calculating fitness'
@@ -542,7 +541,7 @@ if __name__=="__main__":
         antigenic_fitness.calc_growth_rates()
 
         model_performance = calc_model_performance(antigenic_fitness)
-        model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0, 'DENV4_f0': args.DENV4_f0})
+        model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
         sorted_param_vals = sorted(model_performance.keys())
         print sorted_param_vals
         model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
