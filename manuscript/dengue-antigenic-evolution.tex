@@ -159,7 +159,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 
 Titer measurements are prone to noise, and there is a limited amount of available data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect changes in antigenic phenotype to be driven by underlying changes in viral genotype.
-Figure ~\ref{genetic_antigenic_distance} shows the relationship between genetic (patristic) and antigenic distance between each pair of viruses in our dataset.
+Figure ~\ref{genetic_antigenic_distance} shows the relationship between genetic and antigenic distance between each pair of viruses in our dataset.
 Notably, increasing genetic divergence generally corresponds to increased antigenic distance, both within and between serotypes.
 
 \subsection{Within-serotype antigenic evolution better explains observed antigenic relationships}
@@ -196,7 +196,7 @@ We find that accounting for within-serotype antigenic evolution substantially im
 When we allow any branch in the phylogeny to contribte to antigenic evolution, this full tree model is able to predict test titers within a $1.9$-fold dilution of the true value (approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall.
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
 The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset, and to the error observed when this model was used to characterize an influenza dataset.
-From this, we conclude that there is significant antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
+From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
 
 \subsection{There are at least 12 distinct antigenic phenotypes of dengue}
@@ -221,10 +221,13 @@ From this, we conclude that there is significant antigenic evolution within each
 \end{figure}
 
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue.
+The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
+We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
+However, it is unclear whether this level of antigenic heterogeneity is sufficient to differentiate secondary case outcomes in vivo.
+For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
 On average, intraserotype antigenic phenotypes are N titer units apart; interserotype antigenic phenotypes are N titer units apart.
 Notably, many of the titer values in this datset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart.
-Thus, we expect that our model systematically underestimates titer distances overall.
-DENV4 genotypes I and II are estimated to be 0.4 log2 titer units apart; these strains were recently shown to be sufficiently antigenically distinct to differentiate secondary case outcomes in vivo.
+We therefore expect that our model systematically underestimates titer distances overall.
 
 \subsection{Antigenic novelty predicts serotype success}
 % Figure 4: Serotype frequencies + fitness + trajectories example
@@ -234,26 +237,22 @@ We thus wanted to know whether the observed antigenic diversity influences dengu
 At any given time, many factors contribute to both the total size of the viral population (which corresponds to the incidence in the host population), and the makeup of the viral population (the relative frequency of each viral strain currently circulating).
 For example, seasonal fluctuations in mosquito population size and many other environmental factors influence the DENV population size.
 The relative makeup of this viral population is strongly driven by viral fitness.
-If antigenic diversity influences dengue population dynamics, we would expect antigenically novel strains to be more fit: as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other strains antigenically similar to $i$--decreases over time as more people acquire immunity.
-Antigenically novel viruses that are able to escape this immunity are then able to infect more susceptible hosts, making them fitter than the previously circulating strain.
+In meaningfully antigenically diverse viral populations, antigenic novelty contributes to viral fitness: as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other strains antigenically similar to $i$--decreases over time as more people acquire immunity.
+Antigenically novel viruses that are able to escape this population immunity are better able to infect hosts, making them fitter than the previously circulating strain.
 Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we would expect greater antigenic distance from recently circulating strains to correlate with higher growth rates.
 
 To test this hypothesis, we examined the makeup of the dengue virus population in Southeast Asia from 1970 to 2015.
-We estimated the relative population frequency of each canonical DENV genotype (~\ref{genotype_tree}) at 3-month intervals, $x_i(t)$, based on available sequence data (see Methods).
+We estimated the relative population frequency of each DENV serotype (~\ref{genotype_tree}) at 3-month intervals, $x_i(t)$, based on available sequence data (see Methods).
+
 Fitter viruses increase in population frequency over time, such that $x_i(t+dt) > x_i(t)$.
 It follows that these viruses have a growth rate--defined as the fold-change in frequency over time--greater than 1: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
-
 To isolate the extent to which antigenic novelty contributes to clade success and decline, we built a simple model that attempts to predict clade growth rates based on two variables: the antigenic fitness of the clade at time $t$, and a time-invariant fit parameter representing the intrinsic fitness of the serotype the clade belongs to.
 Growth rates are estimated based on a 5-year sliding window.
-We estimate the antigenic fitness of virus $i$ at time $t$ as a function of its antigenic distance from each strain $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning immunity.
+We estimate the antigenic fitness of virus $i$ at time $t$ as a function of its antigenic distance from each strain $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning immunity (see Methods).
 Serotype intrinsic fitness is a free parameter and is constant over time.
-% The model also contains three free parameters:  .... move all this cruft to methods
-% All free parameters are fit by optimizing $\Delta SSE$, the improvement in the total squared error compared to the null model under which all viruses are assumed to have equal antigenic fitness.
-% Fit parameter values are robust to the exact choice of optimization metric.
 
 This simple model explains 59\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 79\% of predictions.
 This strongly suggests that antigenic novelty is a major driver of serotype population dynamics % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
-% Some transition sentence here about how we can use the fit parameter values to learn about the system
 This also demonstrates that this model captures key components of dengue population dynamics.
 Interestingly, the model performs best when we model immunity as waning linearly over time, with the probability of protection dropping by about X\% per year for the first two years after primary infection. %this is some function of gamma and sigma; figure this out later.
 % add a sentence here about the relative intrinsic fitness values; compare to experimental estimates of replicative fitness
