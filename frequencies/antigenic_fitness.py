@@ -521,8 +521,8 @@ if __name__=="__main__":
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args = args.parse_args()
 
-    d1_vals = np.linspace(0,10,8)
-    d2_vals = np.linspace(0,5,8)
+    d1_vals = np.linspace(0,8,8)
+    d2_vals = np.linspace(0,8,8)
     d3_vals = np.linspace(0,5,8)
 
     output = []
