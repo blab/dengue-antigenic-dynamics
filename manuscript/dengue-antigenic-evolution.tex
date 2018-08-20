@@ -268,9 +268,19 @@ Interestingly, the model performs best when we model immunity as waning linearly
 
 \subsection{Antigenic novelty also partially predicts genotype success}
 % Figure 5: Genotype frequencies + fitness
-We also find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation.
-When clades are resolved and predicted at the level of canonical genotypes, we find that antigenic fitness correctly predicts growth vs. decline approximately for X\% of predictions.
-Overall, antigenic novelty explains approximately 25\% of the observed variation in observed genotype growth rates.
+
+In Southeast Asia, serotype dominance turns over every N years, while constituent genotypes turn over every N years on average.
+To directly examine the impact of antigenic fitness on these finer resolution population dynamics, we estimated the relative frequency of each genotype over the same time period.
+
+To estimate how well antigenic novelty predicts genotype success, we used the same model to predict genotype success and decline.
+As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated.
+Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the "interserotype model" above) or at the genotype level (i.e., the antigenic distances computed by the "full tree model", which incoporates the observed within-serotype heterogeneity).
+If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect the "full tree model" to predict genotype growth rates better than the "interserotype model".
+
+We find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation.
+When antigenic distance is estimated from the "interserotype model", we find that antigenic fitness explains approximately X\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline X\% of the time.
+For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
+Surprisingly, more precise estimates of antigenic distance between genotypes from the "full tree model" does not improve our predictions of genotype success ($\Rho = X$, X\% accuracy).
 
 \begin{figure}[h]
   \begin{centering}
@@ -279,13 +289,6 @@ Overall, antigenic novelty explains approximately 25\% of the observed variation
      \label{genotype_fitness}
    \end{centering}
 \end{figure}
-
-
-\subsection{Full-tree model does not improve predictions of genotype success}
-% Figure 6: predicted vs. actual genotype growth rates (all models)
-
-We can use this predictive framework to investigate
-
 
 \begin{figure}[h]
 \centering
@@ -296,27 +299,10 @@ We can use this predictive framework to investigate
 \end{centering}
 \end{figure}
 
-\begin{centering}
-  \resizebox{\textwidth}{!}{
-    \begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
-      \hline
-      Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
-      \hline
-      Serotype & Interserotype & $\Delta$ SSE & 14.90 & 1.29 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Serotype & Interserotype & Pearson $R^2$ & 0.62 & 1.71 & 0.57 & 2.14 & 1.00 & 0.86 & 0.00 & 0.00 \\
-      \hline
-      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-      \hline
-      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-      \hline
-    \end{tabular}
-  }
-\end{centering}
-
 \section*{Discussion}
 
+This suggests that although there is strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact these broad-scale regional dynamics over time.
+However, this does not necessarily imply that these differences do not effect individual secondary case outcomes or finer scale population dynamics that we lack the data to investigate.
 
 \newpage
 
@@ -433,6 +419,25 @@ Our frequency prediction model has a total of 8 free parameters:
 \end{table}
 
 For each dataset, we jointly fit these parameters to maximize $\Delta SSE$.
+
+\begin{centering}
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
+      \hline
+      Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
+      \hline
+      Serotype & Interserotype & $\Delta$ SSE & 14.90 & 1.29 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Serotype & Interserotype & Pearson $R^2$ & 0.62 & 1.71 & 0.57 & 2.14 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+    \end{tabular}
+  }
+\end{centering}
 
 \subsection*{Data availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue}{github.com/blab/dengue}.
