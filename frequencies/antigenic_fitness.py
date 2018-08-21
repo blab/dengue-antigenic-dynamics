@@ -519,47 +519,51 @@ if __name__=="__main__":
     args.add_argument('--save', help='save csv and png files?', action='store_true')
     args.add_argument('--name', type=str, help='analysis name')
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
+    args.add_argument('--mode', type=str, choices=['fit', 'run'], help='Fit parameters or run model?', default='run')
     args = args.parse_args()
 
-    d1_vals = np.linspace(0,8,8)
-    d2_vals = np.linspace(0,8,8)
-    d3_vals = np.linspace(0,5,8)
+    if args.mode == 'fit':
 
-    output = []
-    for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
-        args = deepcopy(args)
-        setattr(args, 'DENV1_f0', d1)
-        setattr(args, 'DENV2_f0', d2)
-        setattr(args, 'DENV3_f0', d3)
+        d1_vals = np.linspace(0,8,8)
+        d2_vals = np.linspace(0,8,8)
+        d3_vals = np.linspace(0,5,8)
+
+        output = []
+        for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
+            args = deepcopy(args)
+            setattr(args, 'DENV1_f0', d1)
+            setattr(args, 'DENV2_f0', d2)
+            setattr(args, 'DENV3_f0', d3)
+            antigenic_fitness = AntigenicFitness(args)
+            if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
+                print 'calculating fitness'
+                antigenic_fitness.calculate_fitness()
+            print 'predicting frequencies'
+            antigenic_fitness.predict_frequencies()
+            print 'calculating growth rates'
+            antigenic_fitness.calc_growth_rates()
+
+            model_performance = calc_model_performance(antigenic_fitness)
+            model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
+            sorted_param_vals = sorted(model_performance.keys())
+            print sorted_param_vals
+            model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
+            output.append(model_performance_str)
+
+        open(args.out_path+args.name+'.csv', 'w').write('\n'.join(output))
+
+    else:
         antigenic_fitness = AntigenicFitness(args)
-        if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-            print 'calculating fitness'
-            antigenic_fitness.calculate_fitness()
-        print 'predicting frequencies'
+        antigenic_fitness.calculate_fitness()
         antigenic_fitness.predict_frequencies()
-        print 'calculating growth rates'
         antigenic_fitness.calc_growth_rates()
 
-        model_performance = calc_model_performance(antigenic_fitness)
-        model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
-        sorted_param_vals = sorted(model_performance.keys())
-        print sorted_param_vals
-        model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
-        output.append(model_performance_str)
-
-    open(args.out_path+args.name+'.csv', 'w').write('\n'.join(output))
-
-    # antigenic_fitness = AntigenicFitness(args)
-    # antigenic_fitness.calculate_fitness()
-    # antigenic_fitness.predict_frequencies()
-    # antigenic_fitness.calc_growth_rates()
-    #
-    # if args.trajectory:
-    #     assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
-    #     for t in args.trajectory:
-    #         closest_timepoint = sorted(list(antigenic_fitness.timepoints), key = lambda tp: abs(t - tp))[0]
-    #         trajectory = predict_trajectories(antigenic_fitness, closest_timepoint)
-    #         if args.save:
-    #             trajectory.to_csv('%s_%s_%.1f_trajectory.csv'%(args.out_path, args.name, t))
-    #         if args.plot:
-    #             plot_trajectory(antigenic_fitness, trajectory)
+        if args.trajectory:
+            assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
+            for t in args.trajectory:
+                closest_timepoint = sorted(list(antigenic_fitness.timepoints), key = lambda tp: abs(t - tp))[0]
+                trajectory = predict_trajectories(antigenic_fitness, closest_timepoint)
+                if args.save:
+                    trajectory.to_csv(args.out_path + '%s_%.1f_trajectory.csv'%(args.name, t))
+                if args.plot:
+                    plot_trajectory(antigenic_fitness, trajectory)
