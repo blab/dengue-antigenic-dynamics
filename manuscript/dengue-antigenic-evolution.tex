@@ -114,6 +114,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 \section*{Results}
 
+% SB general to-do:
+% 1 - clean up language around virus/strain/clade/genotype
+% 2 - add supplemental figures
+% 3 - add references
+
 \subsection{Dengue neutralization titer data}
 
 Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro.
@@ -134,7 +139,7 @@ Normalized titers between $i$ and $j$ are thus calculated as $T_{ij} = log_2(T_{
 \begin{figure}[h]
 \begin{centering}
 \includegraphics[width=0.7\textwidth]{../figures/png/titer_heatmap.png}
-    \caption{\textbf{Normalized antigenic distance between pairs of dengue virus strains and sera.}\linebreak Neutralization titers from Katzelnick et al. were normalized such that the distance between autologous virus:serum pairs is 0, and each titer unit corresponds to one 2-fold change in PRNT50 value. Light gray areas represent missing data.}
+    \caption{\textbf{Normalized antigenic distance between pairs of dengue virus strains and sera.} Neutralization titers from Katzelnick et al. were normalized such that the distance between autologous virus:serum pairs is 0, and each titer unit corresponds to one 2-fold change in PRNT50 value. Light gray areas represent missing data. Higher values correspond to greater antigenic distance.}
      \label{titer_heatmap}
 \end{centering}
 \end{figure}
@@ -149,7 +154,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \begin{figure}[h]
   \begin{centering}
   \includegraphics[width=0.6\textwidth]{../figures/png/genetic_antigenic_distance.png}
-  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.} \linebreak Normalized antigenic distance between virus strains from Figure 1 as a function of the patristic distance between them on a maximum likelihood phylogeny of viral genomes.}
+  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.}  Normalized antigenic distance between virus strains from Figure 1 as a function of the patristic distance between them on a maximum likelihood phylogeny of viral genomes.}
   	\label{genetic_antigenic_distance}
   \end{centering}
 \end{figure}
@@ -161,10 +166,19 @@ Notably, increasing genetic divergence generally corresponds to increased antige
 
 \subsection{Within-serotype antigenic evolution better explains observed antigenic relationships}
 
+% SB: This is a weird place for this figure to go, but I can't quite decide where to put it. Thoughts?
+\begin{figure}[h]
+  \begin{centering}
+    \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
+  	\caption{\textbf{Phylogeny of dengue viral sequences.}  Maximum likelihood phylogeny of dengue virus genomes, colored by canonical genotype assignment.}
+  	\label{genotype_tree}
+  \end{centering}
+\end{figure}
+
 We then sought to fully map the relationship between DENV genetic and antigenic evolution.
 To do so, we adapted a phylogenetics-based model originally developed for influenza. %neher et al reference
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
-First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses.
+First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figure ~\ref{genotype_tree}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny (denoted $d_b$).
 Finally, once each branch has been assigned a $d_b$ value, we can estimate the titer distance between any pair of viruses by tracing the path between them in the phylogeny, summing values of $d_b$ as we go.
 
@@ -180,7 +194,7 @@ We can also use variations of this model to explicitly test whether the observed
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\textwidth]{../figures/png/titer_model_performance.png}
-        \caption{\textbf{Titer model formulations and performance.} \linebreak \textbf{A} The "interserotype model" only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The "full tree model" allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).}
+        \caption{\textbf{Titer model formulations and performance.}  \textbf{A} The "interserotype model" only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The "full tree model" allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).}
          \label{titer_model_performance}
   \end{centering}
 \end{figure}
@@ -198,10 +212,11 @@ From this, we conclude that there is antigenic evolution within each serotype of
 
 \subsection{There are at least 12 distinct antigenic phenotypes of dengue}
 
+% I'm not sure I actually like this figure, but I can't think of a better representation.
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\linewidth]{../figures/png/antigenic_tree.png}
-    \caption{\textbf{Tree of dengue antigenic phenotypes.} \linebreak A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the "full tree model". Antigenically uniform clades were collapsed, and node sizes reflect the size of the collapsed clade.}
+    \caption{\textbf{Tree of dengue antigenic phenotypes.}  A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the "full tree model". Antigenically uniform clades were collapsed, and node sizes reflect the size of the collapsed clade.}
      \label{antigenic_tree}
   \end{centering}
 \end{figure}
@@ -225,19 +240,12 @@ The relative makeup of this viral population is strongly driven by viral fitness
 In meaningfully antigenically diverse viral populations, antigenic novelty contributes to viral fitness: as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other strains antigenically similar to $i$--decreases over time as more people acquire immunity.
 Antigenically novel viruses that are able to escape this population immunity are better able to infect hosts, making them fitter than the previously circulating strain.
 Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we would expect greater antigenic distance from recently circulating strains to correlate with higher growth rates.
-\begin{figure}[h]
-  \begin{centering}
-    \includegraphics[width=\linewidth]{../figures/png/serotype_fitness_model.png}
-  	\caption{\textbf{Antigenic novelty predicts serotype success.} \linebreak \textbf{A} The relative frequency of each serotype in Southeast Asia was estimated every 3 months based on available sequence data. \textbf{B} At each timepoint, we calculate the relative fitness of each serotype based on its antigenic novelty (frequency-weighted distance from recently circulating strains) and a scaling factor representing the intrinsic fitness of each serotype. \textbf{C} At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each clade's future trajectory based on its initial frequency and antigenic fitness at time $t$; we predict forward in 3-month increments, compounding population immunitiy and adjusting antigenic fitness based on predicted frequency changes, for a total prediction period of $dt = 5 years$. \textbf{D} Predicted growth rates are calculated as $\frac{\hat{x_i}(t+dt)}{x_i}(t)$ and compared to empirically observed growth rates. Clade growth versus decline is accurate for 80\% of predictions (points outside the shaded gray area).
-  	\label{serotype_fitness_model}
-  \end{centering}
-\end{figure}
 
 \begin{figure}[h]
   \begin{centering}
-    \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
-  	\caption{\textbf{Tree of canonical dengue genotypes.} \linebreak Maximum likelihood phylogeny of the dengue sequence dataset, colored by canonical genotype assignment.}
-  	\label{genotype_tree}
+    \includegraphics[width=\linewidth]{../figures/png/serotype_fitness_model.png}
+  	\caption{\textbf{Antigenic novelty predicts serotype success.}  \textbf{A} The relative frequency of each serotype in Southeast Asia was estimated every 3 months based on available sequence data. \textbf{B} At each timepoint, we calculate the relative fitness of each serotype based on its antigenic novelty (frequency-weighted distance from recently circulating strains) and a scaling factor representing the intrinsic fitness of each serotype. \textbf{C} At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each clade's future trajectory based on its initial frequency and antigenic fitness at time $t$; we predict forward in 3-month increments, compounding population immunitiy and adjusting antigenic fitness based on predicted frequency changes, for a total prediction period of $dt = 5 years$. \textbf{D} Predicted growth rates are calculated as $\frac{\hat{x_i}(t+dt)}{x_i}(t)$ and compared to empirically observed growth rates. Clade growth versus decline is accurate for 80\% of predictions (points outside the shaded gray area).}
+  	\label{serotype_fitness_model}
   \end{centering}
 \end{figure}
 
@@ -258,14 +266,12 @@ Interestingly, the model performs best when we model immunity as waning linearly
 % add a sentence here about the relative intrinsic fitness values; compare to experimental estimates of replicative fitness
 
 \subsection{Antigenic novelty also partially predicts genotype success}
-% Figure 5: Genotype frequencies + fitness
-
 To directly examine the impact of antigenic fitness on these finer resolution population dynamics, we estimated the relative frequency of each genotype over the same time period.
 
 \begin{figure}[h]
   \begin{centering}
 \includegraphics[width=\linewidth]{../figures/png/genotype_fitness.png}
-    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.} \linebreak \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the "full tree model" of antigenic relationships)}
+    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the "full tree model" of antigenic relationships)}
      \label{genotype_fitness}
    \end{centering}
 \end{figure}
@@ -279,11 +285,12 @@ If within-serotype antigenic heterogeneity contributes to genotype fitness, then
 \centering
 \includegraphics[width=0.7\linewidth]{../figures/png/genotype_fitness_model_compare.png}
 \begin{centering}
-    \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.} \linebreak Antigenic distance between each pair of canonical genotypes was estimated from either the "full tree model" or the "interserotype model" of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
+    \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}  Antigenic distance between each pair of canonical genotypes was estimated from either the "full tree model" or the "interserotype model" of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
      \label{genotype_growth_rates}
 \end{centering}
 \end{figure}
 
+% the final version of these results is still running
 We find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation (Figure ~\ref{genotype_growth_rates}A).
 When antigenic distance is estimated from the "interserotype model", we find that antigenic fitness explains approximately X\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline X\% of the time.
 For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
