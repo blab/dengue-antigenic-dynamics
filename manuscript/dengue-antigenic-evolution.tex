@@ -251,10 +251,10 @@ Growth rates are estimated based on a 5-year sliding window.
 We estimate the antigenic fitness of virus $i$ at time $t$ as a function of its antigenic distance from each strain $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning immunity (see Methods).
 Serotype intrinsic fitness is a free parameter and is constant over time.
 
-This simple model explains 59\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 79\% of predictions.
+This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 80\% of predictions.
 This strongly suggests that antigenic novelty is a major driver of serotype population dynamics % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
 This also demonstrates that this model captures key components of dengue population dynamics.
-Interestingly, the model performs best when we model immunity as waning linearly over time, with the probability of protection dropping by about X\% per year for the first two years after primary infection. %this is some function of gamma and sigma; figure this out later.
+Interestingly, the model performs best when we model immunity as waning linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
 % add a sentence here about the relative intrinsic fitness values; compare to experimental estimates of replicative fitness
 
 \begin{figure}[h]
@@ -269,7 +269,6 @@ Interestingly, the model performs best when we model immunity as waning linearly
 \subsection{Antigenic novelty also partially predicts genotype success}
 % Figure 5: Genotype frequencies + fitness
 
-In Southeast Asia, serotype dominance turns over every N years, while constituent genotypes turn over every N years on average.
 To directly examine the impact of antigenic fitness on these finer resolution population dynamics, we estimated the relative frequency of each genotype over the same time period.
 
 To estimate how well antigenic novelty predicts genotype success, we used the same model to predict genotype success and decline.
@@ -280,7 +279,7 @@ If within-serotype antigenic heterogeneity contributes to genotype fitness, then
 We find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation.
 When antigenic distance is estimated from the "interserotype model", we find that antigenic fitness explains approximately X\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline X\% of the time.
 For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
-Surprisingly, more precise estimates of antigenic distance between genotypes from the "full tree model" does not improve our predictions of genotype success ($\Rho = X$, X\% accuracy).
+Surprisingly, more precise estimates of antigenic distance between genotypes from the "full tree model" does not improve our predictions of genotype success ($\rho = X$, X\% accuracy).
 
 \begin{figure}[h]
   \begin{centering}
@@ -426,8 +425,8 @@ For each dataset, we jointly fit these parameters to maximize $\Delta SSE$.
       \hline
       Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
       \hline
-      Serotype & Interserotype & $\Delta$ SSE & 14.90 & 1.29 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Serotype & Interserotype & Pearson $R^2$ & 0.62 & 1.71 & 0.57 & 2.14 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      Serotype & Interserotype & $\Delta$ SSE & 15.02 & 2.57 & 0.57 & 0.86 & 4.57 & 3.43 & 2.14 & 0.00 \\
+      Serotype & Interserotype & Pearson $R^2$ & 0.63 & 2.57 & 0.57 & 0.86 & 3.43 & 2.29 & 0.71 & 0.00 \\
       \hline
       Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
       Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
