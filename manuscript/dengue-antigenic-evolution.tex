@@ -1,109 +1,109 @@
 \documentclass[11pt,oneside,letterpaper]{article}
 
-% graphicx package, useful for including eps and pdf graphics
-\usepackage{graphicx}
-\usepackage{grffile}
-\usepackage{subfig}
-%\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+  % graphicx package, useful for including eps and pdf graphics
+  \usepackage{graphicx}
+  \usepackage{grffile}
+  \usepackage{subfig}
+  %\DeclareGraphicsExtensions{.pdf,.png,.jpg}
 
-% basic packages
-\usepackage{color}
-\usepackage{parskip}
-\usepackage{float}
-\usepackage{microtype}
-\usepackage{url}
-\urlstyle{same}
+  % basic packages
+  \usepackage{color}
+  \usepackage{parskip}
+  \usepackage{float}
+  \usepackage{microtype}
+  \usepackage{url}
+  \urlstyle{same}
 
-\usepackage[hidelinks]{hyperref}
-\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
+  \usepackage[hidelinks]{hyperref}
+  \hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
 
-\usepackage{longtable}
-\usepackage[]{algorithm2e}
+  \usepackage{longtable}
+  \usepackage[]{algorithm2e}
 
-% reference figures across documents
-% \usepackage{xr}
-% \externaldocument{mers-structure_supp}
+  % reference figures across documents
+  % \usepackage{xr}
+  % \externaldocument{mers-structure_supp}
 
-% text layout
-\usepackage{geometry}
-\geometry{textwidth=15cm} % 15.25cm for single-space, 16.25cm for double-space
-\geometry{textheight=22cm} % 22cm for single-space, 22.5cm for double-space
+  % text layout
+  \usepackage{geometry}
+  \geometry{textwidth=15cm} % 15.25cm for single-space, 16.25cm for double-space
+  \geometry{textheight=22cm} % 22cm for single-space, 22.5cm for double-space
 
-% helps to keep figures from being orphaned on a page by themselves
-\renewcommand{\topfraction}{0.85}
-\renewcommand{\textfraction}{0.1}
+  % helps to keep figures from being orphaned on a page by themselves
+  \renewcommand{\topfraction}{0.85}
+  \renewcommand{\textfraction}{0.1}
 
-% bold the 'Figure #' in the caption and separate it with a period
-% Captions will be left justified
-\usepackage[labelfont=bf,labelsep=period,font=small]{caption}
-% \RequirePackage{subfigure}
+  % bold the 'Figure #' in the caption and separate it with a period
+  % Captions will be left justified
+  \usepackage[labelfont=bf,labelsep=period,font=small]{caption}
+  % \RequirePackage{subfigure}
 
-% review layout with double-spacing
-%\usepackage{setspace}
-%\doublespacing
-%\captionsetup{labelfont=bf,labelsep=period,font=doublespacing}
+  % review layout with double-spacing
+  %\usepackage{setspace}
+  %\doublespacing
+  %\captionsetup{labelfont=bf,labelsep=period,font=doublespacing}
 
-% cite package, to clean up citations in the main text. Do not remove.
-%\usepackage{cite}
-\usepackage{natbib}
-%\renewcommand\citepleft{(}
-%\renewcommand\citepright{)}
-%\renewcommand\citepform[1]{\textsl{#1}}
+  % cite package, to clean up citations in the main text. Do not remove.
+  %\usepackage{cite}
+  \usepackage{natbib}
+  %\renewcommand\citepleft{(}
+  %\renewcommand\citepright{)}
+  %\renewcommand\citepform[1]{\textsl{#1}}
 
-\usepackage{amsmath}
+  \usepackage{amsmath}
 
-%\usepackage{lineno}
-%\linenumbers
+  %\usepackage{lineno}
+  %\linenumbers
 
-% Remove brackets from numbering in list of References
-%\renewcommand\refname{\large References}
-%\makeatletter
-%\renewcommand{\@biblabel}[1]{\quad#1.}
-%\makeatother
+  % Remove brackets from numbering in list of References
+  %\renewcommand\refname{\large References}
+  %\makeatletter
+  %\renewcommand{\@biblabel}[1]{\quad#1.}
+  %\makeatother
 
-\usepackage{authblk}
-\renewcommand\Authands{ \& }
-\renewcommand\Authfont{\normalsize \bf}
-\renewcommand\Affilfont{\small \normalfont}
-\makeatletter
-\renewcommand\AB@affilsepx{, \protect\Affilfont}
-\makeatother
+  \usepackage{authblk}
+  \renewcommand\Authands{ \& }
+  \renewcommand\Authfont{\normalsize \bf}
+  \renewcommand\Affilfont{\small \normalfont}
+  \makeatletter
+  \renewcommand\AB@affilsepx{, \protect\Affilfont}
+  \makeatother
 
-% comments
-%\usepackage{ulem}
-\definecolor{purple}{rgb}{0.459,0.109,0.538}
-\def\tb#1#2{\sout{#1} \textcolor{purple}{#2}}
-\def\tbc#1{\textcolor{purple}{[#1]}}
-\def\gdc#1{\textcolor{blue}{[#1]}}
-\def\lmc#1{\textcolor{green}{[#1]}}
+  % comments
+  %\usepackage{ulem}
+  \definecolor{purple}{rgb}{0.459,0.109,0.538}
+  \def\tb#1#2{\sout{#1} \textcolor{purple}{#2}}
+  \def\tbc#1{\textcolor{purple}{[#1]}}
+  \def\gdc#1{\textcolor{blue}{[#1]}}
+  \def\lmc#1{\textcolor{green}{[#1]}}
 
-% symbols
-% \newcommand{\chiSq}{\chi^{2}_{df}} %LM: ancient DNA? =P %GD: quite :)
-% \newcommand{\dtmrca}{\Delta_\mathrm{TMRCA}}
-% \newcommand{\undtmrca}{\delta_\mathrm{TMRCA}}
-% \newcommand{\dspr}{d_\mathrm{SPR}}
+  % symbols
+  % \newcommand{\chiSq}{\chi^{2}_{df}} %LM: ancient DNA? =P %GD: quite :)
+  % \newcommand{\dtmrca}{\Delta_\mathrm{TMRCA}}
+  % \newcommand{\undtmrca}{\delta_\mathrm{TMRCA}}
+  % \newcommand{\dspr}{d_\mathrm{SPR}}
 
-%%% TITLE %%%
+%%% Title & Authors %%%
 \title{\vspace{1.0cm} \LARGE \bf Dengue antigenic relationships predict evolutionary dynamics}
 
-\author[1,2]{Sidney Bell}
-\author[3]{Leah Katzelnick}
-\author[1]{Trevor Bedford}
+  \author[1,2]{Sidney Bell}
+  \author[3]{Leah Katzelnick}
+  \author[1]{Trevor Bedford}
 
-\affil[1]{Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research Center, Seattle, WA, USA}
-\affil[2]{Molecular and Cell Biology Graduate Program, University of Washington, Seattle, WA, USA}
-\affil[3]{Some Department, University of California, Berkeley, CA, USA}
+  \affil[1]{Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research Center, Seattle, WA, USA}
+  \affil[2]{Molecular and Cell Biology Graduate Program, University of Washington, Seattle, WA, USA}
+  \affil[3]{Some Department, University of California, Berkeley, CA, USA}
 
-% \date{\today}
+  % \date{\today}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
 
-  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-\end{abstract}
+  \end{abstract}
 
 \pagebreak
 
@@ -123,20 +123,15 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 \subsection{Dengue neutralization titer data}
 
 Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro.
-
-Briefly, serum $i$ is serially diluted and incubated with a fixed concentration of virus $j$.
-Titers represent the lowest serum concentration able to neutralize $50\%$ of virus, and are reported as the inverse dilution.
-% SB: shorten this explanation (move most to methods), give people intuition for how higher *normalized* titers correspond to *greater* distance instead
-Thus, a higher titer value indicates that less of serum $i$ is required to neutralize virus $j$, implying stronger cross-neutralization and smaller antigenic distance between viruses $i$ and $j$.
 To measure the pairwise antigenic distances for a panel of diverse DENV strains, Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at 3 months post-infection, and then titered this sera against a panel of test viruses.
 To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants 6 weeks after innoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV strains.
-In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of strains.
 As reported by Katzelnick et al., we find generally consistent patterns of neutralization between the NHP and human sera data; see [ref] for a detailed comparison.
+In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of strains.
 
-To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one 2-fold dilution of sera.
+To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one 2-fold drop in neutralization.
 We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as 0.
-Normalized titers between $i$ and $j$ are thus calculated as $T_{ij} = log_2(T_{ij}) - log_2(T_{ii})$.
+Normalized titers between $i$ and $j$ are thus calculated as $T_{ij} = log_2(T_{ij}) - log_2(T_{ii})$, such that a higher normalized titer value indicates that serum $i$ is less effective at neutralizing virus $j$, implying greater distance between viruses $i$ and $j$.
 
 \begin{figure}[h]
 \begin{centering}
@@ -164,6 +159,8 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 Titer measurements are prone to noise, and there is a limited amount of available data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect changes in antigenic phenotype to be driven by underlying changes in viral genotype.
 Figure ~\ref{genetic_antigenic_distance} shows the relationship between genetic and antigenic distance between each pair of viruses in our dataset.
+There are two groups of comparisons --- between serotype and within serotype --- however, even within serotypes there is significant genetic diversity and a correlation between increased genetic distance and increased antigenic distance.
+The relationship between genetic distance and antigenic distance is consistent within and between serotypes, where the same trend line can be fit to both within and between comparisons.
 Notably, increasing genetic divergence generally corresponds to increased antigenic distance, both within and between serotypes.
 
 \subsection{Within-serotype antigenic evolution better explains observed antigenic relationships}
@@ -321,6 +318,10 @@ We then randomly subsampled up to 8 viruses per region, per month, preferentiall
 Our final dataset consists of 2,563 viral sequences (Supp Fig. N)
 
 \textbf{Titers}\\
+
+Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro.
+Briefly, serum $i$ is serially diluted and incubated with a fixed concentration of virus $j$.
+Titers represent the lowest serum concentration able to neutralize $50\%$ of virus, and are reported as the inverse dilution.
 We used two publicly available plaque reduction neutralization titer (PRNT50) datasets generated by Katzelnick et al. in {[}ref{]}.
 The primary dataset was generated by infecting each of 36 non-human primates with a unique strain of DENV.
 NHP sera was drawn after 12 weeks and titered against the panel of DENV viruses.
