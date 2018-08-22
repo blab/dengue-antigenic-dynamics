@@ -192,9 +192,6 @@ This is analogous to lasso regression to identify a few parameters with positive
 Additionally, some viruses have greater binding avidity, and some sera are more potent than others; these row and column effects, respectively, are normally distributed and are taken into account when estimating titers.
 The model uses convex optimization to learn the values of $d_b$ that minimize the sum of squared error (SSE) between observed and predicted titers in the training data.
 
-This model is an effective tool for estimating antigenic relationships between viruses based on their relative positions in the phylogeny.
-We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform (``interserotype model''), or by the hypothesis that serotypes are antigenically diverse (``full tree model'').
-
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\textwidth]{../figures/png/titer_model_performance.png}
@@ -203,14 +200,19 @@ We can also use variations of this model to explicitly test whether the observed
   \end{centering}
 \end{figure}
 
-\tbc{We validate each model by using model parameters estimated from the training data to predict test data values...}
+This model is an effective tool for estimating antigenic relationships between viruses based on their relative positions in the phylogeny.
+We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform ('interserotype model'), or by the hypothesis that serotypes are antigenically diverse ('full tree model').
+In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes (Figure ~\ref{titer_model_performance}A).
+The 'full tree model' allows any branch in the phylogeny to contribte to antigenic evolution (Figure ~\ref{titer_model_performance}B).
+For each model, we learn model parameters from the training data, and then use those parameters to predict test data values.
+We assess model performance by comparing the predicted test titer values to the actual values.
+Model performance indicates how well the hypothesis embedded in the model explains the observed data.
 
 We find that serotype-level characterization is insufficient to explain observed antigenic phenotypes.
-In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes.
 On average, this interserotype model predicts titers within $1.27$ $log_2$ titer units of the true value (root mean squared error, RMSE), and explains $22\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 
 We find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
-When we allow any branch in the phylogeny to contribte to antigenic evolution, this full tree model is able to predict test titers within $0.89$ $log_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
+The full tree model is able to predict test titers within $0.89$ $log_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
 The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE $0.65-0.8$ $log_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of $0.5$ $log_2$ titer units).
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
@@ -231,7 +233,7 @@ Collapsing putatively antigenically uniform clades, we observe at least 12 disti
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
 Notably, many of the titer values in this dataset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart; if we knew the true value of these censored titers, many of them would indicate larger antigenic distances than the reported values used to train the model.
-We therefore expect that our model systematically underestimates titer distances overall. 
+We therefore expect that our model systematically underestimates titer distances overall.
 
 \subsection{Antigenic novelty predicts serotype success}
 We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
@@ -263,7 +265,7 @@ We estimate the antigenic fitness of virus $i$ at time $t$ as a function of its 
 Serotype intrinsic fitness is a free parameter and is constant over time.
 
 This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 80\% of predictions (Figure ~\ref{serotype_fitness_model}D).
-This strongly suggests that antigenic novelty is a major driver of serotype population dynamics % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
+This strongly suggests that antigenic novelty is a major driver of serotype population dynamics. % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
 This also demonstrates that this model captures key components of dengue population dynamics.
 Interestingly, the model performs best when we model immunity as waning linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
 % add a sentence here about the relative intrinsic fitness values; compare to experimental estimates of replicative fitness
