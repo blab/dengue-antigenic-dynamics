@@ -181,17 +181,19 @@ We then sought to fully map the relationship between DENV genetic and antigenic 
 To do so, we adapted a phylogenetics-based model originally developed for influenza. %neher et al reference
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
 First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figure ~\ref{genotype_tree}).
-Next, we infer how much antigenic change has occurred along each branch of the phylogeny (denoted $d_b$).
-Finally, once each branch has been assigned a $d_b$ value, we can estimate the titer distance between any pair of viruses by tracing the path between them in the phylogeny, summing values of $d_b$ as we go.
+Next, we infer how much antigenic change has occurred along each branch of the phylogeny.
+This assigns each branch $b$ an antigenic distance $d_b$.
+With this in hand, we estimate the antigenic distance between any pair of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go.
 
 To learn these values of $d_b$, we first split our dataset into training (random 90\% of measurements) and test data (the remaining 10\% of values).
-The model then tries to infer one value of $d_b$ for each branch in the tree, subject to a few constraints.
+We take the training data and fit $d_b$ for each branch in the tree, subject to regularization.
 Parsimoniously, we expect that antigenic change is more likely to occur through fewer, larger changes than through many small changes; correspondingly, values of $d_b$ are exponentially distributed such that most values of $d_b = 0$.
+This is analogous to lasso regression to identify a few parameters with positive weights and set other parameters to 0.
 Additionally, some viruses have greater binding avidity, and some sera are more potent than others; these row and column effects, respectively, are normally distributed and are taken into account when estimating titers.
 The model uses convex optimization to learn the values of $d_b$ that minimize the sum of squared error (SSE) between observed and predicted titers in the training data.
 
 This model is an effective tool for estimating antigenic relationships between viruses based on their relative positions in the phylogeny.
-We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform ("interserotype model"), or by the hypothesis that serotypes are antigenically diverse ("full tree model").
+We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform (``interserotype model''), or by the hypothesis that serotypes are antigenically diverse (``full tree model'').
 
 \begin{figure}[h]
   \begin{centering}
@@ -201,6 +203,8 @@ We can also use variations of this model to explicitly test whether the observed
   \end{centering}
 \end{figure}
 
+\tbc{We validate each model by using model parameters estimated from the training data to predict test data values...}
+
 We find that serotype-level characterization is insufficient to explain observed antigenic phenotypes.
 In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes.
 On average, this interserotype model predicts titers within a $2.4$-fold dilution of the true value, and explains $22\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
@@ -208,7 +212,7 @@ On average, this interserotype model predicts titers within a $2.4$-fold dilutio
 We find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
 When we allow any branch in the phylogeny to contribte to antigenic evolution, this full tree model is able to predict test titers within a $1.9$-fold dilution of the true value (approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
-The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset, and to the error observed when this model was used to characterize an influenza dataset.
+The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset \tbc{give this error from Leah's paper}, and to the error observed when this model was used to characterize an influenza dataset \tbc{also give this error, overly opaque without numbers}.
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
 
@@ -228,10 +232,11 @@ Collapsing putatively antigenically uniform clades, we observe at least 12 disti
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
 However, it is unclear whether this level of antigenic heterogeneity is sufficient to differentiate secondary case outcomes in vivo.
-For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
+For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset. \tbc{This should be in Discussion instead.}
 On average, intraserotype antigenic phenotypes are 0.42 titer units apart; interserotype antigenic phenotypes are 1.78 titer units apart.
 Notably, many of the titer values in this datset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart.
 We therefore expect that our model systematically underestimates titer distances overall.
+\tbc{Spell this out more. This is a red flag for reviewers (for good reason).}
 
 \subsection{Antigenic novelty predicts serotype success}
 We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
