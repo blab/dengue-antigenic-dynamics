@@ -178,7 +178,7 @@ Notably, increasing genetic divergence generally corresponds to increased antige
 \end{figure}
 
 We then sought to fully map the relationship between DENV genetic and antigenic evolution.
-To do so, we adapted a phylogenetics-based model originally developed for influenza. %neher et al reference
+To do so, we adapted a phylogenetics-based model originally developed for influenza.
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
 First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figure ~\ref{genotype_tree}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny.
@@ -207,12 +207,12 @@ We can also use variations of this model to explicitly test whether the observed
 
 We find that serotype-level characterization is insufficient to explain observed antigenic phenotypes.
 In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes.
-On average, this interserotype model predicts titers within a $2.4$-fold dilution of the true value, and explains $22\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
+On average, this interserotype model predicts titers within $1.27$ $log_2$ titer units of the true value (root mean squared error, RMSE), and explains $22\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 
 We find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
-When we allow any branch in the phylogeny to contribte to antigenic evolution, this full tree model is able to predict test titers within a $1.9$-fold dilution of the true value (approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
+When we allow any branch in the phylogeny to contribte to antigenic evolution, this full tree model is able to predict test titers within $0.89$ $log_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
-The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset \tbc{give this error from Leah's paper}, and to the error observed when this model was used to characterize an influenza dataset \tbc{also give this error, overly opaque without numbers}.
+The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE $0.65-0.8$ $log_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of $0.5$ $log_2$ titer units).
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
 
