@@ -230,9 +230,8 @@ From this, we conclude that there is antigenic evolution within each serotype of
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue (Figure ~\ref{antigenic_tree}).
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
-Notably, many of the titer values in this datset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart.
-We therefore expect that our model systematically underestimates titer distances overall.
-\tbc{Spell this out more. This is a red flag for reviewers (for good reason).}
+Notably, many of the titer values in this dataset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart; if we knew the true value of these censored titers, many of them would indicate larger antigenic distances than the reported values used to train the model.
+We therefore expect that our model systematically underestimates titer distances overall. 
 
 \subsection{Antigenic novelty predicts serotype success}
 We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
