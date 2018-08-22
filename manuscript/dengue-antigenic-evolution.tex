@@ -17,7 +17,6 @@
   \usepackage[hidelinks]{hyperref}
   \hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black}
 
-  \usepackage{longtable}
   \usepackage[]{algorithm2e}
 
   % reference figures across documents
@@ -127,7 +126,7 @@ To measure the pairwise antigenic distances for a panel of diverse DENV strains,
 To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants 6 weeks after innoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV strains.
 As reported by Katzelnick et al., we find generally consistent patterns of neutralization between the NHP and human sera data; see [ref] for a detailed comparison.
-In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of strains.
+In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of strains (Figure ~\ref{titered_strains_tree}).
 
 To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one 2-fold drop in neutralization.
 We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as 0.
@@ -177,7 +176,7 @@ Notably, increasing genetic divergence generally corresponds to increased antige
 We then sought to fully map the relationship between DENV genetic and antigenic evolution.
 To do so, we adapted a phylogenetics-based model originally developed for influenza.
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
-First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figure ~\ref{genotype_tree}).
+First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figures ~\ref{genotype_tree}, ~\ref{sequence_distribution}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny.
 This assigns each branch $b$ an antigenic distance $d_b$.
 With this in hand, we estimate the antigenic distance between any pair of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go.
@@ -214,7 +213,6 @@ Importantly, all reported error metrics refer to performance on test data, so th
 The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE $0.65-0.8$ $log_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of $0.5$ $log_2$ titer units).
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
-
 \subsection{There are at least 12 distinct antigenic phenotypes of dengue}
 
 % I'm not sure I actually like this figure, but I can't think of a better representation.
@@ -227,7 +225,7 @@ From this, we conclude that there is antigenic evolution within each serotype of
 \end{figure}
 
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue (Figure ~\ref{antigenic_tree}).
-The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
+The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity (Figure ~\ref{genotype_dTiter_heatmap}).
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
 Notably, many of the titer values in this dataset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart; if we knew the true value of these censored titers, many of them would indicate larger antigenic distances than the reported values used to train the model.
 We therefore expect that our model systematically underestimates titer distances overall.
@@ -315,7 +313,7 @@ On average, intraserotype antigenic phenotypes are 0.42 titer units apart; inter
 We downloaded all dengue virus sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained the full coding sequence of E (total N=12,645).
 We discarded sequences which were putative recombinants, duplicates, lab strains, or which lacked an annotated sampling location and/or sampling date.
 We then randomly subsampled up to 8 viruses per region, per month, preferentially including records with available titer data and longer sequences.
-Our final dataset consists of 2,563 viral sequences (Supp Fig. N)
+Our final dataset consists of 2,563 viral sequences (Figure ~\ref{sequence_distribution})
 
 \textbf{Titers}\\
 
@@ -413,7 +411,7 @@ $$\Delta SSE = SSE^{null} - SSE^{model}$$
 Our frequency prediction model has a total of 8 free parameters:
 \begin{table}[h!]
   \begin{center}
-    \label{tab:table1}
+    \label{parameter_definition}
     \begin{tabular}{c|l}
       $\beta$ & Slope of linear relationship between population immunity and viral fitness\\
       $\gamma$ & Slope of linear relationship between titers and probability of protection\\
@@ -425,26 +423,7 @@ Our frequency prediction model has a total of 8 free parameters:
   \end{center}
 \end{table}
 
-For each dataset, we jointly fit these parameters to maximize $\Delta SSE$.
-
-\begin{centering}
-  \resizebox{\textwidth}{!}{
-    \begin{tabular}{ l | l | l | r | r | r | r | r | r | r | r }
-      \hline
-      Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
-      \hline
-      Serotype & Interserotype & $\Delta$ SSE & 15.02 & 2.57 & 0.57 & 0.86 & 4.57 & 3.43 & 2.14 & 0.00 \\
-      Serotype & Interserotype & Pearson $R^2$ & 0.63 & 2.57 & 0.57 & 0.86 & 3.43 & 2.29 & 0.71 & 0.00 \\
-      \hline
-      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-      \hline
-      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
-      \hline
-    \end{tabular}
-  }
-\end{centering}
+For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ (Table S1).
 
 \subsection*{Data availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue}{github.com/blab/dengue}.
@@ -460,10 +439,72 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01 and \_.
 \newpage
 
 % SUPPLEMENT STARTS HERE
+\section*{Supplement}
 
-% \setcounter{figure}{0}
-% \setcounter{table}{0}
-% \renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+
+\begin{centering}
+  \begin{table}[h]
+    \label{parameter_values}
+    \caption{\textbf{Fit parameter values for fitness model}}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}[ht]{ l | l | l | r | r | r | r | r | r | r | r }
+      \hline
+      Genetic resolution & Antigenic resolution & Metric & Metric value & $\beta$ & $\gamma$ & $\sigma$ & DENV1 $f_0$ & DENV2 $f_0$ & DENV3 $f_0$ & DENV4 $f_0$ \\
+      \hline
+      Serotype & Interserotype & $\Delta$ SSE & 15.02 & 2.57 & 0.57 & 0.86 & 4.57 & 3.43 & 2.14 & 0.00 \\
+      Serotype & Interserotype & Pearson $R^2$ & 0.63 & 2.57 & 0.57 & 0.86 & 3.43 & 2.29 & 0.71 & 0.00 \\
+      \hline
+      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
+      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      \hline
+    \end{tabular}
+    }
+\end{table}
+\end{centering}
+
+
+\begin{figure}[h]
+\centering
+	\includegraphics[width=0.65\textwidth]{../figures/png/titered_strains_tree.png}
+	\caption{\textbf{Tree of DENV strains in titer dataset}
+  Maximum likelihood phylogeny of all DENV strains that were included in the titer dataset. Color represents antigenic divergence from root, as inferred by the 'full tree' model.
+	}
+	\label{titered_strains_tree}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+	\includegraphics[width=0.65\textwidth]{../figures/png/genotype_dTiter_heatmap.png}
+	\caption{\textbf{Titer distance by genotype}
+  Values represent the mean antigenic distance between canonical dengue genotypes (in normalized $log_2$ titer units). Genotypes are ordered by patristic distance from root.
+  }
+	\label{genotype_dTiter_heatmap}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+	\includegraphics[width=0.65\textwidth]{../figures/png/sequence_distribution.png}
+	\caption{\textbf{Sequence dataset distribution}
+	}
+	\label{sequence_distribution}
+\end{figure}
+
+
+% \begin{figure}[h]
+% \centering
+% 	\includegraphics[width=0.65\textwidth]{../figures/png/}
+% 	\caption{\textbf{SUP FIGURE 1 TITLE }
+%
+% 	}
+% 	\label{SUP_FIGURE_1_LABEL}
+% \end{figure}
+
 % \renewcommand{\thetable}{S\arabic{table}}
 %
 % \begin{longtable}{ | r | l | p{2cm} | l | l | } % COLUMN FORMATS
