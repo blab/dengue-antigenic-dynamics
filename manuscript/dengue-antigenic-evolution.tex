@@ -113,21 +113,21 @@ While most of these infections are asymptomatic or mild, ~1-3\% of cases progres
 Unlike most infectious diseases, DENV secondary infections are 24 times more likely than primary infections to cause severe disease.
 DENV consists of four genetically distinct clades, canonically thought of as serotypes.
 Primary infection is usually mild and generates lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over X-X months.
-Subsequent heterotypic secondary infections induce broad cross-protection, and symptomatic tertiary and quaternary cases are very rare.
-However, for a small subset of secondary infections, disease enhacement by nonneutralizing, cross-reactive antibodies can result in severe disease.
+Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are very rare.
+However, a small subset of secondary infections are enhanced by nonneutralizing, cross-reactive antibodies, resulting in severe disease.
 Thus, the antigenic relationships between dengue viruses -- the genetic and phenotypic determinants of whether the immune response generated after primary infection results in protection or enhancement of secondary infection -- is a key driver of DENV case outcomes and epidemic patterns.
 
 While each serotype is clearly genetically and antigenically distinct, it is not clear how sub-serotype clades of DENV interact antigenically.
-Each DENV serotype consists of broad genetic diversity, including X-X canonical clades termed 'genotypes'.
-It was observed early on that genotypes can cause characteristically mild/severe disease, and heterogeneous neutralization titers (PRNT) suggest that the immune response to some genotypes is more cross-protective than others.
-However, until recently, it has been assumed that these intraserotype differences are minimally important compared to interserotype differences.
+Each DENV serotype consists of broad genetic diversity, including canonical clades termed 'genotypes'.
+Specific genotypes have been associated with characteristically mild or severe disease, and heterogeneous neutralization titers suggest that the immune response to some genotypes is more cross-protective than others.
+Until recently, it has been assumed that these intraserotype differences are minimally important compared to interserotype differences.
 Notably, though, empirical evidence has demonstrated that these genotype-specific differences can drive case outcomes and epidemic severity.
-For example, analysis of a 15-year Nicaraguan pediatric cohort study demonstrated that both the primary infection serotype and the secondary infection genotype are associated with case outcomes.
-On a broader scale, the DENV1-immune population of Iquitos, Peru, experienced either entirely asymptomatic or very severe epidemic seasons in response to two different genotypes of DENV2.
+For example, analysis of a longitudinal cohort study demonstrated that specific combinations of primary infection serotype and secondary infection genotype can mediate individual case outcomes.
+On a population scale, the DENV1-immune population of Iquitos, Peru, experienced either entirely asymptomatic or very severe epidemic seasons in response to two different genotypes of DENV2.
 
 One explanation for these and similar observations (reviewed in X) is that overlooked intraserotype antigenic variation contributes to these genotype-specific case outcomes and epidemic patterns.
 Recent work to antigenically characterize diverse DENV strains suggests that each serotype may contain antigenic heterogeneity, but the source and impact of this heterogeneity is not clear.
-Here, we take a phylogenetic approach to define the evolutionary basis for observed antigenic heterogeneity among DENV clades.
+Here, we take a phylogenetic approach to characterize the evolutionary basis for observed antigenic heterogeneity among DENV clades.
 We also quantify the impact of within- and between-serotype antigenic novelty on real-world DENV population dynamics.
 
 \section*{Results}
@@ -317,11 +317,21 @@ Surprisingly, more precise estimates of antigenic distance between genotypes fro
 
 \section*{Discussion}
 
-This suggests that although there is strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact these broad-scale regional dynamics over time.
-However, this does not necessarily imply that these differences do not effect individual secondary case outcomes or finer scale population dynamics that we lack the data to investigate.
-For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
-On average, intraserotype antigenic phenotypes are 0.42 titer units apart; interserotype antigenic phenotypes are 1.78 titer units apart.
+% Titer model:
+% * Limitations -- data resolution + limit of detection for inferring associated mutations, other sources of antigenic diversity not captured in PRNT50 assays, thresholding + putative underestimation
+% * Strengths -- confirms and expands upon previous reports of within-serotype variation, suggests that clear genetic mechanisms exist, provides a framework for future investigation of driving mutations
 
+% Fitness model:
+% This suggests that although there is strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact these broad-scale regional dynamics over time.
+% * Limitations -- enumerate model assumptions, possible sampling bias
+% * Strengths -- directly quantifies the extent to which antigenic novelty drives real-world denv population dynamics, provides a framework for future investigation of other effects of population immunity (e.g., epidemic magnitude)
+% * Context
+% -- null: within-serotype antigenic diversity really doesn't impact regional dynamics. If so, what other dynamics could this impact (e.g., viral fitness advantage, secondary case outcomes, vaccine efficacy)? Do we have reason to believe they impact these finer-scale dynamics? How could future studies address this?
+% However, this does not necessarily imply that these differences do not effect individual secondary case outcomes or finer scale population dynamics that we lack the data to investigate.
+% For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
+% On average, intraserotype antigenic phenotypes are 0.42 titer units apart; interserotype antigenic phenotypes are 1.78 titer units apart.
+
+% -- alt: this does effect broad population dynamics, but we can't see it because of the limited resolution of both antigenic + strain-specific incidence data
 
 \newpage
 
