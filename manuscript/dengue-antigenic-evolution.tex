@@ -316,19 +316,36 @@ Surprisingly, more precise estimates of antigenic distance between genotypes fro
 
 \section*{Discussion}
 
-% Titer model:
-% * Limitations -- data resolution + limit of detection for inferring associated mutations, other sources of antigenic diversity not captured in PRNT50 assays, thresholding + putative underestimation
-% * Strengths -- confirms and expands upon previous reports of within-serotype variation, suggests that clear genetic mechanisms exist, provides a framework for future investigation of driving mutations
+\subsection*{Within-serotype antigenic heterogeneity}
+\textbf{Strengths & implications}
+We show that mapping antigenic change to individual branches in the DENV phylogeny is able to explain a large majority of the observed variation in antigenic phenotypes as measured by neutralization titers, suggesting that DENV antigenic evolution is closely coupled to genetic divergence.
+We also find that accounting for within-serotype antigenic evolution is necessary to explain the observed variation in antigenic phenotypes.
+This supports and expands upon previous reports that the null hypothesis of antigenically uniform serotypes is inconsistent with available data.
+We observe at least 12 distinct antigenic phenotypes that are both genetically and antigenically distinct.
+The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing process.
+On average, intraserotype antigenic phenotypes are 0.42 titer units apart and interserotype antigenic phenotypes are 1.78 titer units apart.
+For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
+This suggests that the 12 distinct antigenic phenotypes we identify here may have important impacts on secondary case outcome and vaccine efficacy.
 
-% Fitness model:
+\textbf{Limitations}
+Our current titer dataset spans the breadth of DENV diversity, but provides limited resolution to detect within-genotype antigenic variation or to link individual mutations to antigenic change.
+We have provided all code, configuration files and datasets at `github.com/blab/dengue-antigenic-dynamics` to encourage future studies' use of this model as a mechanistic framework to further investigate the genetic drivers and extent of DENV antigenic heterogeneity once larger titer datasets become available.
+
+Recent analysis of a longitudinal cohort study shows that neutralization titers correlate with protection from severe secondary infection; however, it is important to note that antibody neutralization and escape is only one component of the immune response to DENV.
+DENV case outcomes are also mediated by XYZ immune interactions, the effects of which are not captured in neutralizaiton titers.
+
+\subsection*{Viral clade dynamics}
+
+\textbf{Strengths and limitations of the model}
+% enumerate model assumptions
+% possible sampling bias
+
+\textbf{Impact of antigenic diversity on DENV population dynamics}
 % This suggests that although there is strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact these broad-scale regional dynamics over time.
-% * Limitations -- enumerate model assumptions, possible sampling bias
-% * Strengths -- directly quantifies the extent to which antigenic novelty drives real-world denv population dynamics, provides a framework for future investigation of other effects of population immunity (e.g., epidemic magnitude)
-% * Context
-% -- null: within-serotype antigenic diversity really doesn't impact regional dynamics. If so, what other dynamics could this impact (e.g., viral fitness advantage, secondary case outcomes, vaccine efficacy)? Do we have reason to believe they impact these finer-scale dynamics? How could future studies address this?
+% directly quantifies the extent to which antigenic novelty drives real-world denv population dynamics, provides a framework for future investigation of other effects of population immunity (e.g., epidemic magnitude)
+
+% null: within-serotype antigenic diversity really doesn't impact regional dynamics. If so, what other dynamics could this impact (e.g., viral fitness advantage, secondary case outcomes, vaccine efficacy)? Do we have reason to believe they impact these finer-scale dynamics? How could future studies address this?
 % However, this does not necessarily imply that these differences do not effect individual secondary case outcomes or finer scale population dynamics that we lack the data to investigate.
-% For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
-% On average, intraserotype antigenic phenotypes are 0.42 titer units apart; interserotype antigenic phenotypes are 1.78 titer units apart.
 
 % -- alt: this does effect broad population dynamics, but we can't see it because of the limited resolution of both antigenic + strain-specific incidence data
 
@@ -509,7 +526,7 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01 and \_.
 \centering
 	\includegraphics[width=0.65\textwidth]{../figures/png/genotype_dTiter_heatmap.png}
 	\caption{\textbf{Titer distance by genotype}
-  Values represent the mean antigenic distance between canonical dengue genotypes (in normalized $log_2$ titer units). Genotypes are ordered by patristic distance from root.
+  Values represent the mean antigenic distance between canonical dengue genotypes (in normalized $log_2$ titer units).
   }
 	\label{genotype_dTiter_heatmap}
 \end{figure}
