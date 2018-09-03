@@ -109,15 +109,15 @@
 \section*{Introduction}
 Dengue virus (DENV) is a mosquito-borne flavivirus which consists of four genetically distinct clades, canonically thought of as serotypes.
 DENV circulates primarily in South America and Southeast Asia, infecting 400 million people annually.
-While most of these infections are asymptomatic or mild, ~1-3\% of cases progress to severe dengue hemorrhagic fever, causing approximately 10-15,000 deaths each year.
-Unlike most infectious diseases, DENV secondary infections are 24 times more likely than primary infections to cause severe disease.
-Primary infection is usually mild and generates lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over X-X months.
+While most of these infections are asymptomatic or mild, $\sim$1--3\% of cases progress to severe dengue hemorrhagic fever, causing approximately 10--15,000 deaths each year.
+Unlike most infectious diseases, DENV secondary infections are more likely than primary infections to cause severe disease, with estimates of relative risk of severe dengue of $\sim$24.
+Primary infection is usually mild and generates lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over X--X months.
 Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are very rare.
 However, a small subset of secondary infections are enhanced by nonneutralizing, cross-reactive antibodies, resulting in severe disease.
-Thus, the antigenic relationships between dengue viruses -- the genetic and phenotypic determinants of whether the immune response generated after primary infection results in protection or enhancement of secondary infection -- are key drivers of DENV case outcomes and epidemic patterns.
+Thus, the antigenic relationships between dengue viruses --- describing whether the immune response generated after primary infection results in protection or enhancement of secondary infection --- are key drivers of DENV case outcomes and epidemic patterns.
 
 While each serotype is clearly genetically and antigenically distinct, it is not clear how sub-serotype clades of DENV interact antigenically.
-Each DENV serotype consists of broad genetic diversity, including canonical clades termed 'genotypes'.
+Each DENV serotype consists of broad genetic diversity, including canonical clades termed `genotypes'.
 Specific genotypes have been associated with characteristically mild or severe disease, and heterogeneous neutralization titers suggest that the immune response to some genotypes is more cross-protective than others.
 Until recently, it has been assumed that these intraserotype differences are minimally important compared to interserotype differences.
 Notably, though, empirical evidence has demonstrated that these genotype-specific differences can drive case outcomes and epidemic severity.
@@ -321,23 +321,34 @@ This suggests that DENV antigenic evolution is closely coupled to genetic diverg
 We also find that accounting for within-serotype antigenic evolution is necessary to explain the observed variation in antigenic phenotypes.
 This supports and expands upon previous reports that the null hypothesis of antigenically uniform serotypes is inconsistent with available data.
 We observe at least 12 distinct antigenic phenotypes that are both genetically and antigenically distinct.
-The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing process.
+The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing, though gradual, process.
 
 On average, intraserotype antigenic phenotypes are 0.42 titer units apart and interserotype antigenic phenotypes are 1.78 titer units apart.
 For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
 This suggests that the 12 phenotypes we report may be sufficiently distinct to have important impacts on secondary case outcome and vaccine efficacy.
 Recent analysis of a longitudinal cohort study shows that neutralization titers correlate with protection from severe secondary infection; however, it is important to note that antibody neutralization and escape is only one component of the immune response to DENV.
+\tbc{Is there another example here to cite? I'd ideally like 3 examples rather than just 2.}
 DENV case outcomes are also mediated by interactions with innate and T-cell immunity, the effects of which are not captured in neutralization titers.
+
+\tbc{Paragraph on how our estimate of 12 phenotypes is a lower bound due to the structure of the titer data. I don't like labeling this paragraph `limitations'.}
+
+\tbc{Discuss inability to tie individual mutations to antigenic impact due to too many mutations per branch and sparse data.}
+
+\tbc{Discuss necessity of more detailed titer dataset to elucidate these issues.}
+
+\tbc{Maybe also discuss deficiencies of the PRNT assay here, ie better assays also needed.}
 
 \textbf{Limitations of the titer model}
 We expect that the reported antigenic phenotypes represent a lower-bound on the true extent of intraserotype antigenic variation.
 Our current titer dataset spans the breadth of DENV diversity, but provides limited resolution to detect within-genotype antigenic variation or to link individual mutations to antigenic change.
 We have provided all code, configuration files and datasets at `github.com/blab/dengue-antigenic-dynamics` to encourage future studies' use of this model as a mechanistic framework to further investigate the genetic drivers and full extent of DENV antigenic heterogeneity as larger titer datasets become available.
+\tbc{I'd make a separate single `methods sharing' paragraph towards the end of the Discussion. This methods sharing should cover both antigenic phenotypes and clade dynamics. I didn't like the repetition in current Discussion. I'd basically get rid of the paragraph.}
 
 \subsection*{Viral clade dynamics}
 \textbf{Serotype dynamics}
 By directly quantifying antigenic novelty over time, we demonstrate that antigenic fitness is able to explain most of the observed variation in serotype growth and decline in a hyperendemic population.
 This is strong evidence that antigenic novelty is a key component of DENV viral fitness, driving real-world DENV population dynamics.
+\tbc{You should describe in friendly language how the model works in this paragraph. Don't hand wave it aside with `antigenic novelty'. Avoid math here.}
 
 This model also provides a framework to examine how waning immunity, intrinsic viral fitness and XYZ interact with DENV antigenic fitness.
 We fit model parameters to maximize the improvement in growth rate prediction error compared to a null model wherein all viruses are assigned equal antigenic fitness (similar to a standard SIR model; for a detailed explanation, see Methods).
@@ -346,6 +357,8 @@ We find that DENV dynamics are most consistent with the hypothesis that immunity
 Similarly, we find that antigenic vs intrinsic fitness determines approximately X\% and X\%, respectively, of overall DENV fitness.
 Inferred intrinsic fitness values varied by a factor of XXX-XXX, with %serotype fitness order, in/consistent with experimental estimates of replicative fitness
 
+\tbc{Paragraph describing how well the model works for serotype level data. Bridge this into a description of why the comparison of model fits for two genotype models is the right comparison. Discuss how well the model works for both genotype models.}
+
 % transition sentence here
 
 \textbf{Genotype population dynamics and antigenic diverstiy}
@@ -353,9 +366,18 @@ Although we find strong evidence that genotypes vary in their ability to escape 
 However, the majority of DENV transitions are hyper-local, and viral populations across a broad region may not mix homogeneously each season.
 Thus, it is possible that these sub-serotype antigenic differences impact finer-scale population dynamics, but we lack the requisite data to examine this hypothesis.
 
+\tbc{All the above should be expanded. Cover better space and what metapopulation we are projecting. Cover the lack of outside imports.}
+
 DENV population composition is estimated at each timepoint based on available sequence data (see Methods), which may represent biased sampling of more severe cases from urban centers.
 We only examine the relative makeup of the DENV population over time, as reliable data on the size of the viral population over time (i.e., population prevalence) are not currently available.
+
+\tbc{Good paragraph, but cover in more detail. Say we really want real prevalence.}
+
+\tbc{Model sharing section...}
+
 We again provide all code, configuration files, and data in hopes that this model can provide as a framework for future investigation of how population immunity impacts population prevalence and epidemic magnitude.
+
+\tbc{Conclusion: I'd suggest to relate to previous epi dynamics models and say that incorporating genetic and serological data has bright future for understanding dengue dynamics.}
 
 \newpage
 
@@ -481,9 +503,9 @@ For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ (Tabl
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue}{github.com/blab/dengue}.
 
 \section*{Acknowledgements}
-We would like to thank \_ for useful discussion and advice.
+We would like to thank Richard Neher, \_ for useful discussion and advice.
 SB is supported by \_.
-TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01 and \_.
+TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 
 % \bibliographystyle{mbe}
 % \bibliography{mers-structure}
