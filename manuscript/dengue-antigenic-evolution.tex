@@ -243,8 +243,6 @@ From this, we conclude that there is antigenic evolution within each serotype of
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue (Figure ~\ref{antigenic_tree}).
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity (Figure ~\ref{genotype_dTiter_heatmap}).
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
-Notably, many of the titer values in this dataset are left-censored, where we know two strains are at least N titer units apart, but do not know exactly how far apart; if we knew the true value of these censored titers, many of them would indicate larger antigenic distances than the reported values used to train the model.
-We therefore expect that our model systematically underestimates titer distances overall.
 
 \subsection{Antigenic novelty predicts serotype success}
 We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
@@ -317,31 +315,25 @@ Surprisingly, more precise estimates of antigenic distance between genotypes fro
 \subsection*{Within-serotype antigenic heterogeneity}
 We show that mapping antigenic change to individual branches and interpolating across the DENV phylogeny is able to explain a large majority of the observed variation in antigenic phenotypes as measured by neutralization titers.
 This suggests that DENV antigenic evolution is closely coupled to genetic divergence.
+% This might be a natural spot to discuss why we don't have the statistical power to identify associations between specific mutations and antigenic change.
 We also find that accounting for within-serotype antigenic evolution is necessary to explain the observed variation in antigenic phenotypes.
 This supports and expands upon previous reports that the null hypothesis of antigenically uniform serotypes is inconsistent with available data.
 We observe at least 12 distinct antigenic phenotypes that are both genetically and antigenically distinct.
-The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing, though gradual, process.
-
 On average, intraserotype antigenic phenotypes are 0.42 titer units apart and interserotype antigenic phenotypes are 1.78 titer units apart.
 For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
-This suggests that the 12 phenotypes we report may be sufficiently distinct to have important impacts on secondary case outcome and vaccine efficacy.
-Recent analysis of a longitudinal cohort study shows that neutralization titers correlate with protection from severe secondary infection; however, it is important to note that antibody neutralization and escape is only one component of the immune response to DENV.
-% \tbc{Is there another example here to cite? I'd ideally like 3 examples rather than just 2.}
-% DENV case outcomes are also mediated by interactions with innate and T-cell immunity, the effects of which are not captured in neutralization titers.
+This suggests that the 12 phenotypes we report may be sufficiently distinct to have important impacts on secondary case outcomes and vaccine efficacy.
 
-% \tbc{Paragraph on how our estimate of 12 phenotypes is a lower bound due to the structure of the titer data. I don't like labeling this paragraph `limitations'.}
-
-% \tbc{Discuss inability to tie individual mutations to antigenic impact due to too many mutations per branch and sparse data.}
-
-% \tbc{Discuss necessity of more detailed titer dataset to elucidate these issues.}
-
-% \tbc{Maybe also discuss deficiencies of the PRNT assay here, ie better assays also needed.}
-
-\textbf{Limitations of the titer model}
-We expect that the reported antigenic phenotypes represent a lower-bound on the true extent of intraserotype antigenic variation.
-Our current titer dataset spans the breadth of DENV diversity, but provides limited resolution to detect within-genotype antigenic variation or to link individual mutations to antigenic change.
-We have provided all code, configuration files and datasets at `github.com/blab/dengue-antigenic-dynamics` to encourage future studies' use of this model as a mechanistic framework to further investigate the genetic drivers and full extent of DENV antigenic heterogeneity as larger titer datasets become available.
-% \tbc{I'd make a separate single `methods sharing' paragraph towards the end of the Discussion. This methods sharing should cover both antigenic phenotypes and clade dynamics. I didn't like the repetition in current Discussion. I'd basically get rid of the paragraph.}
+Overall, we expect that these antigenic phenotypes represent a lower-bound on the extent, magnitude, and nature of antigenic heterogeneity with DENV.
+Our current titer dataset spans the breadth of DENV diversity, but in most cases lacks the resolution to detect sub-genotype antigenic variation or to identify which specific mutations correspond to changes in antigenic phenotype.
+The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing, though gradual, process.
+We therefore expect that future studies with richer datasets will find additional antigenic variation within each genotype.
+This dataset also contains many left-censored titer values, where we know two strains are at least N titer units apart, but do not know exactly how far apart.
+If we knew the true value of these censored titers, many of them would indicate larger antigenic distances than the reported values used to train the model.
+Thus, it is likely that our model systematically underestimates the magnitude of titer distances overall.
+Finally, antibody neutralization and escape (as measured by PRNT titers) is only one component of the immune response to DENV.
+Although analysis of a longitudinal cohort study shows that these neutralization titers correlate with protection from severe secondary infection, it is important to note that
+DENV case outcomes are also mediated by interactions with innate and T-cell immunity, the effects of which are not captured in neutralization titers.
+Overall, while it is clear that the four-serotype model is insufficient to explain DENV antigenic evolution, richer datasets and the development of more holistic assays will be required in order to fully quantify and understand these dynamics.
 
 \subsection*{Viral clade dynamics}
 \textbf{Serotype dynamics}
