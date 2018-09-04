@@ -287,7 +287,7 @@ To directly examine the impact of antigenic fitness on these finer resolution po
 % fix the x axis here so the subplots line up
 \begin{figure}[h]
   \begin{centering}
-\includegraphics[width=\linewidth]{../figures/png/genotype_fitness.png}
+\includegraphics[width=\linewidth]{../figures/png/genotype-fitness.png}
     \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the 'full tree model' of antigenic relationships)}
      \label{genotype_fitness}
    \end{centering}
@@ -300,18 +300,17 @@ If within-serotype antigenic heterogeneity contributes to genotype fitness, then
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\linewidth]{../figures/png/genotype_fitness_model_compare.png}
+\includegraphics[width=0.7\linewidth]{../figures/png/genotype_growth_rates.png}
 \begin{centering}
     \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}  Antigenic distance between each pair of canonical genotypes was estimated from either the 'full tree model' or the 'interserotype model' of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
      \label{genotype_growth_rates}
 \end{centering}
 \end{figure}
 
-% the final version of these results is still running
 Overall, we find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation (Figure ~\ref{genotype_growth_rates}A).
-When antigenic distance is estimated from the 'interserotype model', we find that antigenic fitness explains approximately X\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline X\% of the time.
-For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
-Surprisingly, more precise estimates of antigenic distance between genotypes from the 'full tree model' does not improve our predictions of genotype success ($\rho = X$, X\% accuracy; Figure ~\ref{genotype_growth_rates}B).
+When antigenic distance is estimated from the 'interserotype model', we find that antigenic fitness explains approximately 31\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 68\% of the time.
+% For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
+Surprisingly, more precise estimates of antigenic distance between genotypes from the 'full tree model' does not improve our predictions of genotype success ($R^2 = 0.28$, 70\% accuracy; Figure ~\ref{genotype_growth_rates}B).
 
 \section*{Discussion}
 
@@ -327,28 +326,28 @@ On average, intraserotype antigenic phenotypes are 0.42 titer units apart and in
 For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
 This suggests that the 12 phenotypes we report may be sufficiently distinct to have important impacts on secondary case outcome and vaccine efficacy.
 Recent analysis of a longitudinal cohort study shows that neutralization titers correlate with protection from severe secondary infection; however, it is important to note that antibody neutralization and escape is only one component of the immune response to DENV.
-\tbc{Is there another example here to cite? I'd ideally like 3 examples rather than just 2.}
-DENV case outcomes are also mediated by interactions with innate and T-cell immunity, the effects of which are not captured in neutralization titers.
+% \tbc{Is there another example here to cite? I'd ideally like 3 examples rather than just 2.}
+% DENV case outcomes are also mediated by interactions with innate and T-cell immunity, the effects of which are not captured in neutralization titers.
 
-\tbc{Paragraph on how our estimate of 12 phenotypes is a lower bound due to the structure of the titer data. I don't like labeling this paragraph `limitations'.}
+% \tbc{Paragraph on how our estimate of 12 phenotypes is a lower bound due to the structure of the titer data. I don't like labeling this paragraph `limitations'.}
 
-\tbc{Discuss inability to tie individual mutations to antigenic impact due to too many mutations per branch and sparse data.}
+% \tbc{Discuss inability to tie individual mutations to antigenic impact due to too many mutations per branch and sparse data.}
 
-\tbc{Discuss necessity of more detailed titer dataset to elucidate these issues.}
+% \tbc{Discuss necessity of more detailed titer dataset to elucidate these issues.}
 
-\tbc{Maybe also discuss deficiencies of the PRNT assay here, ie better assays also needed.}
+% \tbc{Maybe also discuss deficiencies of the PRNT assay here, ie better assays also needed.}
 
 \textbf{Limitations of the titer model}
 We expect that the reported antigenic phenotypes represent a lower-bound on the true extent of intraserotype antigenic variation.
 Our current titer dataset spans the breadth of DENV diversity, but provides limited resolution to detect within-genotype antigenic variation or to link individual mutations to antigenic change.
 We have provided all code, configuration files and datasets at `github.com/blab/dengue-antigenic-dynamics` to encourage future studies' use of this model as a mechanistic framework to further investigate the genetic drivers and full extent of DENV antigenic heterogeneity as larger titer datasets become available.
-\tbc{I'd make a separate single `methods sharing' paragraph towards the end of the Discussion. This methods sharing should cover both antigenic phenotypes and clade dynamics. I didn't like the repetition in current Discussion. I'd basically get rid of the paragraph.}
+% \tbc{I'd make a separate single `methods sharing' paragraph towards the end of the Discussion. This methods sharing should cover both antigenic phenotypes and clade dynamics. I didn't like the repetition in current Discussion. I'd basically get rid of the paragraph.}
 
 \subsection*{Viral clade dynamics}
 \textbf{Serotype dynamics}
 By directly quantifying antigenic novelty over time, we demonstrate that antigenic fitness is able to explain most of the observed variation in serotype growth and decline in a hyperendemic population.
 This is strong evidence that antigenic novelty is a key component of DENV viral fitness, driving real-world DENV population dynamics.
-\tbc{You should describe in friendly language how the model works in this paragraph. Don't hand wave it aside with `antigenic novelty'. Avoid math here.}
+% \tbc{You should describe in friendly language how the model works in this paragraph. Don't hand wave it aside with `antigenic novelty'. Avoid math here.}
 
 This model also provides a framework to examine how waning immunity, intrinsic viral fitness and XYZ interact with DENV antigenic fitness.
 We fit model parameters to maximize the improvement in growth rate prediction error compared to a null model wherein all viruses are assigned equal antigenic fitness (similar to a standard SIR model; for a detailed explanation, see Methods).
@@ -357,7 +356,7 @@ We find that DENV dynamics are most consistent with the hypothesis that immunity
 Similarly, we find that antigenic vs intrinsic fitness determines approximately X\% and X\%, respectively, of overall DENV fitness.
 Inferred intrinsic fitness values varied by a factor of XXX-XXX, with %serotype fitness order, in/consistent with experimental estimates of replicative fitness
 
-\tbc{Paragraph describing how well the model works for serotype level data. Bridge this into a description of why the comparison of model fits for two genotype models is the right comparison. Discuss how well the model works for both genotype models.}
+% \tbc{Paragraph describing how well the model works for serotype level data. Bridge this into a description of why the comparison of model fits for two genotype models is the right comparison. Discuss how well the model works for both genotype models.}
 
 % transition sentence here
 
@@ -366,18 +365,18 @@ Although we find strong evidence that genotypes vary in their ability to escape 
 However, the majority of DENV transitions are hyper-local, and viral populations across a broad region may not mix homogeneously each season.
 Thus, it is possible that these sub-serotype antigenic differences impact finer-scale population dynamics, but we lack the requisite data to examine this hypothesis.
 
-\tbc{All the above should be expanded. Cover better space and what metapopulation we are projecting. Cover the lack of outside imports.}
+% \tbc{All the above should be expanded. Cover better space and what metapopulation we are projecting. Cover the lack of outside imports.}
 
 DENV population composition is estimated at each timepoint based on available sequence data (see Methods), which may represent biased sampling of more severe cases from urban centers.
 We only examine the relative makeup of the DENV population over time, as reliable data on the size of the viral population over time (i.e., population prevalence) are not currently available.
 
-\tbc{Good paragraph, but cover in more detail. Say we really want real prevalence.}
+% \tbc{Good paragraph, but cover in more detail. Say we really want real prevalence.}
 
-\tbc{Model sharing section...}
+% \tbc{Model sharing section...}
 
 We again provide all code, configuration files, and data in hopes that this model can provide as a framework for future investigation of how population immunity impacts population prevalence and epidemic magnitude.
 
-\tbc{Conclusion: I'd suggest to relate to previous epi dynamics models and say that incorporating genetic and serological data has bright future for understanding dengue dynamics.}
+% \tbc{Conclusion: I'd suggest to relate to previous epi dynamics models and say that incorporating genetic and serological data has bright future for understanding dengue dynamics.}
 
 \newpage
 
@@ -531,11 +530,11 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
       Serotype & Interserotype & $\Delta$ SSE & 15.02 & 2.57 & 0.57 & 0.86 & 4.57 & 3.43 & 2.14 & 0.00 \\
       Serotype & Interserotype & Pearson $R^2$ & 0.63 & 2.57 & 0.57 & 0.86 & 3.43 & 2.29 & 0.71 & 0.00 \\
       \hline
-      Genotype & Interserotype & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      Genotype & Interserotype & $\Delta$ SSE & 14.83 & 2.57 & 0.57 & 0.86 & 5.71 & 4.57 & 3.57 & 0.00 \\
+      Genotype & Interserotype & Pearson $R^2$ & 0.36 & 2.57 & 0.57 & 0.86 & 5.71 & 5.71 & 2.86 & 0.00 \\
       \hline
-      Genotype & Full Tree & $\Delta$ SSE & 14.99 & 1.71 & 0.57 & 2.57 & 1.00 & 0.57 & 0.00 & 0.00 \\
-      Genotype & Full tree & Pearson $R^2$ & 0.36 & 0.43 & 0.00 & 0.43 & 1.00 & 0.86 & 0.00 & 0.00 \\
+      Genotype & Full tree & $\Delta$ SSE & 14.22 & 1.71 & 0.57 & 0.43 & 1.40 & 0.80 & 0.40 & 0.00 \\
+      Genotype & Full tree & Pearson $R^2$ & 0.33 & 1.29 & 0.57 & 0.43 & 1.40 & 1.60 & 0.40 & 0.00 \\
       \hline
     \end{tabular}
     }
