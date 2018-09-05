@@ -207,7 +207,7 @@ The model uses convex optimization to learn the values of $d_b$ that minimize th
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\textwidth]{../figures/png/titer_model_performance.png}
-        \caption{\textbf{Titer model formulations and performance.}  \textbf{A} The 'interserotype model' only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The 'full tree model' allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).}
+        \caption{\textbf{Titer model formulations and performance.}  \textbf{A} The `interserotype model' only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The `full tree model' allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).}
          \label{titer_model_performance}
   \end{centering}
 \end{figure}
@@ -215,7 +215,7 @@ The model uses convex optimization to learn the values of $d_b$ that minimize th
 This model is an effective tool for estimating antigenic relationships between viruses based on their relative positions in the phylogeny.
 We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform ('interserotype model'), or by the hypothesis that serotypes are antigenically diverse ('full tree model').
 In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes (Figure ~\ref{titer_model_performance}A).
-The 'full tree model' allows any branch in the phylogeny to contribte to antigenic evolution (Figure ~\ref{titer_model_performance}B).
+The `full tree model' allows any branch in the phylogeny to contribte to antigenic evolution (Figure ~\ref{titer_model_performance}B).
 For each model, we learn model parameters from the training data, and then use those parameters to predict test data values.
 We assess model performance by comparing the predicted test titer values to the actual values.
 Model performance indicates how well the hypothesis embedded in the model explains the observed data.
@@ -235,7 +235,7 @@ From this, we conclude that there is antigenic evolution within each serotype of
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\linewidth]{../figures/png/antigenic_tree.png}
-    \caption{\textbf{Tree of dengue antigenic phenotypes.}  A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the 'full tree model'. Antigenically uniform clades were collapsed, and node sizes reflect the size of the collapsed clade.}
+    \caption{\textbf{Tree of dengue antigenic phenotypes.}  A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the `full tree model'. Antigenically uniform clades were collapsed, and node sizes reflect the size of the collapsed clade.}
      \label{antigenic_tree}
   \end{centering}
 \end{figure}
@@ -286,29 +286,29 @@ To directly examine the impact of antigenic fitness on these finer resolution po
 \begin{figure}[h]
   \begin{centering}
 \includegraphics[width=\linewidth]{../figures/png/genotype-fitness.png}
-    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the 'full tree model' of antigenic relationships)}
+    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the `full tree model' of antigenic relationships)}
      \label{genotype_fitness}
    \end{centering}
 \end{figure}
 
 To estimate how well antigenic novelty predicts genotype success, we used the same model to predict genotype success and decline.
 As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated (Figure ~\ref{genotype_fitness}).
-Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the 'interserotype model' above) or at the genotype level (i.e., the antigenic distances computed by the 'full tree model', which incoporates the observed within-serotype heterogeneity).
-If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect the 'full tree model' to predict genotype growth rates better than the 'interserotype model'.
+Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the `interserotype model' above) or at the genotype level (i.e., the antigenic distances computed by the `full tree model', which incoporates the observed within-serotype heterogeneity).
+If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect the `full tree model' to predict genotype growth rates better than the `interserotype model'.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{../figures/png/genotype_growth_rates.png}
 \begin{centering}
-    \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}  Antigenic distance between each pair of canonical genotypes was estimated from either the 'full tree model' or the 'interserotype model' of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
+    \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}  Antigenic distance between each pair of canonical genotypes was estimated from either the `full tree model' or the `interserotype model' of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
      \label{genotype_growth_rates}
 \end{centering}
 \end{figure}
 
 Overall, we find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation (Figure ~\ref{genotype_growth_rates}A).
-When antigenic distance is estimated from the 'interserotype model', we find that antigenic fitness explains approximately 31\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 68\% of the time.
+When antigenic distance is estimated from the `interserotype model', we find that antigenic fitness explains approximately 31\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 68\% of the time.
 % For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
-Surprisingly, more precise estimates of antigenic distance between genotypes from the 'full tree model' does not improve our predictions of genotype success ($R^2 = 0.28$, 70\% accuracy; Figure ~\ref{genotype_growth_rates}B).
+Surprisingly, more precise estimates of antigenic distance between genotypes from the `full tree model' does not improve our predictions of genotype success ($R^2 = 0.28$, 70\% accuracy; Figure ~\ref{genotype_growth_rates}B).
 
 \section*{Discussion}
 
@@ -395,7 +395,7 @@ In total, our dataset includes 47 virus strains, 36 serum strains, and 1182 meas
 
 \subsection*{Titer Model}
 We normalize measured titers between virus i and serum j, $T_{ij}$, relative to autologous titers: $$T_{ij} = log_2(T_{ii}) - log_2(T_{ij})$$
-To predict unmeasured titers, we employ the 'tree model' from Neher et al. and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution.
+To predict unmeasured titers, we employ the `tree model' from Neher et al. and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution.
 Observed titer drops are mapped to branches in the viral phylogeny after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (row and column effects, respectively):
 $$\hat{T}_{ij} \approx T_{ij} = \sum_{b \in path(i,j)} d_b + v_i + p_j$$
 where $d_b$ is the titer drop assigned to each branch, $b$, in the phylogeny.
@@ -410,10 +410,10 @@ We assess performance by comparing predicted to known titer values in our test d
 \subsection*{Viral Clade Dynamics}
 
 \textbf{Empirical Clade Frequencies}\\
-As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to present based on observed relative abundance of each clade in the 'slice' of the phylogeny corresponding to each quarterly timepoint.
+As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to present based on observed relative abundance of each clade in the `slice' of the phylogeny corresponding to each quarterly timepoint.
 
 Briefly, the frequency trajectory of each clade in the phylogeny is modeled according to a Brownian motion diffusion process discretized to three-month intervals.
-Relative to a simple Brownian motion, the expectation includes an 'inertia' term that adds velocity to the diffusion and the variance includes a term $x(1-x)$ to scale variance according to frequency following a Wright-Fisher population genetic process.
+Relative to a simple Brownian motion, the expectation includes an `inertia' term that adds velocity to the diffusion and the variance includes a term $x(1-x)$ to scale variance according to frequency following a Wright-Fisher population genetic process.
 This results in the following diffusion process:
 $$x(t+dt) = \mathcal{N}(x(t) + \epsilon dx, dt \sigma^2 x(t) (1-x(t)))$$
 
@@ -538,7 +538,7 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 \centering
 	\includegraphics[width=0.65\textwidth]{../figures/png/titered_strains_tree.png}
 	\caption{\textbf{Tree of DENV strains in titer dataset}
-  Maximum likelihood phylogeny of all DENV strains that were included in the titer dataset. Color represents antigenic divergence from root, as inferred by the 'full tree' model.
+  Maximum likelihood phylogeny of all DENV strains that were included in the titer dataset. Color represents antigenic divergence from root, as inferred by the `full tree' model.
 	}
 	\label{titered_strains_tree}
 \end{figure}
