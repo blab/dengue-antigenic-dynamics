@@ -336,28 +336,29 @@ DENV case outcomes are also mediated by interactions with innate and T-cell immu
 Overall, while it is clear that the four-serotype model is insufficient to explain DENV antigenic evolution, richer datasets and the development of more holistic assays will be required in order to fully quantify and understand the full extent of DENV antigenic diversity.
 
 \subsection*{Viral clade dynamics}
-We use these inferred antigenic relationships to directly quantify the extent to which antigenic fitness determines the composition of the DENV population in a real-world hyperendemic population.
-We measure serotype frequencies across Southeast Asia through time and construct a model to estimate how they will fluctuate.
+We use these inferred antigenic relationships to directly quantify the extent to which antigenic fitness determines the composition of a DENV population.
+We measure serotype frequencies across Southeast Asia over time and construct a model to estimate how they will fluctuate.
 This model places a fitness value on each serotype that derives from a constant intrinsic component alongside a time-dependent antigenic component.
 Antigenic fitness declines with population immunity, which is accumulated via the recent circulation of antigenically similar viruses.
-We find that antigenic fitness is able to explain most of the observed variation in serotype growth and decline in a hyperendemic population (Figure ~\ref{serotype_fitness_model}).
-This demonstrates that antigenic fitness is a strong determinant of DENV serotype success and decline.
+We find that antigenic fitness is able to explain most of the observed variation in serotype growth and decline (Figure ~\ref{serotype_fitness_model}).
+This demonstrates that antigenic fitness is a strong determinant of DENV serotype dynamics in a real-world, hyperendemic population.
 
-This model also allows us to examine how waning immunity and intrinsic viral fitness interact with DENV antigenic fitness.
+This model enables us to examine how waning immunity and intrinsic viral fitness interact with DENV antigenic fitness.
 We fit model parameters to maximize the improvement in growth rate prediction error compared to a null model wherein all viruses are assigned equal antigenic fitness.
 Models that improve predictions represent hypotheses that are more consistent with the observed real-world dynamics.
 We find that DENV dynamics are most consistent with the hypothesis that immunity wanes linearly over a period of 2 years, %consistent with Leah's PNAS paper?
-Similarly, we find that antigenic vs intrinsic fitness determines approximately X\% and X\%, respectively, of overall DENV fitness.
+Similarly, we find that intrinsic vs antigenic components determine approximately X\% and X\%, respectively, of overall DENV fitness.
 Inferred intrinsic fitness values varied by a factor of XXX-XXX, with %serotype fitness order, in/consistent with experimental estimates of replicative fitness
 
-We also use this model to quantify the extent to which within-serotype antigenic differences determine the success and decline of canonical DENV genotypes.
-As for serotypes, we estimate the frequencies and antigenic fitness of each canonical genotype over time based on available sequence data and the frequency-weighted antigenic distance from recently circulating viruses, respectively.
-We can calculate antigenic fitness based on either serotype-level (`interserotype model') or genotype-level (`full tree') antigenic distances.
-If genotype-level antigenic variation impacts regional DENV population dynamics, then incorporating these specific differences into our estimates of antigenic fitness should better explain the observed fluctuations in genotype frequency over time, compared to estimates of antigenic fitness based on the coarser serotype-level antigenic relationships between genotypes.
-We find that antigenic fitness explains a large portion of the observed variation in genotype growth and decline, but incorporating within-serotype antigenic differences does not improve our predictions (Figure ~\ref{genotype_growth_rates}).
-
+We similarly use this model to quantify the effect of within-serotype antigenic variation on the success and decline of canonical DENV genotypes.
+As above, genotype antigenic fitness declines with population immunity.
+Here, we estimate population immunity based on antigenic distance from recently circulating strains, using distances derived from the `interserotype model' or the `full tree model' of DENV antigenic evolution.
+We can then directly compare how strongly these coarser serotype-level versus specific genotype-level antigenic relationships impact DENV population dynamics.
+Overall, we find that antigenic fitness explains a large portion of the observed variation in genotype growth and decline.
+Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure ~\ref{genotype_growth_rates}).
 This suggests that although we find strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact broad-scale regional dynamics over time.
-However, this observation is limited by the available data and model assumptions.
+
+However, this observation is subject to caveats imposed by the the available data and model assumptions.
 We estimate DENV population composition over time based on available sequence data, pooled across all of Southeast Asia (see Methods).
 As the vast majority of cases of DENV are asymptomatic, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
 We also assume that Southeast Asia represents a closed viral population with homogeneous mixing.
