@@ -139,7 +139,7 @@ On a population scale, the DENV1-immune population of Iquitos, Peru, experienced
 One explanation for these and similar observations (reviewed in X) is that overlooked intraserotype antigenic variation contributes to these genotype-specific case outcomes and epidemic patterns.
 Recent work to antigenically characterize diverse DENV strains suggests that each serotype may contain antigenic heterogeneity, but the source and impact of this heterogeneity is not clear.
 Here, we take a phylogenetic approach to characterize the evolutionary basis for observed antigenic heterogeneity among DENV clades.
-We also quantify the impact of within- and between-serotype antigenic novelty on real-world DENV population dynamics.
+We also quantify the impact of within- and between-serotype antigenic variation on real-world DENV population dynamics.
 
 \section*{Results}
 
@@ -150,14 +150,14 @@ We also quantify the impact of within- and between-serotype antigenic novelty on
 \subsection{Dengue neutralization titer data}
 
 Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro.
-To measure the pairwise antigenic distances for a panel of diverse DENV strains, Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at 3 months post-infection, and then titered this sera against a panel of test viruses.
-To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants 6 weeks after innoculation with a monovalent component of the NIH dengue vaccine candidate.
+To measure the pairwise antigenic distances for a panel of diverse DENV strains, Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at three months post-infection, and then titered this sera against a panel of test viruses.
+To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants six weeks after innoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV strains.
 As reported by Katzelnick et al., we find generally consistent patterns of neutralization between the NHP and human sera data; see [ref] for a detailed comparison.
 In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of strains (Figure ~\ref{titered_strains_tree}).
 
-To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one 2-fold drop in neutralization.
-We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as 0.
+To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one, two-fold drop in neutralization.
+We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as zero.
 Normalized titers between $i$ and $j$ are thus calculated as $T_{ij} = log_2(T_{ij}) - log_2(T_{ii})$, such that a higher normalized titer value indicates that serum $i$ is less effective at neutralizing virus $j$, implying greater distance between viruses $i$ and $j$.
 
 \begin{figure}[h]
@@ -184,7 +184,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \end{figure}
 
 Titer measurements are prone to noise, and there is a limited amount of available data.
-If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect changes in antigenic phenotype to be driven by underlying changes in viral genotype.
+If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect that changes in antigenic phenotype correspond to underlying changes in viral genotype.
 Figure ~\ref{genetic_antigenic_distance} shows the relationship between genetic and antigenic distance between each pair of viruses in our dataset.
 There are two groups of comparisons --- between serotype and within serotype --- however, even within serotypes there is significant genetic diversity and a correlation between increased genetic distance and increased antigenic distance.
 The relationship between genetic distance and antigenic distance is consistent within and between serotypes, where the same trend line can be fit to both within and between comparisons.
@@ -207,7 +207,7 @@ Conceptually, this model predicts titer values through three steps (see Methods 
 First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figures ~\ref{genotype_tree}, ~\ref{sequence_distribution}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny.
 This assigns each branch $b$ an antigenic distance $d_b$.
-With this in hand, we estimate the antigenic distance between any pair of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go.
+With this in hand, we interpolate the antigenic distance between any pair of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go.
 
 To learn these values of $d_b$, we first split our dataset into training (random 90\% of measurements) and test data (the remaining 10\% of values).
 We take the training data and fit $d_b$ for each branch in the tree, subject to regularization.
@@ -225,7 +225,7 @@ The model uses convex optimization to learn the values of $d_b$ that minimize th
 \end{figure}
 
 This model is an effective tool for estimating antigenic relationships between viruses based on their relative positions in the phylogeny.
-We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform ('interserotype model'), or by the hypothesis that serotypes are antigenically diverse ('full tree model').
+We can also use variations of this model to explicitly test whether the observed antigenic phenotypes are better explained by the hypothesis that dengue serotypes are antigenically uniform (`interserotype model'), or by the hypothesis that serotypes are antigenically diverse (`full tree model').
 In the interserotype model, we set $d_b = 0$ for all branches in the tree that do not lie between serotypes (Figure ~\ref{titer_model_performance}A).
 The `full tree model' allows any branch in the phylogeny to contribte to antigenic evolution (Figure ~\ref{titer_model_performance}B).
 For each model, we learn model parameters from the training data, and then use those parameters to predict test data values.
@@ -252,13 +252,13 @@ From this, we conclude that there is antigenic evolution within each serotype of
   \end{centering}
 \end{figure}
 
-Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of dengue (Figure ~\ref{antigenic_tree}).
+Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of DENV (Figure ~\ref{antigenic_tree}) and reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity (Figure ~\ref{genotype_dTiter_heatmap}).
-We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity, but these results clearly reject the null hypothesis that all DENV strains within a serotype are antigenically uniform.
+We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity.
 
 \subsection{Antigenic novelty predicts serotype success}
-We observe strong evidence that homotypic genotypes of dengue vary in their ability to escape antibody neutralization.
-However, antibody neutralization is only one of many factors that contribute to secondary infection outcomes.
+We observe strong evidence that homotypic genotypes of DENV vary in their ability to escape antibody neutralization.
+However, antibody neutralization is only one of many factors that shape epidemic patterns.
 We thus wanted to know whether the observed antigenic diversity influences dengue population dynamics in the real world.
 At any given time, many factors contribute to both the total size of the viral population (which corresponds to the incidence in the host population), and the makeup of the viral population (the relative frequency of each viral strain currently circulating).
 For example, seasonal fluctuations in mosquito population size and many other environmental factors influence the DENV population size.
@@ -275,26 +275,23 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
   \end{centering}
 \end{figure}
 
-To test this hypothesis, we examined the makeup of the dengue virus population in Southeast Asia from 1970 to 2015.
-We estimated the relative population frequency of each DENV serotype at 3-month intervals, $x_i(t)$ (Figure ~\ref{serotype_fitness_model}A), based on available sequence data (see Methods).
+To test this hypothesis, we examined the composition of the dengue virus population in Southeast Asia from 1970 to 2015.
+We estimated the relative population frequency of each DENV serotype at three month intervals, $x_i(t)$ (Figure ~\ref{serotype_fitness_model}A), based on available sequence data (see Methods).
 
 Fitter viruses increase in population frequency over time, such that $x_i(t+dt) > x_i(t)$.
-It follows that these viruses have a growth rate--defined as the fold-change in frequency over time--greater than 1: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
+It follows that these viruses have a growth rate--defined as the fold-change in frequency over time--greater than one: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
 To isolate the extent to which antigenic novelty contributes to clade success and decline, we built a simple model that attempts to predict clade growth rates based on two variables: the antigenic fitness of the clade at time $t$, and a time-invariant fit parameter representing the intrinsic fitness of the serotype the clade belongs to.
-Growth rates are estimated based on a 5-year sliding window (Figure ~\ref{serotype_fitness_model}C).
+Growth rates are estimated based on a five year sliding window (Figure ~\ref{serotype_fitness_model}C).
 We estimate the antigenic fitness of virus $i$ at time $t$ as a function of its antigenic distance from each strain $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning immunity (Figure ~\ref{serotype_fitness_model}B; see Methods).
 Serotype intrinsic fitness is a free parameter and is constant over time.
 
 This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 80\% of predictions (Figure ~\ref{serotype_fitness_model}D).
-This strongly suggests that antigenic novelty is a major driver of serotype population dynamics. % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
+This strongly suggests that antigenic fitness is a major driver of serotype population dynamics. % add an estimate here of the relative contribution of antigenic vs. intrinsic fitness
 This also demonstrates that this model captures key components of dengue population dynamics, performing significantly better than the null model under which all clades have equal antigenic fitness (see Methods).
 Interestingly, the model performs best when we model immunity as waning linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
 % add a sentence here about the relative intrinsic fitness values; compare to experimental estimates of replicative fitness
 
 \subsection{Antigenic novelty also partially predicts genotype success}
-To directly examine the impact of antigenic fitness on these finer resolution population dynamics, we estimated the relative frequency of each genotype over the same time period.
-
-% fix the x axis here so the subplots line up
 \begin{figure}[h]
   \begin{centering}
 \includegraphics[width=\linewidth]{../figures/png/genotype-fitness.png}
@@ -303,10 +300,10 @@ To directly examine the impact of antigenic fitness on these finer resolution po
    \end{centering}
 \end{figure}
 
-To estimate how well antigenic novelty predicts genotype success, we used the same model to predict genotype success and decline.
+To estimate how well antigenic fitness predicts genotype dynamics, we used the same model to predict genotype success and decline.
 As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated (Figure ~\ref{genotype_fitness}).
 Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the `interserotype model' above) or at the genotype level (i.e., the antigenic distances computed by the `full tree model', which incoporates the observed within-serotype heterogeneity).
-If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect the `full tree model' to predict genotype growth rates better than the `interserotype model'.
+If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect estimates of antigenic fitness based on the `full tree model' to better predict genotype growth rates.
 
 \begin{figure}[h]
 \centering
@@ -326,10 +323,10 @@ Surprisingly, more precise estimates of antigenic distance between genotypes fro
 
 \subsection*{Within-serotype antigenic heterogeneity}
 We show that mapping antigenic change to individual branches and interpolating across the DENV phylogeny is able to explain a large majority of the observed variation in antigenic phenotypes as measured by neutralization titers.
-This suggests that DENV antigenic evolution is closely coupled to genetic divergence.
+This demonstrates that DENV antigenic divergence is closely coupled to genetic divergence.
 % This might be a natural spot to discuss why we don't have the statistical power to identify associations between specific mutations and antigenic change.
 We also find that accounting for within-serotype antigenic evolution is necessary to explain the observed variation in antigenic phenotypes.
-This supports and expands upon previous reports that the null hypothesis of antigenically uniform serotypes is inconsistent with available data.
+This supports and expands upon previous reports that the null hypothesis of antigenically uniform serotypes is inconsistent with observed patterns of cross-protection and susceptibility.
 We observe at least 12 distinct antigenic phenotypes that are both genetically and antigenically distinct.
 On average, intraserotype antigenic phenotypes are 0.42 titer units apart and interserotype antigenic phenotypes are 1.78 titer units apart.
 For context, analysis of the recent CYD-TDV vaccine trial shows different vaccine efficacy against genotypes I and II of DENV4, which are 0.4 log2 titer units apart in our dataset.
@@ -348,8 +345,8 @@ DENV case outcomes are also mediated by interactions with innate and T-cell immu
 Overall, while it is clear that the four-serotype model is insufficient to explain DENV antigenic evolution, richer datasets and the development of more holistic assays will be required in order to fully quantify and understand the full extent of DENV antigenic diversity.
 
 \subsection*{Viral clade dynamics}
-We use these inferred antigenic relationships to directly quantify the extent to which antigenic fitness determines the composition of a DENV population.
-We measure serotype frequencies across Southeast Asia over time and construct a model to estimate how they will fluctuate.
+We use these inferred antigenic relationships to directly quantify the impact of antigenic fitness on DENV population composition.
+To do so, we measure serotype frequencies across Southeast Asia over time and construct a model to estimate how they will fluctuate.
 This model places a fitness value on each serotype that derives from a constant intrinsic component alongside a time-dependent antigenic component.
 Antigenic fitness declines with population immunity, which is accumulated via the recent circulation of antigenically similar viruses.
 We find that antigenic fitness is able to explain most of the observed variation in serotype growth and decline (Figure ~\ref{serotype_fitness_model}).
@@ -366,7 +363,7 @@ We similarly use this model to quantify the effect of within-serotype antigenic 
 As above, genotype antigenic fitness declines with population immunity.
 Here, we estimate population immunity based on antigenic distance from recently circulating strains, using distances derived from the `interserotype model' or the `full tree model' of DENV antigenic evolution.
 We then directly compare how strongly these coarser serotype-level versus specific genotype-level antigenic relationships impact DENV population dynamics.
-Overall, we find that antigenic fitness explains a large portion of the observed variation in genotype growth and decline.
+Overall, we find that antigenic fitness explains a moderate portion of the observed variation in genotype growth and decline.
 Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure ~\ref{genotype_growth_rates}).
 This suggests that although we find strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact broad-scale regional dynamics over time.
 
@@ -375,7 +372,7 @@ We estimate DENV population composition over time based on available sequence da
 As the vast majority of cases of DENV are asymptomatic, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
 We also assume that Southeast Asia represents a closed viral population with homogeneous mixing.
 However, increasing globalization likely results in some amount of viral importation that is not accounted for in this model.
-Additionally, although Southeast Asia experiences hyperendemic DENV circulation, the majority of DENV transmissions are hyper-local, and viral populations across this broad region may not mix homogeneously each season.
+Finally, although Southeast Asia experiences hyperendemic DENV circulation, the majority of DENV transmissions are hyper-local, and viral populations across this broad region may not mix homogeneously each season.
 Thus, it is possible that these sub-serotype antigenic differences impact finer-scale population dynamics, but we lack the requisite data to examine this hypothesis.
 
 \subsection*{Conclusions}
