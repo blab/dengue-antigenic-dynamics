@@ -128,8 +128,16 @@ Subsequent heterotypic secondary infection induces broad cross-protection, and s
 However, a small subset of secondary infections are enhanced by nonneutralizing, cross-reactive antibodies, resulting in severe disease.
 Thus, the antigenic relationships between dengue viruses --- describing whether the immune response generated after primary infection results in protection or enhancement of secondary infection --- are key drivers of DENV case outcomes and epidemic patterns.
 
+\begin{figure}[h]
+  \begin{centering}
+    \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
+  	\caption{\textbf{Phylogeny of dengue viral sequences.}  Maximum likelihood phylogeny of dengue virus genomes, colored by canonical genotype assignment.}
+  	\label{genotype_tree}
+  \end{centering}
+\end{figure}
+
 While each serotype is clearly genetically and antigenically distinct, it is not clear how sub-serotype clades of DENV interact antigenically.
-Each DENV serotype consists of broad genetic diversity, including canonical clades termed `genotypes'.
+Each DENV serotype consists of broad genetic diversity, including canonical clades termed `genotypes' (Figure ~\ref{genotype_tree}).
 Specific genotypes have been associated with characteristically mild or severe disease, and heterogeneous neutralization titers suggest that the immune response to some genotypes is more cross-protective than others.
 Until recently, it has been assumed that these intraserotype differences are minimally important compared to interserotype differences.
 Notably, though, empirical evidence has demonstrated that these genotype-specific differences can drive case outcomes and epidemic severity.
@@ -174,7 +182,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \begin{figure}[h]
   \begin{centering}
   \includegraphics[width=0.6\textwidth]{../figures/png/genetic_antigenic_distance.png}
-  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.}  Normalized antigenic distance between virus strains from Figure 1 as a function of the patristic distance between them on a maximum likelihood phylogeny of viral genomes.}
+  	\caption{\textbf{Normalized antigenic distance vs. genetic distance between pairs of dengue strains.} Antigenic distances are the same as from Figure ~\ref{titer_heatmap}; genetic distances are the patristic distances between viruses on a maximum likelihood phylogeny.}
   	\label{genetic_antigenic_distance}
   \end{centering}
 \end{figure}
@@ -187,16 +195,6 @@ The relationship between genetic distance and antigenic distance is consistent w
 Notably, increasing genetic divergence generally corresponds to increased antigenic distance, both within and between serotypes.
 
 \subsection{Within-serotype antigenic evolution better explains observed antigenic relationships}
-
-% SB: This is a weird place for this figure to go, but I can't quite decide where to put it. Thoughts?
-\begin{figure}[h]
-  \begin{centering}
-    \includegraphics[width=\linewidth]{../figures/png/genotype_tree.png}
-  	\caption{\textbf{Phylogeny of dengue viral sequences.}  Maximum likelihood phylogeny of dengue virus genomes, colored by canonical genotype assignment.}
-  	\label{genotype_tree}
-  \end{centering}
-\end{figure}
-
 We then sought to fully map the relationship between DENV genetic and antigenic evolution.
 To do so, we adapted a phylogenetics-based model originally developed for influenza.
 Conceptually, this model predicts titer values through three steps (see Methods for detailed formulas).
@@ -215,7 +213,7 @@ The model uses convex optimization to learn the values of $d_b$ that minimize th
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\textwidth]{../figures/png/titer_model_performance.png}
-        \caption{\textbf{Titer model formulations and performance.}  \textbf{A} The `interserotype model' only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The `full tree model' allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).}
+        \caption{\textbf{Titer model formulations and performance.}  \textbf{A} The `interserotype model' only allows branches that lie between serotypes to contribute to antigenic evolution. All other branches are assigned $d_b = 0$. \textbf{B} The `full tree model' allows any branch in the phylogeny to contribute to antigenic evolution. \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation). Shading represents the 95\% confidence interval.}
          \label{titer_model_performance}
   \end{centering}
 \end{figure}
@@ -243,7 +241,7 @@ From this, we conclude that there is antigenic evolution within each serotype of
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=.8\linewidth]{../figures/png/antigenic_tree.png}
-    \caption{\textbf{Tree of dengue antigenic phenotypes.}  A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the `full tree model'. Antigenically uniform clades were collapsed, and node sizes reflect the size of the collapsed clade.}
+    \caption{\textbf{Tree of dengue antigenic phenotypes.}  A maximum likelihood phylogeny of DENV genomes was used to infer the topology, with branch lengths scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the `full tree' model of DENV evolution. Antigenically uniform clades were collapsed, and node diameter reflects the size of the collapsed clade.}
      \label{antigenic_tree}
   \end{centering}
 \end{figure}
@@ -265,7 +263,7 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
 \begin{figure}[h]
   \begin{centering}
     \includegraphics[width=\linewidth]{../figures/png/serotype_fitness_model.png}
-  	\caption{\textbf{Antigenic novelty predicts serotype success.}  \textbf{A} The relative frequency of each serotype in Southeast Asia was estimated every 3 months based on available sequence data. \textbf{B} At each timepoint, we calculate the relative fitness of each serotype based on its antigenic novelty (frequency-weighted distance from recently circulating strains) and a scaling factor representing the intrinsic fitness of each serotype. \textbf{C} At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each clade's future trajectory based on its initial frequency and antigenic fitness at time $t$; we predict forward in 3-month increments, compounding population immunitiy and adjusting antigenic fitness based on predicted frequency changes, for a total prediction period of $dt = 5 years$. \textbf{D} Predicted growth rates are calculated as $\frac{\hat{x_i}(t+dt)}{x_i}(t)$ and compared to empirically observed growth rates. Clade growth versus decline is accurate for 80\% of predictions (points outside the shaded gray area).}
+  	\caption{\textbf{Antigenic novelty predicts serotype success.}  \textbf{A} The relative frequency of each serotype, $i$, in Southeast Asia was estimated every three months based on available sequence data. \textbf{B} We calculate antigenic fitness for each serotype over time as its frequency-weighted antigenic distance from recently circulating viruses \textbf{C} At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each serotype's future trajectory based on its initial frequency, time-invariant intrinsic fitness, and antigenic fitness at time $t$. We predict forward in three-month increments, compounding population immunitiy and adjusting antigenic fitness based on predicted frequency changes, for a total prediction period of $dt = 5$ years. \textbf{D} Predicted growth rates are calculated as $\frac{\hat{x_i}(t+dt)}{x_i(t)}$ and compared to empirically observed growth rates. Serotype growth versus decline is accurate for 80\% of predictions (points outside the shaded gray area).}
   	\label{serotype_fitness_model}
   \end{centering}
 \end{figure}
