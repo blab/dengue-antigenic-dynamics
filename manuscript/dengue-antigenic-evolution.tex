@@ -288,29 +288,21 @@ Interestingly, the model performs best when we model immunity as waning linearly
 \begin{figure}[h]
   \begin{centering}
 \includegraphics[width=\linewidth]{../figures/png/genotype-fitness.png}
-    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the `full tree model' of antigenic relationships)}
+    \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}  \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data. \textbf{B} Antigenic fitness was calculated for each canonical dengue genotype as its frequency-weighted antigenic distance from recently circulating strains (here, using antigenic distances estimated from the `full tree model' of antigenic relationships) \textbf{C, D}  Antigenic fitness, derived from antigenic distances as estimated by the `interserotype' or `full tree' model, respectively, was used to predict genotype growth or decline over a 5-year period. Growth versus decline was accurate (predicted and actual growth rates both > 1 or both < 1, points outside the gray shaded area) for 68\% -- 70\% of predictions, respectively.
+}
      \label{genotype_fitness}
    \end{centering}
 \end{figure}
 
 To estimate how well antigenic fitness predicts genotype dynamics, we used the same model to predict genotype success and decline.
-As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated (Figure ~\ref{genotype_fitness}).
-Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the `interserotype model' above) or at the genotype level (i.e., the antigenic distances computed by the `full tree model', which incoporates the observed within-serotype heterogeneity).
+As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated (Figure ~\ref{genotype_fitness}B).
+Importantly, we can calculate antigenic distance between $i$ and $j$ at the serotype level (i.e., the antigenic distances computed from the `interserotype model' as illustrated in Figure ~\ref{titer_model_performance}A) or at the genotype level (i.e., the antigenic distances computed by the `full tree model' as illustrated in Figure ~\ref{titer_model_performance}B, which incoporates the observed within-serotype heterogeneity).
 If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect estimates of antigenic fitness based on the `full tree model' to better predict genotype growth rates.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.7\linewidth]{../figures/png/genotype_growth_rates.png}
-\begin{centering}
-    \caption{\textbf{Predicted vs. actual genotype growth rates under full-tree or interserotype models of antigenic phenotype.}  Antigenic distance between each pair of canonical genotypes was estimated from either the `full tree model' or the `interserotype model' of antigenic divergence. For each model, antigenic fitness was estimated at each timepoint based on frequency-weighted antigenic distance from recently circulating strains and used to predict genotype growth or decline over a 5-year period.}
-     \label{genotype_growth_rates}
-\end{centering}
-\end{figure}
-
-Overall, we find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation (Figure ~\ref{genotype_growth_rates}A).
-When antigenic distance is estimated from the `interserotype model', we find that antigenic fitness explains approximately 31\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 68\% of the time.
+Overall, we find that antigenic novelty contributes to genotype turnover, although it explains less of the observed variation.
+When antigenic distance is estimated from the `interserotype model', we find that antigenic fitness explains approximately 31\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 68\% of the time (Figure ~\ref{genotype_fitness}C).
 % For genotypes, we find that antigenic fitness determines approximately X\% of total fitness.
-Surprisingly, more precise estimates of antigenic distance between genotypes from the `full tree model' does not improve our predictions of genotype success ($R^2 = 0.28$, 70\% accuracy; Figure ~\ref{genotype_growth_rates}B).
+Surprisingly, more precise estimates of antigenic distance between genotypes from the `full tree model' does not improve our predictions of genotype success ($R^2 = 0.28$, 70\% accuracy; Figure ~\ref{genotype_fitness}D).
 This suggests that although we find strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact broad-scale regional dynamics over time.
 
 \section*{Discussion}
@@ -352,12 +344,12 @@ This demonstrates that antigenic fitness is a strong determinant of DENV serotyp
 % Similarly, we find that intrinsic vs antigenic components determine approximately X\% and X\%, respectively, of overall DENV fitness.
 % Inferred intrinsic fitness values varied by a factor of XXX-XXX, with %serotype fitness order, in/consistent with experimental estimates of replicative fitness
 
-We similarly use this model to quantify the effect of within-serotype antigenic variation on the success and decline of canonical DENV genotypes.
+We similarly use this model to quantify the effect of within-serotype antigenic variation on the success and decline of canonical DENV genotypes (Figure ~\ref{genotype_fitness}).
 As above, genotype antigenic fitness declines with population immunity.
 Here, we estimate population immunity based on antigenic distance from recently circulating strains, using distances derived from the `interserotype model' or the `full tree model' of DENV antigenic evolution.
 We then directly compare how strongly these coarser serotype-level versus specific genotype-level antigenic relationships impact DENV population dynamics.
 Overall, we find that antigenic fitness explains a moderate portion of the observed variation in genotype growth and decline.
-Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure ~\ref{genotype_growth_rates}).
+Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions.
 This suggests that although genotypes are antigenically diverse, these differences do not appear to influence large-scale regional dynamics over time.
 
 However, this observation is subject to caveats imposed by the the available data and model assumptions.
