@@ -101,7 +101,6 @@
 % - Add titer symmetry figure to supplement
 % - Check figure references (esp. for supplement)
 % - Add references
-% - Update T_{ij} -> D_{ij} notation throughout (esp. methods)
 % - Fix antigenic tree labels
 % - Final review of math
 % - Add both trend lines to geno/pheno graph
@@ -405,15 +404,15 @@ As discussed in Katzelnick et al., these two datasets show similar patterns of a
 In total, our dataset includes 47 virus strains, 36 serum strains, and 1182 measurements.
 
 \subsection*{Titer Model}
-We normalize measured titers between virus i and serum j, $T_{ij}$, relative to autologous titers: $$T_{ij} = log_2(T_{ii}) - log_2(T_{ij})$$
+We compute normalized antigenic distance between virus $i$ and serum $j$ (denoted $D_{ij}$) from measured titers relative to autologous titers (denoted $T_{ii}$ and $T_{ij}$, respectively), such that $$D_{ij} = log_2(T_{ii}) - log_2(T_{ij})$$.
 To predict unmeasured titers, we employ the `tree model' from Neher et al. and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution.
 Observed titer drops are mapped to branches in the viral phylogeny after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (row and column effects, respectively):
-$$\hat{T}_{ij} \approx T_{ij} = \sum_{b \in path(i,j)} d_b + v_i + p_j$$
+$$\hat{D}_{ij} \approx D_{ij} = \sum_{b \in path(i,j)} d_b + v_i + p_j$$
 where $d_b$ is the titer drop assigned to each branch, $b$, in the phylogeny.
 We randomly withhold 10\% of titer measurements as a test set.
 We use the remaining 90\% of titer measurements as a training set to learn values for virus avidity, serum potency, and branch effects.
 As in Neher et al., we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function:
-$$C = \sum_{i,j} (\hat{T}_{ij} - T_{ij})^2 + \lambda \sum_{b} d_b + \gamma \sum_{i} v_i^2 + \delta \sum_{i} p_i^2$$
+$$C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_b + \gamma \sum_{i} v_i^2 + \delta \sum_{i} p_i^2$$
 Respectively, these terms represent the squared training error; an L1 regularization term on branch effects, such that most values of $d_b = 0$; and L2 regularization terms on virus avidities and serum potencies, such that they are normally distributed.
 These parameter values are then used to predict the titer distance between all pairs of viruses, $i$ and $j$, in the phylogeny.
 We assess performance by comparing predicted to known titer values in our test data set, and present test error (aggregated from 10-fold cross-validation) throughout the manuscript.
