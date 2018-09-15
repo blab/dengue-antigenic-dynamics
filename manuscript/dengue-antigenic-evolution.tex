@@ -98,7 +98,6 @@
 \maketitle
 
 %%%%%%%% TO DO LIST %%%%%%%%%%
-% - Add titer symmetry figure to supplement
 % - Check figure references (esp. for supplement)
 % - Add references
 % - Fix antigenic tree labels
@@ -551,6 +550,17 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
   Maximum likelihood phylogeny of all DENV strains that were included in the titer dataset. Color represents antigenic divergence from root, as inferred by the `full tree' model.
 	}
 	\label{titered_strains_tree}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{../figures/png/titer_asymmetry.png}
+  \caption{\textbf{Titer value symmetry}
+  Some viruses have greater avidity overall, and some sera are more potent overall.
+  We normalize for these row and column effects ($v_a$ and $p_b$, respectively) in the titer model.
+  Here, we show that once overall virus avidity and serum potency are accounted for, titers are roughly symmetric (i.e., $D_{ij} \approx D_{ji}$).
+  }
+\label{titer_asymmetry}
 \end{figure}
 
 \begin{figure}[h]
