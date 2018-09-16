@@ -71,7 +71,8 @@
   % comments
   %\usepackage{ulem}
   \definecolor{purple}{rgb}{0.459,0.109,0.538}
-  \def\tbc#1{\textcolor{purple}{[#1]}}
+  \def\sbc#1{\textcolor{purple}{[#1]}}
+  \def\tbc#1{\textcolor{green}{[#1]}}
   \def\lkc#1{\textcolor{blue}{[#1]}}
 
 %%% Title & Authors %%%
@@ -91,18 +92,21 @@
 \maketitle
 
 %%%%%%%% TO DO LIST %%%%%%%%%%
-% - Check figure references (esp. for supplement)
 % - Add references
-% - Fix antigenic tree labels
-% - Final review of math
+% - Shorten abstract to 150 words (for serious, elife!? >_> )
+% - Add vertical grid lines to genotype tree fig, remove '_' from legend labels
+% - Fix cbar label on genotype dtiter heatmap figure
+% - One last audit of language use for "clade" vs "genotype" vs "serotype" vs "strain"
+% - Read through of revised discussion, most recent revisions to results/methods/intro
+% - Number equations, refer specifically as appropriate
+% - Fix summation notation
 
 %%%%%%% TO DISCUSS %%%%%%%%%%%%
-% - Perhaps redesign the serotype trajectory figure to better illustrate the rolling immunity calculation
-% - How to update / display the antigenic tree? potential for misleading interpretation in terms of which clades are more closely related antigenically based on the genetic topology
+% - Perhaps redesign the serotype trajectory figure (panel C) to better illustrate the rolling immunity calculation
+% - How to adjust / display the antigenic tree? potential for misleading interpretation in terms of which clades are more closely related antigenically based on the genetic topology. Also, fix labels.
 % - Ask Leah what she meant by wanting growth rates on a log scale so "growth and decline can be meaningfully compared"
 % - Add a rate of antigenic change per unit of genetic change?
-% - Refit intrinsic fitness values such that DENV4_f0 = 1 and all others are > 1? This would allow direct comparison between these parameter values, as well as discussion of proportion of fitness attributable & possible "tradeoff"?
-% - Keep explanation of parameter fitting in the fitness model results section? difficult to report / discuss these values without this explanation, but it also feels overly technical.
+% - Refit intrinsic fitness values such that DENV4_f0 = 1 and all others are > 1? This would allow direct comparison between these parameter values, as well as discussion of proportion of fitness attributable (antigenic vs intrinsic) & possible "tradeoffs"? Or leave this well enough alone -- might be overinterpreting
 
 \begin{abstract}
 Dengue virus (DENV), the causative agent of dengue hemorrhagic fever, exists as four genetically distinct serotypes, DENV1-4.
