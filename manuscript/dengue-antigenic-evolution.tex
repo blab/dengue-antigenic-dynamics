@@ -259,16 +259,12 @@ On average, this interserotype model predicts titers within 1.02 log$_2$ titer u
 However, we find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
 The full tree model is able to predict test titers within 0.86 log$_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains 74\% of the observed variation in neutralization titers overall (Figure~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
-The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset* (RMSE 0.65--0.8 log$_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of 0.5 log$_2$ titer units)*. \sbc{move to discussion?} \tbc{fine here}
+The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset* (RMSE 0.65--0.8 log$_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of 0.5 log$_2$ titer units)*.
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
-
-\subsection*{There are at least 12 distinct antigenic phenotypes of dengue}
 
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of DENV (Figure~\ref{antigenic_tree}) and reject the null hypothesis that all DENV viruses within a serotype are antigenically uniform.
 The titer dataset spans the breadth of canonical DENV genotypes, but in most cases lacks the resolution to detect within-genotype antigenic diversity.
 We thus expect that these results represent a lower-bound on the true extent of DENV intraserotype antigenic diversity.
-\sbc{I think this subsection is a bit short, but most of the obvious expansions are (appropriately, I think) in the discussion. Thoughts? I do like having a separate subsection explicitly defining the 12 phenotypes, though.}
-\tbc{Leave paragraph as it is and where it is, but remove subsection heading `There are at least...'}
 
 \begin{figure}[h]
   \begin{centering}
@@ -277,7 +273,6 @@ We thus expect that these results represent a lower-bound on the true extent of 
     A maximum likelihood phylogeny of DENV genomes was used to infer the topology.
     Branch lengths are scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the `full tree' model of DENV evolution.
     Antigenically uniform clades were collapsed, and node diameter reflects the size of the collapsed clade.
-    \sbc{I'm not sure I actually like this figure, but I can't think of a better representation. See comment for discussion (top) re: possible misinterpretation.}
     }
      \label{antigenic_tree}
   \end{centering}
@@ -346,7 +341,7 @@ This suggests that although we find strong evidence that genotypes vary in their
     In this panel, we show antigenic fitness over time as derived from the `full tree model' estimates of antigenic distance.
     \textbf{C, D}  Fitness estimates were used to predict clade growth rates over 5 years, compounding immunity every three months based on predicted frequency changes (Methods Eq.~\ref{eq_compounding_immunity}).
     Here, we compare observed vs predicted growth rates for both formulations of the fitness model (using fitness derived from either the `interserotype' or `full tree' model estimates of antigenic distance).
-    Growth versus decline was accurate (predicted and actual growth rates both $> 1$ or both $< 1$, points outside the gray shaded area) for 68\% -- 70\% of predictions, respectively. \sbc{I think this legend is probably still unclear. Wording help?}
+    Growth versus decline was accurate (predicted and actual growth rates both $> 1$ or both $< 1$, points outside the gray shaded area) for 68\% -- 70\% of predictions, respectively.
 }
      \label{genotype_fitness}
    \end{centering}
@@ -492,7 +487,7 @@ We quantify population immunity to virus $i$ at time $t$, $P_i(t)$, as a functio
   \label{eq_population_immunity}
 P_i(t) = \sum_{n=1}^{n=N} \left(w(n)  \sum_{j} \Big( x_j(t-n) \, C( D_{ij}) \Big) \right)
 \end{equation}
-Where $D_{ij}$ is the antigenic distance between $i$ and each non-overlapping clade $j$, $n$ is the number of years since exposure, and $x_j(t-n)$ is the relative frequency of $j$ at year $t$ \tbc{check this --- sentence term describe both $t$ and $n$}.
+Where $D_{ij}$ is the antigenic distance between $i$ and each non-overlapping clade $j$, $n$ is the number of years since exposure, and $x_j(t-n)$ is the relative frequency of $j$ at year $t-n$.
 Waning immunity is modeled as a non-negative linear function of time:
 \begin{equation}
 \label{eq_waning_immunity}
@@ -514,9 +509,9 @@ where $\beta$ and $f_0$ are fit parameters representing the slope of the linear 
 Similar to the model implemented in {\L}uksza and L\"assig*, we estimate predicted clade frequencies at time $t + dt$ as
 \begin{equation}
   \label{eq_predict_frequency}
-\hat{x_i}(t+dt) = \frac{x_i(t) e^{f_i(t) dt}}{\sum_{i}x_i(t)}
+\hat{x_i}(t+dt) = \frac{x_i(t) e^{f_i(t) dt}}{\sum_{i}x_i(t) e^{f_i(t) dt}}
 \end{equation}
-for short-term predictions (where $dt < 1$ year). \tbc{I believe the denominator needs to have the exponential term as well.}
+for short-term predictions (where $dt < 1$ year).
 
 For long-term predictions, we must account for immunity accrued at each intermediate timepoint between $t$ and $dt$.
 We divide the interval between $t$ and $dt$ into a total of $U$ 3 month timepoints, $[t+u, t+2u, ... t+U]$, such that $t+U=dt$.
@@ -629,8 +624,6 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 	\includegraphics[width=0.75\textwidth]{../figures/png/titered_strains_tree.png}
 	\caption{\textbf{Tree of DENV viruses in titer dataset}
   Maximum likelihood phylogeny of all DENV viruses that were included in the titer dataset.
-  Color represents antigenic divergence from root, as inferred by the `full tree' model.
-  \tbc{I find it confusing when later results are introduced in beginning figures. At this point in the reading I don't have any idea what you mean by `full tree' model. I suggest to make this is a simple ML tree. Remove the titer model coloring.}
 	}
 	\label{titered_strains_tree}
 \end{figure}
@@ -651,7 +644,6 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
   Some viruses have greater avidity overall, and some sera are more potent overall.
   We normalize for these row and column effects ($v_a$ and $p_b$, respectively) in the titer model.
   Once overall virus avidity and serum potency are accounted for, titers are roughly symmetric (i.e., $D_{ij} \approx D_{ji}$).
-  \tbc{This would be better with a wider aspect ratio.}
   }
 \label{titer_asymmetry}
 \end{figure}
