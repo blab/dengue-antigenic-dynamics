@@ -222,10 +222,10 @@ Conceptually, this model predicts titer values through three steps.
 First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figures~\ref{genotype_tree}, \ref{sequence_distribution}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny by mapping titer changes to individual branches.
 This assigns each branch $b$ an antigenic distance $d_b$.
-With this in hand, we interpolate the antigenic distance between all pairs of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go (Methods, Eq.~\ref{eq_predicted_titers}).
+With this in hand, we estimate the antigenic distance between all pairs of viruses by tracing the path between them in the phylogeny, summing branch-specific distances $d_b$ as we go (Methods, Eq.~\ref{eq_predicted_titers}).
 
 To learn these values of $d_b$, we first split our dataset into training (random 90\% of measurements) and test data (the remaining 10\% of values).
-We take the training data and fit $d_b$ for each branch in the tree, subject to regularization as defined by the following constraints (Methods, Eq.~\ref{eq_cost_fn}).
+We take the training data and fit $d_b$ for each branch in the tree, subject to regularization as follows (also detailed in Methods, Eq.~\ref{eq_cost_fn}).
 Parsimoniously, we expect that antigenic change is more likely to occur through larger changes on a few branches than through small changes on many branches; correspondingly, our prior expectation of values of $d_b$ is exponentially distributed such that most values of $d_b = 0$.
 This is analogous to lasso regression to identify a few parameters with positive weights and set other parameters to 0.
 Additionally, some viruses have greater binding avidity, and some sera are more potent than others (Figure~\ref{titer_asymmetry}); these `row' and `column' effects, respectively, are normally distributed and are taken into account when estimating titers.
