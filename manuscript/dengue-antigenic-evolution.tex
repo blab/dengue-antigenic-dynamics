@@ -188,7 +188,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \begin{centering}
 \includegraphics[width=0.65\textwidth]{../figures/png/titer_heatmap.png}
     \caption{\textbf{Normalized antigenic distance between pairs of dengue viruses and sera.}
-    Aggregated neutralization titers from Katzelnick et al. were standardized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one, two-fold change in PRNT50 value.
+    Aggregated neutralization titers from Katzelnick et al. are standardized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one, two-fold change in PRNT50 value.
     Light gray areas represent missing data.
     Higher values correspond to greater antigenic distance.
     }
@@ -216,8 +216,7 @@ There are two groups of comparisons --- between serotype and within serotype ---
 The relationship between genetic distance and antigenic distance is consistent within and between serotypes, where increasing genetic divergence generally corresponds to increased antigenic distance.
 
 \subsection*{Antigenic evolution occurs within serotypes}
-We then sought to fully map the relationship between DENV genetic and antigenic evolution.
-To do so, we adapted a phylogeny-based model originally developed for influenza*.
+To fully map the relationship between DENV genetic and antigenic evolution, we adapt a phylogeny-based model originally developed for influenza*.
 Conceptually, this model predicts titer values through three steps.
 First, we build a phylogeny of dengue virus sequences to establish the genetic relationships between viruses (Figures~\ref{genotype_tree}, \ref{sequence_distribution}).
 Next, we infer how much antigenic change has occurred along each branch of the phylogeny by mapping titer changes to individual branches.
@@ -270,9 +269,9 @@ We thus expect that these results represent a lower-bound on the true extent of 
   \begin{centering}
     \includegraphics[width=.8\linewidth]{../figures/png/antigenic_tree.png}
     \caption{\textbf{Tree of dengue antigenic phenotypes.}
-    A maximum likelihood phylogeny of DENV genomes was used to infer the topology.
+    We infer the topology from a maximum likelihood phylogeny of DENV genomes.
     Branch lengths are scaled to reflect $d_b$, the relative contributions of each branch to antigenic divergence, as inferred by the `full tree' model of DENV evolution.
-    Antigenically uniform clades were collapsed, and node diameter reflects the size of the collapsed clade.
+    Antigenically uniform clades are collapsed, and node diameter reflects the size of the collapsed clade.
     }
      \label{antigenic_tree}
   \end{centering}
@@ -281,7 +280,7 @@ We thus expect that these results represent a lower-bound on the true extent of 
 \subsection*{Antigenic novelty predicts serotype success}
 From the titer model, we observe strong evidence that homotypic genotypes of DENV vary in their ability to escape antibody neutralization (Figures~\ref{titer_model_performance}, \ref{genotype_dTiter_heatmap}).
 However, antibody neutralization is only one of many factors that shape epidemic patterns.
-We thus wanted to know whether the observed antigenic diversity influences dengue population dynamics in the real world.
+We investigate whether the observed antigenic diversity influences dengue population dynamics in the real world.
 The size of the viral population (i.e., prevalence, commonly analyzed using SIR models) is determined by many complex factors, and reliable values for population prevalence are largely unavailable.
 Contrastingly, the composition of the viral population (i.e., the relative frequency of each viral clade currently circulating) can be estimated over time by examining historical sequence data*, and is primarily driven by viral fitness*.
 In meaningfully antigenically diverse viral populations, antigenic novelty (relative to standing population immunity) contributes to viral fitness: as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other viruses antigenically similar to $i$--decreases over time as more people acquire immunity*.
@@ -292,7 +291,7 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
   \begin{centering}
     \includegraphics[width=\linewidth]{../figures/png/serotype_fitness_model.png}
   	\caption{\textbf{Antigenic novelty predicts serotype success.}
-    \textbf{A} The relative frequency of each serotype, $x_i$, in Southeast Asia was estimated every three months based on available sequence data.
+    \textbf{A} The relative frequency of each serotype, $x_i$, in Southeast Asia is estimated every three months based on available sequence data.
     \textbf{B} We calculate antigenic fitness for each serotype over time as its frequency-weighted antigenic distance from recently circulating viruses.
     \textbf{C} At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each serotype's future trajectory based on its initial frequency, time-invariant intrinsic fitness, and antigenic fitness at time $t$ (Methods, Eq.~\ref{eq_predict_frequency}).
     We predict forward in three-month increments for a total prediction period of $dt = 5$ years.
@@ -304,12 +303,12 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
   \end{centering}
 \end{figure}
 
-To test this hypothesis, we examined the composition of the dengue virus population in Southeast Asia from 1970 to 2015.
-We estimated the relative population frequency of each DENV serotype at three month intervals, $x_i(t)$ (Figure~\ref{serotype_fitness_model}A), based on available sequence data (Methods, Eq.~\ref{eq_estimate_frequency}).
+To test this hypothesis, we examine the composition of the dengue virus population in Southeast Asia from 1970 to 2015.
+We estimate the relative population frequency of each DENV serotype at three month intervals, $x_i(t)$ (Figure~\ref{serotype_fitness_model}A), based on available sequence data (Methods, Eq.~\ref{eq_estimate_frequency}).
 
 Fitter virus clades increase in frequency over time, such that $x_i(t+dt) > x_i(t)$.
 It follows that these clades have a growth rate--defined as the fold-change in frequency over time--greater than one: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
-To isolate the extent to which antigenic fitness contributes to clade success and decline, we extended work by * to build a simple model that attempts to predict clade growth rates based on two variables: the antigenic fitness of the clade at time $t$, and a time-invariant free parameter representing the intrinsic fitness of the serotype the clade belongs to.
+To isolate the extent to which antigenic fitness contributes to clade success and decline, we extend work by * to build a simple model that attempts to predict clade growth rates based on two variables: the antigenic fitness of the clade at time $t$, and a time-invariant free parameter representing the intrinsic fitness of the serotype the clade belongs to.
 We estimate the antigenic fitness of clade $i$ at time $t$ as a function of its antigenic distance from each viral clade $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning population immunity (Figure~\ref{serotype_fitness_model}B; Methods, Eq.~\ref{eq_waning_immunity}).
 Growth rates are estimated based on a five year sliding window (Figure~\ref{serotype_fitness_model}C).
 
@@ -317,7 +316,7 @@ This simple model explains 62\% of the observed variation in serotype growth rat
 This strongly suggests that antigenic fitness is a major driver of serotype population dynamics.
 This also demonstrates that this model captures key components of dengue population dynamics; examining the formulation of this model in more detail can yield insights into how antigenic relationships influence DENV population composition.
 The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in prediction error relative to a null model, see Methods).
-Interestingly, we find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
+We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
 We also find that these dynamics are best explained by intrinsic fitness that moderately varies by by serotype (Table~\ref{parameter_values}).
 
 \subsection*{Antigenic novelty also partially predicts genotype success}
@@ -336,7 +335,7 @@ This suggests that although we find strong evidence that genotypes vary in their
 \includegraphics[width=\linewidth]{../figures/png/genotype-fitness.png}
     \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}
     \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data.
-    \textbf{B} Antigenic fitness was calculated for each genotype as its frequency-weighted antigenic distance from recently circulating genotypes.
+    \textbf{B} Antigenic fitness is calculated for each genotype as its frequency-weighted antigenic distance from recently circulating genotypes.
     We assess antigenic distance using either the `full tree model' or the `interserotype model' of antigenic relationships (Figure~\ref{titer_model_performance}).
     In this panel, we show antigenic fitness over time as derived from the `full tree model' estimates of antigenic distance.
     \textbf{C, D}  Fitness estimates were used to predict clade growth rates over 5 years, compounding immunity every three months based on predicted frequency changes (Methods Eq.~\ref{eq_compounding_immunity}).
