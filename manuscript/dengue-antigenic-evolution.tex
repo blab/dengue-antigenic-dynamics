@@ -175,11 +175,11 @@ This sera was also titered against a broad panel of DENV viruses.
 As reported by Katzelnick et al., we find generally consistent patterns of neutralization between the NHP and human sera data; see [ref] for a detailed comparison.
 In total, our dataset consists of 454 NHP sera titrations spanning the breadth of DENV diversity, and 728 human sera titrations providing deep coverage of a small subset of viruses.
 
-To normalize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one, two-fold drop in neutralization.
+To standardize these measurements, we first take the $log_2$ of each value, such that one titer unit corresponds to one, two-fold drop in neutralization.
 We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as zero.
 Normalized antigenic distance between $i$ and $j$ are thus calculated as $D_{ij} = log_2(T_{ii}) - log_2(T_{ij})$, such that a higher value of $D_{ij}$ indicates that serum $i$ is less effective at neutralizing virus $j$, implying greater antigenic distance between viruses $i$ and $j$.
 
-The full dataset of normalized titer values is shown in Figure ~\ref{titer_heatmap}.
+The full dataset of standardized titer values is shown in Figure ~\ref{titer_heatmap}.
 Here, we see that homotypic virus-serum pairs are more closely related antigenically than heterotypic pairs.
 However, we also observe large variance around this trend, both within and between serotypes.
 This suggests that treating each serotype as antigenically uniform overlooks potentially important antigenic heterogeneity across viruses within each serotype.
@@ -188,7 +188,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \begin{centering}
 \includegraphics[width=0.4\textwidth]{../figures/png/titer_heatmap.png}
     \caption{\textbf{Normalized antigenic distance between pairs of dengue viruses and sera.}
-    Aggregated neutralization titers from Katzelnick et al. were normalized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one 2-fold change in PRNT50 value.
+    Aggregated neutralization titers from Katzelnick et al. were standardized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one, two-fold change in PRNT50 value.
     Light gray areas represent missing data.
     Higher values correspond to greater antigenic distance.
     }
@@ -434,7 +434,7 @@ As discussed in Katzelnick et al., these two datasets show similar patterns of a
 In total, our dataset includes 47 virus strains, 36 serum strains, and 1182 measurements.
 
 \subsection*{Titer Model}
-We compute normalized antigenic distance between virus $i$ and serum $j$ (denoted $D_{ij}$) from measured titers relative to autologous titers (denoted $T_{ii}$ and $T_{ij}$, respectively), such that
+We compute standardized antigenic distance between virus $i$ and serum $j$ (denoted $D_{ij}$) from measured titers relative to autologous titers (denoted $T_{ii}$ and $T_{ij}$, respectively), such that
 \begin{equation}
   \label{eq_titer_norm}
 D_{ij} = log_2(T_{ii}) - log_2(T_{ij})
@@ -658,7 +658,7 @@ TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 \centering
 	\includegraphics[width=0.65\textwidth]{../figures/png/genotype_dTiter_heatmap.png}
 	\caption{\textbf{Titer distance by genotype}
-  Values represent the mean interpolated antigenic distance between canonical dengue genotypes (in normalized $log_2$ titer units).
+  Values represent the mean interpolated antigenic distance between canonical dengue genotypes (in standardized $log_2$ titer units).
   }
 	\label{genotype_dTiter_heatmap}
 \end{figure}
