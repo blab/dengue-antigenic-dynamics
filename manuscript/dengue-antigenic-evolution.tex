@@ -254,10 +254,10 @@ We assess model performance by comparing the predicted test titer values to the 
 Model performance indicates how well the hypothesis embedded in the model explains the observed data.
 
 We find that serotype-level characterization is insufficient to explain observed antigenic phenotypes.
-On average, this interserotype model predicts titers within $1.27$ $log_2$ titer units of the true value (root mean squared error, RMSE), and explains $22\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
+On average, this interserotype model predicts titers within $1.02$ $log_2$ titer units of the true value (root mean squared error, RMSE), and explains $62\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 
 We find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
-The full tree model is able to predict test titers within $0.89$ $log_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains $66\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
+The full tree model is able to predict test titers within $0.86$ $log_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains $74\%$ of the observed variation in neutralization titers overall (Figure ~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
 The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE $0.65-0.8$ $log_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of $0.5$ $log_2$ titer units). \sbc{move to discussion?}
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
