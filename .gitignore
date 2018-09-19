@@ -1,4 +1,3 @@
-data/*
 papers/*
 slides/*
 recombination/
@@ -20,7 +19,8 @@ environment*
 *.p
 \.Icon
 \.swp
-\.Icon\.swp
+\.Icon
+\.swp
 Icon?
 
 # LaTeX intermediaries #
