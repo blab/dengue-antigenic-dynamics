@@ -70,6 +70,7 @@
 
   % comments
   %\usepackage{ulem}
+  \definecolor{eLifeMediumGrey}{rgb}{0,0,0}
   \definecolor{purple}{rgb}{0.459,0.109,0.538}
   \definecolor{green}{rgb}{0.20,0.50,0.48}
   \def\sbc#1{\textcolor{purple}{[#1]}}
@@ -92,14 +93,7 @@
 \begin{document}
 \maketitle
 
-%%%%%%%% TO DO LIST %%%%%%%%%%
-% - Add references
-% - Adjust serotype fitness panel C: add "t" and "dt", show examples of growth rate calculation for observed and actual, color corresponding points in D
-% - Adjust antigenic tree figure: labels, layout
-% - Add estimate of # antigenic shift events per years of circulation for each serotype (average)
-% - Flesh out repo outline
-
-\begin{abstract} % exactly 150 words, per the author guidelines.
+\begin{abstract}
 Dengue virus (DENV) exists as four genetically distinct serotypes, each of which is also antigenically distinct: the immune response to primary infection can be either cross-protective or associated with severe disease upon heterotypic secondary infection.
 Each serotype is historically assumed to antigenically uniform.
 Recent analyses suggest that antigenic heterogeneity may exist within each serotype, but its source, extent and impact remain unclear.
@@ -132,20 +126,20 @@ By leveraging both molecular data and real-world population dynamics, these resu
 \pagebreak
 
 \section*{Introduction}
-Dengue virus (DENV) is a mosquito-borne flavivirus which consists of four genetically distinct clades, canonically thought of as serotypes \citep{holmes2003origin}**.
+Dengue virus (DENV) is a mosquito-borne flavivirus which consists of four genetically distinct clades, canonically thought of as serotypes \citep{lanciotti1997molecular}.
 DENV circulates primarily in South America and Southeast Asia, infecting 400 million people annually.
 While most of these infections are asymptomatic or mild, $\sim$1--3\% of cases progress to severe dengue hemorrhagic fever, causing approximately 10--15,000 deaths each year \citep{bhatt2013global}.
-Unlike most infectious diseases, DENV secondary infections are more likely than primary infections to cause severe disease, with estimates of relative risk of severe dengue of $\sim$24 \citep{mizumoto2014risk}**.
-Primary DENV infection is more often mild and is thought to generate lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over six months to two years \citep{katzelnick2016neutralizing,sabin1952research}**.
-Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are rare  \citep{gibbons2007analysis,olkowski2013reduced}**.
-However, a small subset of secondary infections are enhanced by nonneutralizing, cross-reactive antibodies, resulting in severe disease \citep{katzelnick2017antibody}**.
+Unlike most infectious diseases, DENV secondary infections are more likely than primary infections to cause severe disease, with estimates of relative risk of severe dengue of $\sim$24 \citep{mizumoto2014risk}.
+Primary DENV infection is more often mild and is thought to generate lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over six months to two years \citep{katzelnick2016neutralizing,sabin1952research}.
+Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are rare  \citep{gibbons2007analysis,olkowski2013reduced}.
+However, a small subset of secondary infections are enhanced by nonneutralizing, cross-reactive antibodies, resulting in severe disease \citep{halstead1979vivo,katzelnick2017antibody,sangkawibha1984risk}.
 Thus, the antigenic relationships between dengue viruses --- describing whether the immune response generated after primary infection results in protection or enhancement of secondary infection --- are key drivers of DENV case outcomes and epidemic patterns.
 
 While each serotype is clearly genetically and antigenically distinct, it is not clear how sub-serotype clades of DENV interact antigenically.
-Each DENV serotype consists of broad genetic diversity, including canonical clades termed `genotypes' (Figure~\ref{genotype_tree}).
-Specific genotypes have been associated with characteristically mild or severe disease, and heterogeneous neutralization titers suggest that the immune response to some genotypes is more cross-protective than others \citep{holmes2003origin}**.
+Each DENV serotype consists of broad genetic diversity, including canonical clades termed `genotypes' (Figure~\ref{genotype_tree}) \citep{rico1990molecular,twiddy2003inferring}.
+Specific genotypes have been associated with characteristically mild or severe disease, and heterogeneous neutralization titers suggest that the immune response to some genotypes is more cross-protective than others \citep{gentry1982identification,russell1967dengue}.
 Until recently, it has been assumed that these intraserotype differences are minimally important compared to interserotype differences.
-However, empirical evidence has demonstrated that these genotype-specific differences can drive case outcomes and epidemic severity.
+However, empirical evidence has demonstrated that these genotype-specific differences can drive case outcomes and epidemic severity (reviewed in Holmes and Twiddy, 2003).
 For example, analysis of a longitudinal cohort study demonstrated that specific combinations of primary infection serotype and secondary infection genotype can mediate individual case outcomes \citep{ohainle2011dynamics}.
 On a population scale, the DENV1-immune population of Iquitos, Peru, experienced either entirely asymptomatic or very severe epidemic seasons in response to two different genotypes of DENV2 \citep{kochel2002effect}.
 
@@ -168,7 +162,7 @@ We also quantify the impact of within- and between-serotype antigenic variation 
 
 \subsection*{Dengue neutralization titer data}
 
-Antigenic distance between a pair of viruses $i$ and $j$ is experimentally quantified using neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro**.
+Antigenic distance between a pair of viruses $i$ and $j$ is experimentally quantified using neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro\citep{russell1967dengue}.
 To measure the pairwise antigenic distances for a panel of diverse DENV viruses (Figure~\ref{titered_strains_tree}), Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at three months post-infection, and then titered this sera against a panel of test viruses \citep{katzelnick2015dengue}.
 To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants six weeks after inoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV viruses.
@@ -209,7 +203,7 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
   \end{centering}
 \end{figure}
 
-Titer measurements are prone to noise**, and there is a limited amount of available titer data.
+Titer measurements are prone to noise, and there is a limited amount of available titer data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect that changes in antigenic phenotype correspond to underlying changes in viral genotype.
 Figure~\ref{genetic_antigenic_distance} shows the relationship between genetic and antigenic distance between each pair of viruses in our dataset.
 There are two groups of comparisons --- between serotype and within serotype --- however, even within serotypes there is significant genetic diversity and a correlation between increased genetic distance and increased antigenic distance.
@@ -282,10 +276,10 @@ We thus expect that these results represent a lower-bound on the true extent of 
 From the titer model, we observe strong evidence that homotypic genotypes of DENV vary in their ability to escape antibody neutralization (Figures~\ref{titer_model_performance}, \ref{genotype_dTiter_heatmap}).
 However, antibody neutralization is only one of many factors that shape epidemic patterns.
 We investigate whether the observed antigenic diversity influences dengue population dynamics in the real world.
-The size of the viral population (i.e., prevalence, commonly analyzed using SIR models**) is determined by many complex factors**, and reliable values for population prevalence are largely unavailable.
+The size of the viral population (i.e., prevalence, commonly analyzed using SIR models as reviewed in \citep{lourencco2018challenges}) is determined by many complex factors, and reliable values for population prevalence are largely unavailable.
 Contrastingly, the composition of the viral population (i.e., the relative frequency of each viral clade currently circulating) can be estimated over time by examining historical sequence data \citep{lee2018deep,neher2016prediction}, and is primarily driven by viral fitness** \citep{bedford2011strength}.
 In meaningfully antigenically diverse viral populations, antigenic novelty (relative to standing population immunity) contributes to viral fitness: as a given virus $i$ circulates in a population, the proportion of the population that is susceptible to infection with $i$--and other viruses antigenically similar to $i$--decreases over time as more people acquire immunity** \citep{luksza2014predictive}.
-Antigenically novel viruses that are able to escape this population immunity are better able to infect hosts and sustain transmission chains, making them fitter than the previously circulating viruses**.
+Antigenically novel viruses that are able to escape this population immunity are better able to infect hosts and sustain transmission chains, making them fitter than the previously circulating viruses \citep{zhang2005clade}**.
 Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we would expect greater antigenic distance from recently circulating viruses to correlate with higher growth rates.
 
 \begin{figure}[h]
@@ -392,9 +386,9 @@ This suggests that although genotypes are antigenically diverse, these differenc
 
 However, this observation is subject to caveats imposed by the the available data and model assumptions.
 We estimate DENV population composition over time based on available sequence data, pooled across all of Southeast Asia (Methods, Eq.~\ref{eq_estimate_frequency}).
-As the vast majority of cases of DENV are asymptomatic** \citep{bhatt2013global}, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
+As the vast majority of cases of DENV are asymptomatic, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
 We also assume that Southeast Asia represents a closed viral population with homogeneous mixing.
-However, increasing globalization likely results in some amount of viral importation that is not accounted for in this model**.
+However, increasing globalization likely results in some amount of viral importation that is not accounted for in this model \citep{allicock2012phylogeography}.
 Finally, although Southeast Asia experiences hyperendemic DENV circulation, the majority of DENV transmissions are hyper-local \citep{salje2017dengue}, and viral populations across this broad region may not mix homogeneously each season.
 Thus, it is possible that these sub-serotype antigenic differences impact finer-scale population dynamics, but we lack the requisite data to examine this hypothesis.
 
@@ -416,11 +410,12 @@ We have provided all code, configuration files and datasets at `github.com/blab/
 We downloaded all dengue virus sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained the full coding sequence of E (total N=12,645) \citep{kuiken2011lanl}.
 We discarded sequences which were putative recombinants, duplicates, lab strains, or which lacked an annotated sampling location and/or sampling date.
 We then randomly subsampled up to 8 viruses per region, per month, preferentially including records with available titer data and longer sequences.
-Our final dataset consists of 2,563 viral sequences (Figure~\ref{sequence_distribution})
+Our final dataset consists of 2,563 viral sequences (Figure~\ref{sequence_distribution}).
+We used the annotated reference dataset from \citep{pyke2016highly} to assign sequences to canonical genotypes.
 
 \textbf{Titers}\\
 
-Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro**.
+Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro \citep{russell1967dengue}.
 Briefly, two-fold serial dilutions of serum $i$ are incubated with a fixed concentration of virus $j$.
 Titers represent the lowest serum concentration able to neutralize $50\%$ of virus, and are reported as the inverse dilution.
 We used two publicly available plaque reduction neutralization titer (PRNT50) datasets generated by Katzelnick et al. in \citep{katzelnick2015dengue}.
@@ -438,7 +433,7 @@ We compute standardized antigenic distance between virus $i$ and serum $j$ (deno
 D_{ij} = \mathrm{log}_2(T_{ii}) - \mathrm{log}_2(T_{ij})
 \end{equation}
 To predict unmeasured titers, we employ the `tree model' from Neher et al. and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution \citep{hadfield2017nextstrain,neher2016prediction}.
-We use RAxML version 8.2.11 to build a maximum likelihood phylogeny of dengue viral genomes \citep{stamatakis2014raxml}.
+We use RAxML version 8.2.11 and a GTRCAT nucleotide substitution model to build a maximum likelihood phylogeny of dengue viral genome sequences \citep{stamatakis2014raxml}.
 Observed titer drops are mapped to branches in the viral phylogeny after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (`row' and `column' effects, respectively):
 \begin{equation}
   \label{eq_predicted_titers}
@@ -583,7 +578,7 @@ For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ (Tabl
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
 
 \section*{Acknowledgements}
-We would like to thank Richard Neher, Molly OhAinle, David Shaw, Paul Edlefsen, and Michal Juraska for useful discussion and advice.
+We would like to thank Richard Neher, Molly OhAinle, David Shaw, Paul Edlefsen, Michal Juraska, and all members of the Bedford Lab for useful discussion and advice.
 SB is a Graduate Research Fellow and is supported by NSF DGE-1256082.
 TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 
