@@ -14,7 +14,7 @@ Predicted growth rates are calculated as the predicted final frequency over the 
 # Running the fitness model  
 ### Prepare input files
 _1 - Estimate empirical clade frequencies over time by [running augur](../augur/)._   
-_2 - [Parse clade frequencies](./helpers_scripts/parse-frequencies.ipynb) to identify which clades correspond to serotypes and genotypes of interest._  
+_2 - [Parse clade frequencies](./helper_scripts/parse-frequencies.ipynb) to identify which clades correspond to serotypes and genotypes of interest._  
 _3 - Parse the titer tree (also output from augur) to estimate the antigenic distance between each pair of clades (sum values of `dTiter` for each branch that lies between the two clades on the tree)._  
 **N.B.: For this dataset, steps 1-3 have already been completed; prepared input files for the fitness model can be found [here](../data/frequencies/)**  
 
@@ -26,6 +26,27 @@ _`clade_resolution` should be either `serotype` or `genotype`._
 _`antigenic_resolution` should be either `interserotype_model` or `fulltree_model`_  
 
 _5 - Examine model performance_  
-_Load the out file, `model_performance.csv` into the visualization notebook [here](../helpers_scripts/profile-likelihoods.ipynb) to visualize model performance as defined by a variety of optimization metrics._  
+_Load the out file, `model_performance.csv` into the visualization notebook [here](../helper_scripts/profile-likelihoods.ipynb) to visualize model performance as defined by a variety of optimization metrics._  
   
-**N.B.: For this dataset, steps 4-5 have already been completed; model performance for the entire parameter space can be found [here](./profile_likelihoods/)**
+**N.B.: For this dataset, steps 4-5 have already been completed; model performance for the entire parameter space can be found [here](./profile_likelihoods/). Optimized parameter values are shown below:**
+  
+**beta** Slope of linear relationship between population immunity and viral fitness   
+**gamma** Slope of linear relationship between titers and probability of protection   
+**sigma** Proportion of titers waning each year since primary infection   
+**f_{s0}** Relative intrinsic fitness of each serotype (f_0 = 0 for DENV4)   
+**N** Number of years of previous immunity that contribute to antigenic fitness   
+**dt** Number of years in the future to predict clade frequencies   
+  
+|Genetic resolution | Antigenic resolution | Metric | Metric value | beta | gamma | sigma | DENV1 f_0 | DENV2 f_0 | DENV3 f_0 | DENV4 f_0| 
+|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+|Serotype | Interserotype |    Delta  SSE | 15.02 | 2.57 | 0.57 | 0.86 | 4.57 | 3.43 | 2.14 | 0.00|   
+|Serotype | Interserotype | Pearson   R^2  | 0.63 | 2.57 | 0.57 | 0.86 | 3.43 | 2.29 | 0.71 | 0.00|   
+|Genotype | Interserotype |    Delta  SSE | 14.83 | 2.57 | 0.57 | 0.86 | 5.71 | 4.57 | 3.57 | 0.00|   
+|Genotype | Interserotype | Pearson   R^2  | 0.36 | 2.57 | 0.57 | 0.86 | 5.71 | 5.71 | 2.86 | 0.00|  
+|Genotype | Full tree |    Delta  SSE | 14.22 | 1.71 | 0.57 | 0.43 | 1.40 | 0.80 | 0.40 | 0.00|  
+|Genotype | Full tree | Pearson   R^2  | 0.33 | 1.29 | 0.57 | 0.43 | 1.40 | 1.60 | 0.40 | 0.00|    
+  
+### Run the fitness model  
+6 - Run `antigenic_fitness.py -h` to see all available options. Simply running with the default options will run the serotype model with parameters fit to optimize `delta_sse`.  
+ 
+7 - Explore model output and visualize results with [this notebook](../figures/fitness-frequencies.ipynb)
