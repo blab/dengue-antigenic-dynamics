@@ -9,7 +9,10 @@ antigenic_resolution = sys.argv[2]
 
 frequency_path = '../../data/frequencies/southeast_asia_%s_frequencies.csv'%(clade_resolution)
 titer_path = '../../data/frequencies/%s_Dij.csv'%antigenic_resolution
-out_path = '../southeast_asia/%s/%s/'%(clade_resolution, antigenic_resolution)
+out_path = '../southeast_asia/%s/%s_model/'%(clade_resolution, antigenic_resolution)
+
+if not os.path.isdir(out_path):
+	os.mkdir(out_path)
 
 beta_vals = np.linspace(0,3,8)
 gamma_vals = np.linspace(0,2,8)

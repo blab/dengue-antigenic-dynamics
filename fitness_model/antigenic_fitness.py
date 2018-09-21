@@ -301,14 +301,7 @@ class AntigenicFitness():
         # keep track of which predictions will be made based on low initial values
         self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
 
-        if self.fitness_path:
-            if self.fitness_path == 'null': # negative control: fitnesses all = 0.
-                self.fitness = pd.DataFrame(index=self.timepoints, columns=self.clades)
-                self.fitness.fillna(0., inplace=True)
-            else: # load from file if provided
-                self.fitness = pd.read_csv(self.fitness_path, index_col=0)
-        else:
-            self.fitness = None
+        self.fitness = None
 
         self.trajectories = {}
 
@@ -501,19 +494,18 @@ if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
 
     args = argparse.ArgumentParser()
-    args.add_argument('--frequency_path', help='actual_frequencies csv', default='./source/southeast_asia_serotype_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='./source/all_effects_Dij.csv')
-    args.add_argument('--fitness_path', type=str, help='path to precomputed actual_frequencies or \'null\'')
+    args.add_argument('--frequency_path', help='actual_frequencies csv', default='../data/frequencies/southeast_asia_serotype_frequencies.csv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.csv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
-    args.add_argument('--gamma', type=float, help='Value or value range for -1*proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=1.)
-    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.5)
-    args.add_argument('--beta', type=float, help='Value or value range for beta. fitness = -1.*beta*population_immunity', default=1.6)
-    args.add_argument('--DENV1_f0', type=float, help='Relative f0 values for DENV1', default = 0.)
-    args.add_argument('--DENV2_f0', type=float, help='Relative f0 values for DENV2', default = 0.)
-    args.add_argument('--DENV3_f0', type=float, help='Relative f0 values for DENV3', default = 0.)
-    args.add_argument('--DENV4_f0', type=float, help='Relative f0 values for DENV4', default = 0.)
+    args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.57)
+    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.86)
+    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=2.57)
+    args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 4.57)
+    args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 3.43)
+    args.add_argument('--DENV3_f0', type=float, help='Relative intrinsic fitness value for DENV3', default = 2.14)
+    args.add_argument('--DENV4_f0', type=float, help='Relative intrinsic fitness value for DENV4', default = 0.)
     args.add_argument('--trajectory', type=float, nargs='*', help='timepoint(s) to compute trajectories for')
     args.add_argument('--plot', help='make plots?', action='store_true')
     args.add_argument('--save', help='save csv and png files?', action='store_true')
