@@ -1,4 +1,5 @@
 # Dengue antigenic relationships predict evolutionary dynamics
+<img align="right" width="500" src="https://raw.githubusercontent.com/blab/dengue-antigenic-dynamics/master/figures/png/antigenic_tree.png">
 
 Dengue virus (DENV) exists as four genetically distinct serotypes, each of which is also antigenically distinct: the immune response to primary infection can be either cross-protective or associated with severe disease upon heterotypic secondary infection.
 Each serotype is historically assumed to antigenically uniform.
