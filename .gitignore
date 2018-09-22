@@ -3,11 +3,14 @@ slides/*
 recombination/
 titer-analysis/png/
 frequencies/flu/
+raw-titer-analysis/png/
 scripts/frequencies/scratchwork/
 manuscript/\.latex/
 manuscript/\.latex\.json
+manuscript/template\.tex
 
-dengue-antigenic-evolution.pdf
+
+dengue-antigenic-dynamics.pdf
 *draft*
 
 *.fasta
@@ -22,6 +25,9 @@ environment*
 \.Icon
 \.swp
 Icon?
+*.gz
+*.fls
+*.fdb_latexmk
 
 # LaTeX intermediaries #
 ########################
@@ -31,13 +37,3 @@ Icon?
 *.blg
 *.out
 *.pdfsync
-
-manuscript/template\.tex
-
-*.gz
-
-*.fls
-
-*.fdb_latexmk
-
-raw-titer-analysis/png/
