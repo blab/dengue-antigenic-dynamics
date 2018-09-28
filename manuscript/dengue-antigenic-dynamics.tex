@@ -97,7 +97,7 @@
 
 \begin{abstract}
 Dengue virus (DENV) exists as four genetically distinct serotypes, each of which is also antigenically distinct: the immune response to primary infection can be either cross-protective or associated with severe disease upon heterotypic secondary infection.
-Each serotype is historically assumed to antigenically uniform.
+Each serotype is historically assumed to be antigenically uniform.
 Recent analyses suggest that antigenic heterogeneity may exist within each serotype, but its source, extent and impact remain unclear.
 Here, we construct a phylogeny-based model to directly map antigenic change to underlying genetic divergence.
 We report moderate antigenic diversity within each serotype, and identify 12 antigenically distinct clades.
@@ -290,6 +290,7 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
   	\caption{\textbf{Antigenic novelty predicts serotype success.}
     \textbf{A} The relative frequency of each serotype, $x_i$, in Southeast Asia is estimated every three months based on available sequence data.
     \textbf{B} We calculate antigenic fitness for each serotype over time as its frequency-weighted antigenic distance from recently circulating viruses.
+    We then add this to a time-invariant intrinsic fitness value to calculate total fitness (shown here, arbitrary units).
     \textbf{C} illustrates how the model predicts clade growth rates.
     At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each serotype's future trajectory based on its initial frequency, time-invariant intrinsic fitness, and antigenic fitness at time $t$ (Methods, Eq.~\ref{eq_predict_frequency}).
     We predict forward in three-month increments for a total prediction period of $dt = 5$ years.
@@ -335,8 +336,9 @@ This suggests that although we find strong evidence that genotypes vary in their
     \caption{\textbf{Relative frequencies and fitness of dengue genotypes, 1970-2015.}
     \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data.
     \textbf{B} Antigenic fitness is calculated for each genotype as its frequency-weighted antigenic distance from recently circulating genotypes.
+    We then add this to a time-invariant, serotype-specific intrinsic fitness value to calculate total fitness (shown here, arbitrary units).
     We assess antigenic distance using either the `full tree model' or the `interserotype model' of antigenic relationships (Figure~\ref{titer_model_performance}).
-    In this panel, we show antigenic fitness over time as derived from the `full tree model' estimates of antigenic distance.
+    In this panel, we show total fitness over time, incorporating estimates of antigenic fitness derived from the `full tree' model.
     \textbf{C, D}  Fitness estimates were used to predict clade growth rates over 5 years, compounding immunity every three months based on predicted frequency changes (Methods Eq.~\ref{eq_compounding_immunity}).
     Here, we compare observed vs predicted growth rates for both formulations of the fitness model (using fitness derived from either the `interserotype' or `full tree' model estimates of antigenic distance).
     Growth versus decline was accurate (predicted and actual growth rates both $> 1$ or both $< 1$, points outside the gray shaded area) for 68\% -- 70\% of predictions, respectively.
@@ -387,6 +389,7 @@ Surprisingly, however, we find that incorporating within-serotype antigenic diff
 This suggests that although genotypes are antigenically diverse, these differences do not appear to influence large-scale regional dynamics over time.
 
 However, this observation is subject to caveats imposed by the the available data and model assumptions.
+Our estimates of antigenic fitness are informed by the antigenic distances inferred by the titer tree model; thus, as above, we are unable to account for nuanced antigenic differences between sub-genotype clades of DENV due to limited titer data.
 We estimate DENV population composition over time based on available sequence data, pooled across all of Southeast Asia (Methods, Eq.~\ref{eq_estimate_frequency}).
 As the vast majority of cases of DENV are asymptomatic, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
 We also assume that Southeast Asia represents a closed viral population with homogeneous mixing.
