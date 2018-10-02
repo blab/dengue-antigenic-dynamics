@@ -11,7 +11,6 @@ We find that antigenic fitness mediates fluctuations in DENV clade frequencies, 
 These results provide a more nuanced understanding of dengue antigenic evolution, with important ramifications for vaccine design and epidemic preparedness.
 
 # Analysis outline  
-1 - [Run the titer model via augur](https://github.com/blab/dengue-antigenic-dynamics/tree/master/augur) (repackaged portion of the [Nextstrain](www.nextstrain.org/dengue) pipeline) to build a viral phylogeny, assign antigenic change to specific branches, and infer clade frequencies.  
+1 - [Run the titer model via augur](https://github.com/blab/dengue-antigenic-dynamics/tree/master/titer_model/) (repackaged portion of the [Nextstrain](www.nextstrain.org/dengue) pipeline) to build a viral phylogeny, assign antigenic change to specific branches, and infer clade frequencies.  
 2 - [Run the fitness model](https://github.com/blab/dengue-antigenic-dynamics/tree/master/fitness_model) to quantify population immunity over time, predict clade frequencies, and assess performance.  
 3 - [Use the visualization notebooks](https://github.com/blab/dengue-antigenic-dynamics/tree/master/figures) to explore results and recreate all the figures from the paper.
-

@@ -1,0 +1,16 @@
+language: python
+sudo: true
+python:
+  - "2.7"
+# command to install dependencies
+virtualenv:
+  system_site_packages: true
+before_install:
+  - sudo apt-get install python-numpy python-scipy
+install:
+  - pip install biopython
+  - python setup.py build
+  - python setup.py install
+# command to run tests
+script:
+    - bash .travis_test.sh
