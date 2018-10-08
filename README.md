@@ -4,9 +4,9 @@ Sidney M. Bell<sup>1,2</sup>, Leah Katzelnick<sup>3,4</sup>, Trevor Bedford<sup>
 
 <sup>1</sup>Vaccine and Infectious Disease Division, Fred Hutchinson Cancer Research Center, Seattle, WA, USA, <sup>2</sup>Molecular and Cell Biology Program, University of Washington, Seattle, WA, USA, <sup>3</sup>Division of Infectious Diseases and Vaccinology, School of Public Health, University of California, Berkeley, Berkeley, CA, USA, <sup>4</sup>Department of Biology, University of Florida, Gainesville, FL, USA
 
-<img align="right" width="450" src="figures/png/antigenic_tree.png">
-
 ## Abstract
+
+<img align="right" width="450" src="figures/png/antigenic_tree.png">
 
 Dengue virus (DENV) exists as four genetically distinct serotypes, each of which is also antigenically distinct: the immune response to primary infection can be either cross-protective or associated with severe disease upon heterotypic secondary infection.
 Each serotype is historically assumed to antigenically uniform.
