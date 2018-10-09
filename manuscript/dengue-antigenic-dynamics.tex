@@ -315,7 +315,7 @@ Growth rates are estimated based on a five year sliding window (Figure~\ref{sero
 This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 80\% of predictions (Figure~\ref{serotype_fitness_model}D).
 This strongly suggests that antigenic fitness is a major driver of serotype population dynamics.
 This also demonstrates that this model captures key components of dengue population dynamics; examining the formulation of this model in more detail can yield insights into how antigenic relationships influence DENV population composition.
-The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in prediction error relative to a null model, see Methods).
+The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in frequency prediction error relative to a null model, see Methods).
 We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
 We also find that these dynamics are best explained by intrinsic fitness that moderately varies by by serotype (Table~\ref{parameter_values}).
 
@@ -550,10 +550,10 @@ f_i^{null}(t) = 0
 \hat{x_i}^{null}(t+dt) = x_i(t) e^0 = x_i(t)
 \end{equation}
 
-For both the null model and the antigenically-informed model, we can assess predictive power as the sum of squared error between predicted and empirical clade growth rates:
+For both the null model and the antigenically-informed model, we can assess predictive power as the sum of squared error between predicted and empirical clade frequencies:
 \begin{equation}
   \label{eq_sse}
-SSE = \sum_{i,t} \left( \frac{\hat{x_i}(t+dt)}{x_i(t)} - \frac{\hat{x_i}^{null}(t+dt)}{x_i(t)} \right)^2
+SSE = \sum_{i,t} \left( \hat{x_i}(t+dt) - x_{i}(t+dt) \right)^2
 \end{equation}
 
 We can then estimate how much more error is present in the null model than the antigenically-informed model:
@@ -577,7 +577,8 @@ Our frequency prediction model has a total of 8 free parameters:
   \end{center}
 \end{table}
 
-For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ (Table S1).
+For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ (Table S1) via a sweep through parameter space.
+Optimization was confirmed by inspecting the profile likelihoods of each parameter.
 
 \subsection*{Data availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
