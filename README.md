@@ -17,6 +17,14 @@ We also quantify the impact of this antigenic heterogeneity on real-world DENV p
 We find that antigenic fitness mediates fluctuations in DENV clade frequencies, although this appears to be driven by coarser serotype-level antigenic differences.
 These results provide a more nuanced understanding of dengue antigenic evolution, with important ramifications for vaccine design and epidemic preparedness.
 
+## Install
+
+Everything is Python based. Python packages that are required can be installed via:
+```
+cd dengue-antigenic-dynamics/
+pip install -r requirements
+```
+
 ## Analysis outline
 
 1. [Run the titer model via augur](titer_model/) (repackaged portion of the [Nextstrain](www.nextstrain.org/dengue) pipeline) to build a viral phylogeny, assign antigenic change to specific branches, and infer clade frequencies.  
