@@ -30,3 +30,7 @@ pip install -r requirements
 1. [Run the titer model via augur](titer_model/) (repackaged portion of the [Nextstrain](www.nextstrain.org/dengue) pipeline) to build a viral phylogeny, assign antigenic change to specific branches, and infer clade frequencies.  
 2. [Run the fitness model](fitness_model/) to quantify population immunity over time, predict clade frequencies, and assess performance.  
 3. [Use the visualization notebooks](figures/) to explore results and recreate all the figures from the paper.
+
+## Citation
+
+[Bell SM, Katzelnick L, Bedford T. 2018. Dengue antigenic relationships predict evolutionary dynamics. bioRxiv: 432054.](http://dx.doi.org/10.1101/432054)
