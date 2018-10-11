@@ -1,6 +1,9 @@
 biopython >=1.69, ==1.*
 cvxopt >=1.1.8, ==1.1.*
 future >=0.16.0, ==0.16.*
-matplotlib >=2.0, ==2.*
+matplotlib >=2.2, ==2.*
 pandas >=0.17.1, ==0.17.*
-seaborn >=0.6.0, ==0.6.*
+seaborn >=0.8.1, ==0.8.*
+numpy >=1.14.2, ==1.14.*
+scipy >=1.0.0, ==1.0.*
+statsmodels >=0.8.0, ==0.8.*

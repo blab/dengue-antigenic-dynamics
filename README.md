@@ -19,7 +19,7 @@ These results provide a more nuanced understanding of dengue antigenic evolution
 
 ## Install
 
-Everything is Python based. Python packages that are required can be installed via:
+Everything is Python 2.7 based. Python packages that are required can be installed via:
 ```
 cd dengue-antigenic-dynamics/
 pip install -r requirements
