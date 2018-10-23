@@ -1,8 +1,5 @@
-```
-This is a versioned and slightly modified copy of BALTIC, the tree parser developed by Gytis Dudas. 
-Please see github.com/blab/baltic for the current release of BALTIC and beautiful examples.
-```
-
+# This is a versioned and slightly modified copy of BALTIC, the tree parser developed by Gytis Dudas.
+# Please see github.com/blab/baltic for the current release of BALTIC and beautiful examples.
 
 import re
 import copy
