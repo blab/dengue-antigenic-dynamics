@@ -121,7 +121,7 @@ We find that DENV antigenic divergence is tightly coupled to DENV genetic diverg
 We report modest but significant antigenic diversity within each serotype of DENV, and identify a minimum of 12 distinct antigenic clades.
 Within each serotype, these antigenic clades are separated by antigenic distances comparable to those associated with differing vaccine efficacy in the recent CYD-TDV vaccine trial.
 This suggests that antigenic interactions between specific viral genotypes may contribute to secondary case outcomes and vaccine efficacy.
-To understand the impact of this antigenic heterogeneity on real-world DENV population dynamics, we also quantify the extent to which population immunity--accumulated through recent circulation of antigenically similar genotypes--determines the success and decline of DENV clades in a hyperendemic population.
+To understand the impact of this antigenic heterogeneity on real-world DENV population dynamics, we also quantify the extent to which population immunity---accumulated through recent circulation of antigenically similar genotypes---determines the success and decline of DENV clades in a hyperendemic population.
 We find that antigenic fitness is a key determinant of DENV population turnover, although this appears to be driven by coarser serotype-level antigenic differences.
 By leveraging both molecular data and real-world population dynamics, these results provide a more nuanced understanding of dengue antigenic evolution, with important ramifications for improving vaccine design and epidemic preparedness.
 
@@ -130,7 +130,7 @@ By leveraging both molecular data and real-world population dynamics, these resu
 \section*{Introduction}
 Dengue virus (DENV) is a mosquito-borne flavivirus which consists of four genetically distinct clades, canonically thought of as serotypes \citep{lanciotti1997molecular}.
 DENV circulates primarily in South America and Southeast Asia, infecting 400 million people annually.
-While most of these infections are asymptomatic or mild, $\sim$1--3\% of cases progress to severe dengue hemorrhagic fever, causing approximately 10--15,000 deaths each year \citep{bhatt2013global}.
+While most of these infections are asymptomatic or mild, $\sim$1---3\% of cases progress to severe dengue hemorrhagic fever, causing approximately 10---15,000 deaths each year \citep{bhatt2013global}.
 Unlike most infectious diseases, DENV secondary infections are more likely than primary infections to cause severe disease, with estimates of relative risk of severe dengue of $\sim$24 \citep{mizumoto2014risk}.
 Primary DENV infection is more often mild and is thought to generate lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over six months to two years \citep{katzelnick2016neutralizing,sabin1952research}.
 Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are rare  \citep{gibbons2007analysis,olkowski2013reduced}.
@@ -164,7 +164,7 @@ We also quantify the impact of within- and between-serotype antigenic variation 
 
 \subsection*{Dengue neutralization titer data}
 
-Antigenic distance between a pair of viruses $i$ and $j$ is experimentally quantified using neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro\citep{russell1967dengue}.
+Antigenic distance between a pair of viruses $i$ and $j$ is experimentally quantified using neutralization titers, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ \textit{in vitro} \citep{russell1967dengue}.
 To measure the pairwise antigenic distances for a panel of diverse DENV viruses (Figure~\ref{titered_strains_tree}), Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at three months post-infection, and then titered this sera against a panel of test viruses \citep{katzelnick2015dengue}.
 To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants six weeks after inoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV viruses.
@@ -254,7 +254,7 @@ On average, this interserotype model predicts titers within 1.02 log$_2$ titer u
 However, we find that accounting for within-serotype antigenic evolution substantially improves our ability to explain dengue antigenic phenotypes.
 The full tree model is able to predict test titers within 0.86 log$_2$ titer units of the true value (RMSE approaching the level of error intrinsic to the assay), and explains 74\% of the observed variation in neutralization titers overall (Figure~\ref{titer_model_performance}).
 Importantly, all reported error metrics refer to performance on test data, so this difference in model performance is not due to the number of free parameters.
-The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE 0.65--0.8 log$_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of 0.5 log$_2$ titer units) \citep{katzelnick2015dengue,neher2016prediction}.
+The full tree model performance is comparable to the model error from a cartography-based characterization of the same dataset (RMSE 0.65---0.8 log$_2$ titer units), and to the error observed when this model was used to characterize an influenza dataset (RMSE of 0.5 log$_2$ titer units) \citep{katzelnick2015dengue,neher2016prediction}.
 From this, we conclude that there is antigenic evolution within each serotype of DENV, and that this is driven by underlying genetic divergence.
 
 Collapsing putatively antigenically uniform clades, we observe at least 12 distinct antigenic phenotypes of DENV (Figure~\ref{antigenic_tree}) and reject the null hypothesis that all DENV viruses within a serotype are antigenically uniform.
@@ -307,12 +307,12 @@ To test this hypothesis, we examine the composition of the dengue virus populati
 We estimate the relative population frequency of each DENV serotype at three month intervals, $x_i(t)$ (Figure~\ref{serotype_fitness_model}A), based on available sequence data (Methods, Eq.~\ref{eq_estimate_frequency}).
 
 Fitter virus clades increase in frequency over time, such that $x_i(t+dt) > x_i(t)$.
-It follows that these clades have a growth rate--defined as the fold-change in frequency over time--greater than one: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
+It follows that these clades have a growth rate---defined as the fold-change in frequency over time---greater than one: $\frac{x_i(t+dt)}{x_i(t)} > 1$.
 To isolate the extent to which antigenic fitness contributes to clade success and decline, we extend work by {\L}uksza and L\"assig  \citep{luksza2014predictive} to build a simple model that attempts to predict clade growth rates based on two variables: the antigenic fitness of the clade at time $t$, and a time-invariant free parameter representing the intrinsic fitness of the serotype the clade belongs to.
 We estimate the antigenic fitness of clade $i$ at time $t$ as a function of its antigenic distance from each viral clade $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning population immunity (Figure~\ref{serotype_fitness_model}B; Methods, Eq.~\ref{eq_waning_immunity}).
 Growth rates are estimated based on a five year sliding window (Figure~\ref{serotype_fitness_model}C).
 
-This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs decline correctly for 80\% of predictions (Figure~\ref{serotype_fitness_model}D).
+This simple model explains 62\% of the observed variation in serotype growth rates, and predicts serotype growth vs. decline correctly for 80\% of predictions (Figure~\ref{serotype_fitness_model}D).
 This strongly suggests that antigenic fitness is a major driver of serotype population dynamics.
 This also demonstrates that this model captures key components of dengue population dynamics; examining the formulation of this model in more detail can yield insights into how antigenic relationships influence DENV population composition.
 The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in frequency prediction error relative to a null model, see Methods).
@@ -340,7 +340,7 @@ This suggests that although we find strong evidence that genotypes vary in their
     We assess antigenic distance using either the `full tree model' or the `interserotype model' of antigenic relationships (Figure~\ref{titer_model_performance}).
     In this panel, we show total fitness over time, incorporating estimates of antigenic fitness derived from the `full tree' model.
     \textbf{C, D}  Fitness estimates were used to predict clade growth rates over 5 years, compounding immunity every three months based on predicted frequency changes (Methods Eq.~\ref{eq_compounding_immunity}).
-    Here, we compare observed vs predicted growth rates for both formulations of the fitness model (using fitness derived from either the `interserotype' or `full tree' model estimates of antigenic distance).
+    Here, we compare observed vs. predicted growth rates for both formulations of the fitness model (using fitness derived from either the `interserotype' or `full tree' model estimates of antigenic distance).
     Growth versus decline was accurate (predicted and actual growth rates both $> 1$ or both $< 1$, points outside the gray shaded area) for 68\% -- 70\% of predictions, respectively.
 }
      \label{genotype_fitness}
@@ -412,7 +412,7 @@ We have provided all code, configuration files and datasets at `github.com/blab/
 \section*{Methods}
 \subsection*{Data}
 \textbf{Sequences}\\
-We downloaded all dengue virus sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained the full coding sequence of E (total N=12,645) \citep{kuiken2011lanl}.
+We downloaded all dengue virus sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained the full coding sequence of \textit{E} (total N=12,645) \citep{kuiken2011lanl}.
 We discarded sequences which were putative recombinants, duplicates, lab strains, or which lacked an annotated sampling location and/or sampling date.
 We then randomly subsampled up to 8 viruses per region, per month, preferentially including records with available titer data and longer sequences.
 Our final dataset consists of 2,563 viral sequences (Figure~\ref{sequence_distribution}).
@@ -420,7 +420,7 @@ We used the annotated reference dataset from \citep{pyke2016highly} to assign se
 
 \textbf{Titers}\\
 
-Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ in vitro \citep{russell1967dengue}.
+Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ \textit{in vitro} \citep{russell1967dengue}.
 Briefly, two-fold serial dilutions of serum $i$ are incubated with a fixed concentration of virus $j$.
 Titers represent the lowest serum concentration able to neutralize $50\%$ of virus, and are reported as the inverse dilution.
 We used two publicly available plaque reduction neutralization titer (PRNT50) datasets generated by Katzelnick et al. in \citep{katzelnick2015dengue}.
@@ -496,7 +496,7 @@ Waning immunity is modeled as a non-negative linear function of time:
 \label{eq_waning_immunity}
   w(n) = max(-\gamma n + 1, 0)
 \end{equation}
-The relationship between antigenic distance and the probability of protection, $C$, is also assumed to be linear and non-negative, such that:
+The relationship between antigenic distance and the probability of protection, $C$, is also assumed to be non-negative and linear with slope $-\sigma$, such that:
 \begin{equation}
 C(D_{ij}) = max(-\sigma D_{ij} + 1, 0)
 \end{equation}
