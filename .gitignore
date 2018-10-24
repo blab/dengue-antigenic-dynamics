@@ -39,3 +39,7 @@ Icon?
 *.pdfsync
 
 manuscript/elife-aux/
+
+*.pyc
+
+*.gz(busy)
