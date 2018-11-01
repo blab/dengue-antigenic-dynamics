@@ -43,3 +43,5 @@ manuscript/elife-aux/
 *.pyc
 
 *.gz(busy)
+
+*.sketch
