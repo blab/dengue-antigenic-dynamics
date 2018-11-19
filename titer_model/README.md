@@ -52,8 +52,12 @@ Run `python dengue.process.py --titer_model full_tree` for the "full tree" model
 
 Run `python dengue.process.py --titer_model interserotype` for the "interserotype" model.  
 
-**NB: For this dataset, step 2 has been run for you; see `./full-tree-model-output/` and `./interserotype-model-output/`**
+**NB: For this dataset, step 2 has been run for you; see `./full-tree-model-output/`, `./interserotype-model-output/` and ../auspice/**
 
 ### 3 - Check out your results
 
 Results are output in JSON format, found in `./processed/`. You can parse and examine results using the notebooks found [here](../figures/).
+
+The "full tree" model output is available at: [nextstrain.org/community/blab/dengue-antigenic-dynamics/dengue-fulltree](https://nextstrain.org/community/blab/dengue-antigenic-dynamics/dengue-fulltree)
+
+The "interserotype" model output is available at: [nextstrain.org/community/blab/dengue-antigenic-dynamics/dengue-interserotype](https://nextstrain.org/community/blab/dengue-antigenic-dynamics/dengue-interserotype)
