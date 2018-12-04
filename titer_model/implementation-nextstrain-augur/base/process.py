@@ -48,11 +48,11 @@ class process(object):
         super(process, self).__init__()
         self.config = combine_configs("process", config)
 
-        try:
-            assert(os.path.basename(os.getcwd()) == self.config["dir"])
-        except AssertionError:
-            print("Run this script from within the {} directory".format(self.config["dir"]))
-            sys.exit(2)
+        # try:
+        #     assert(os.path.basename(os.getcwd()) == self.config["dir"])
+        # except AssertionError:
+        #     print("Run this script from within the {} directory".format(self.config["dir"]))
+        #     sys.exit(2)
 
         for p in self.config["output"].values():
             if not os.path.isdir(p):

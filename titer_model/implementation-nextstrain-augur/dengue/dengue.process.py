@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os, sys
 # we assume (and assert) that this script is running from the virus directory, i.e. inside H7N9 or zika
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 import base.process
 from base.process import process
 import argparse
@@ -44,6 +44,7 @@ def make_config (prepared_json, args):
 	return {
 		"dir": "dengue",
 		"in": prepared_json,
+		"output": {"auspice": "../../%s_model_output/"%args.titer_model, "data": "./processed/"},
 		"geo_inference": ['region'], # what traits to perform this on; don't run country (too many demes, too few sequences per deme to be reliable)
 		"auspice": { ## settings for auspice JSON export
 			"extra_attr": ['serum', 'clade', 'dTiter_sanofi'], # keys from tree.tree.clade['attr'] to include in export
@@ -109,7 +110,7 @@ if __name__=="__main__":
 			pivots = runner.get_pivots_via_spacing()
 			runner.estimate_tree_frequencies(pivots=pivots, stiffness=2) # stiffness ~= amount of smoothing
 
-			for region in ['southeast_asia', 'south_america']: #regions:
+			for region in ['southeast_asia']:#, 'south_america']: #regions:
 				try:
 					runner.estimate_tree_frequencies(region=region, stiffness=2)
 				except:
@@ -117,31 +118,31 @@ if __name__=="__main__":
 		# titers
 		if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neher et al., PNAS 2016
 
-			### Comparison: force dTiter values to be non-zero only on interserotype brances
-			def is_interserotype(node):
-				descendents = node.get_terminals()
-				serotypes = [k.name.split('/')[0] for k in descendents if 'DENV' in k.name]
-				serotypes = [s for s in serotypes if s != 'DENV']
-				return len(set(serotypes)) > 1
-
-			interserotype_branches = []
-			for node in runner.tree.tree.find_clades():
-				if is_interserotype(node):
-					interserotype_branches.append(node)
-					for child in node.clades:
-						interserotype_branches.append(child)
-			for node in runner.tree.tree.find_clades():
-				if node in interserotype_branches:
-					node.interserotype = True
-				else:
-					node.interserotype = False
-
 			if args.titer_model == 'full_tree':
 				titer_model_criterium = lambda node: True
 			else:
+				### Comparison: force dTiter values to be non-zero only on interserotype brances
+				def is_interserotype(node):
+					descendents = node.get_terminals()
+					serotypes = [k.name.split('/')[0] for k in descendents if 'DENV' in k.name]
+					serotypes = [s for s in serotypes if s != 'DENV']
+					return len(set(serotypes)) > 1
+
+				interserotype_branches = []
+				for node in runner.tree.tree.find_clades():
+					if is_interserotype(node):
+						interserotype_branches.append(node)
+						for child in node.clades:
+							interserotype_branches.append(child)
+				for node in runner.tree.tree.find_clades():
+					if node in interserotype_branches:
+						node.interserotype = True
+					else:
+						node.interserotype = False
+
 				titer_model_criterium = lambda node: node.interserotype == True
 
-			titer_model(runner,
+			titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
 						lam_pot = runner.config['titers']['lam_pot'],
 						lam_avi = runner.config['titers']['lam_avi'],
 					lam_drop = runner.config['titers']['lam_drop'],
@@ -151,6 +152,17 @@ if __name__=="__main__":
 					criterium = titer_model_criterium, # calculate dTiter for all branches
 					cross_validate=10,
 					) # calculate dTiter for all branches
+
+			titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
+						lam_pot = runner.config['titers']['lam_pot'],
+						lam_avi = runner.config['titers']['lam_avi'],
+					lam_drop = runner.config['titers']['lam_drop'],
+					training_fraction = 1., # run again with all the data
+					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
+					plot=False,
+					criterium = titer_model_criterium, # calculate dTiter for all branches
+					) # calculate dTiter for all branches
+
 			titer_export(runner)
 
 	### Export for visualization in auspice

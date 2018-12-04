@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os, sys
 # we assume (and assert) that this script is running from the virus directory, i.e. inside H7N9 or zika
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 import base.prepare
 from base.prepare import prepare
 from base.utils import fix_names
@@ -18,11 +18,12 @@ def collect_args():
 
     parser.add_argument('-s', '--serotypes', '--lineage', choices=["all", "denv1", "denv2", "denv3", "denv4", "multiple"], default="all", type=str, nargs='+', help="Serotype(s) to prepare. \"multiple\" will run them all.")
     parser.add_argument('-y', '--years_back', type=int, default=100, help="Years back in time to sample from")
-    parser.add_argument('--titers', default='../../../../data/titers_katzelnick2015/dengue_titers.tsv', help="tab-delimited file of titer strains and values from fauna (e.g., dengue_titers.tsv)")
+    parser.add_argument('--titers', default='../../../data/titers_katzelnick2015/dengue_titers.tsv', help="tab-delimited file of titer strains and values from fauna (e.g., dengue_titers.tsv)")
     parser.add_argument('--strains', help="a text file containing a list of strains (one per line) to prepare without filtering or subsampling")
     parser.set_defaults(
         viruses_per_month=3,
-        file_prefix=None
+        file_prefix=None,
+        sequences='../../../data/sequences/dengue_all.fasta'
     )
     return parser
 
@@ -139,8 +140,8 @@ if __name__=="__main__":
 
     if 'multiple' in params.serotypes:
         params.serotypes = ['denv1', 'denv2', 'denv3', 'denv4', 'all']
-    else:
-        params.serotypes = [params.serotypes]
+    # else:
+    #     params.serotypes = params.serotypes]
     # modify config file according to serotype
     for serotype in params.serotypes:
         print("Preparing serotype %s"%serotype)
