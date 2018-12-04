@@ -490,7 +490,7 @@ class process(object):
         '''
         self.tree = tree(aln=self.seqs.aln, proteins=self.proteins, verbose=self.config["subprocess_verbosity_level"])
         newick_file = self.output_path + ".newick"
-        if self.try_to_restore and os.path.isfile(newick_file) and self.tree.check_newick(newick_file):
+        if self.try_to_restore and os.path.isfile(newick_file):# and self.tree.check_newick(newick_file):
             self.log.notify("Newick file \"{}\" can be used to restore".format(newick_file))
         else:
             self.log.notify("Building newick tree.")

@@ -284,8 +284,8 @@ class sequence_set(object):
                 tmpseq = self.proteins[prot].extract(seq)
                 translated_seq, translation_exception = safe_translate(str(tmpseq.seq), report_exceptions=True)
 
-                if translation_exception:
-                    self.log.notify("Trouble translating because of invalid codons %s" % seq.id)
+                # if translation_exception:
+                #     self.log.notify("Trouble translating because of invalid codons %s" % seq.id)
 
                 tmpseq.seq = Seq(translated_seq)
 
