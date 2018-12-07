@@ -320,7 +320,7 @@ class tree_frequencies(object):
         for node in self.tree.find_clades(order='postorder'):
             if node.is_terminal():
                 if self.node_filter(node):
-                    tps.append(node.numdate)
+                    tps.append(node.attr["num_date"])
                     node.leafs = np.array([leaf_count], dtype=int)
                     leaf_count+=1
                 else:
