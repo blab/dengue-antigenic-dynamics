@@ -169,7 +169,7 @@ def titer_export(process):
 
             predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
             model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
-        elif hasattr(process.titer_tree.hasattr, 'validation'):
+        elif hasattr(process.titer_tree, 'validation'):
             predicted_values = pd.DataFrame(process.titer_tree.validation.pop('values'), columns=['actual', 'predicted'])
             model_performance = pd.DataFrame(process.titer_tree.validation)
             predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
