@@ -20,7 +20,7 @@ sigma_vals = np.linspace(0,2,8)
 
 for (b,g,s) in product(beta_vals, gamma_vals, sigma_vals):
 	name = ''.join(random.choice('0123456789abcdef') for n in xrange(30))
-	cmd = 'python ../antigenic_fitness.py --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 5 --beta %f --gamma %f --sigma %f --DENV4_f0 0'%(frequency_path, titer_path, out_path, name, b,g,s)
+	cmd = 'python ../antigenic_fitness.py --mode fit --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 5 --beta %f --gamma %f --sigma %f --DENV4_f0 0'%(frequency_path, titer_path, out_path, name, b,g,s)
 
 	os.system('sbatch -t 20:00:00 --wrap="%s"'%cmd)
 	os.system('sleep 0.05')
