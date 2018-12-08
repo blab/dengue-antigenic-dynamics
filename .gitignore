@@ -1,16 +1,7 @@
-papers/*
-slides/*
-recombination/
-titer-analysis/png/
-frequencies/flu/
-raw-titer-analysis/png/
-scripts/frequencies/scratchwork/
 manuscript/\.latex/
 manuscript/\.latex\.json
 manuscript/template\.tex
-
-
-dengue-antigenic-dynamics.pdf
+*.pdf
 *draft*
 
 *.fasta
@@ -20,6 +11,7 @@ dengue-antigenic-dynamics.pdf
 .DS_Store
 environment*
 *.p
+*.pickle
 \.Icon
 \.swp
 \.Icon
