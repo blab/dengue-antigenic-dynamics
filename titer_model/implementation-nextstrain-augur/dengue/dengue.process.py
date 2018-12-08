@@ -150,7 +150,7 @@ if __name__=="__main__":
 					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
 					plot=False,
 					criterium = titer_model_criterium, # calculate dTiter for all branches
-					cross_validate=10,
+					cross_validate=100,
 					) # calculate dTiter for all branches
 
 			titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
