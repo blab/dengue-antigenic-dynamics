@@ -93,7 +93,8 @@ def make_config(serotype, params):
     if params.titers is not None:
         if not os.path.isfile(params.titers):
             params.titers = '../../../../data/titers_katzelnick2015/%s'%params.titers
-        titer_values, strains, sources = TiterCollection.load_from_file(params.titers)
+        titer_values, strains, sources = TiterCollection.load_from_file(params.titers, excluded_sources=['agm_1mo', 'agm_5mo'])
+        print (sources)
     else:
         titer_values, strains, sources = None, None, None
 
