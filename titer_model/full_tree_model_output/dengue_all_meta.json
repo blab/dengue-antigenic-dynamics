@@ -1,5 +1,5 @@
 {
- "updated": "6 Dec 2018", 
+ "updated": "9 Dec 2018", 
  "author_info": {
   "Duoc_et_al.": {
    "title": "?", 
@@ -247,7 +247,7 @@
   }, 
   "Alvarado_et_al.": {
    "title": "?", 
-   "n": 266
+   "n": 269
   }, 
   "Andrade_et_al.": {
    "title": "?", 
@@ -315,7 +315,7 @@
   }, 
   "Diallo_et_al.": {
    "title": "?", 
-   "n": 3
+   "n": 4
   }, 
   "Dong_et_al.": {
    "title": "?", 
@@ -420,6 +420,10 @@
   "Caro_et_al.": {
    "title": "?", 
    "n": 15
+  }, 
+  "Manap_et_al.": {
+   "title": "?", 
+   "n": 1
   }, 
   "Aung_et_al.": {
    "title": "?", 
@@ -531,7 +535,7 @@
   }, 
   "Aaskov_et_al.": {
    "title": "?", 
-   "n": 92
+   "n": 94
   }, 
   "Chetry_et_al.": {
    "title": "?", 
@@ -942,7 +946,7 @@
    "n": 51
   }
  }, 
- "virus_count": 2560, 
+ "virus_count": 2567, 
  "controls": {
   "geographic location": {
    "europe": {
@@ -955,15 +959,15 @@
    }, 
    "name": "region", 
    "south_america": {
-    "count": 448, 
+    "count": 449, 
     "subcats": {}
    }, 
    "africa": {
-    "count": 50, 
+    "count": 51, 
     "subcats": {}
    }, 
    "southeast_asia": {
-    "count": 583, 
+    "count": 585, 
     "subcats": {}
    }, 
    "china": {
@@ -983,7 +987,7 @@
     "subcats": {}
    }, 
    "north_america": {
-    "count": 307, 
+    "count": 310, 
     "subcats": {}
    }
   }, 
@@ -1230,7 +1234,7 @@
     "subcats": {}
    }, 
    "Alvarado_et_al.": {
-    "count": 266, 
+    "count": 269, 
     "subcats": {}
    }, 
    "Andrade_et_al.": {
@@ -1298,7 +1302,7 @@
     "subcats": {}
    }, 
    "Diallo_et_al.": {
-    "count": 3, 
+    "count": 4, 
     "subcats": {}
    }, 
    "Dong_et_al.": {
@@ -1403,6 +1407,10 @@
    }, 
    "Caro_et_al.": {
     "count": 15, 
+    "subcats": {}
+   }, 
+   "Manap_et_al.": {
+    "count": 1, 
     "subcats": {}
    }, 
    "Aung_et_al.": {
@@ -1514,7 +1522,7 @@
     "subcats": {}
    }, 
    "Aaskov_et_al.": {
-    "count": 92, 
+    "count": 94, 
     "subcats": {}
    }, 
    "Chetry_et_al.": {
@@ -2363,6 +2371,14 @@
    "type": "continuous", 
    "legendTitle": "Sampling date", 
    "key": "num_date"
+  }, 
+  "cTiter": {
+   "vmin": "0.0", 
+   "vmax": "2.0", 
+   "legendTitle": "log2 titer distance from root", 
+   "key": "cTiter", 
+   "menuItem": "antigenic dist. from root", 
+   "type": "continuous"
   }
  }, 
  "seq_author_map": {
@@ -2440,6 +2456,7 @@
   "DENV/SRI_LANKA/GALLE2264/2012": "Sessions_et_al.", 
   "DENV2/INDIA/1392/2009": "Agarwal_et_al.", 
   "DENV2/THAILAND/0195/1982": "Chinnawirotpisan_et_al.", 
+  "DENV4/PUERTO_RICO/BIDV2446/1999": "Alvarado_et_al.", 
   "DENV4/COLOMBIA/SANLV192075/2009": "Silva_et_al.", 
   "DENV1/INDONESIA/NIID75/2014": "Adachi_et_al.", 
   "DENV2/THAILAND/S16803/1974": "Falgout_et_al.", 
@@ -2527,7 +2544,7 @@
   "DENV/PUERTO_RICO/13/1988": "Beltran_et_al.", 
   "DENV3/NICARAGUA/BIDV5516/2010": "Alvarado_et_al.", 
   "DENV2/INDONESIA/MKS2032/2008": "Bifani_et_al.", 
-  "DENV4/BRAZIL/GUSP0730/2013": "Balarini_et_al.", 
+  "DENV4/NEW_CALEDONIA/070104/2009": "Aubry_et_al.", 
   "DENV4/BRAZIL/GUSP0353/2013": "Balarini_et_al.", 
   "DENV1/THAILAND/K0022/1993": "Chinnawirotpisan_et_al.", 
   "DENV1/INDIA/AP12269/2015": "Chetry_et_al.", 
@@ -2582,7 +2599,7 @@
   "DENV3/PERU/BIDV7289/2008": "Birren_et_al.", 
   "DENV2/TONGA/UH16/1974": "Bennett_et_al.", 
   "DENV1/NEW_CALEDONIA/0504992/2003": "Aubry_et_al.", 
-  "DENV2/CHINA/GD/2001": "Bai_et_al.", 
+  "DENV2/MALAYSIA/DKD811/2008": "Manap_et_al.", 
   "DENV2/INDIA/ILBS02/2015": "Choudhary_et_al.", 
   "DENV4/BRAZIL/SERUM27/2012": "Allen_et_al.", 
   "DENV2/CHINA/4118/2014": "Li_et_al.", 
@@ -2801,7 +2818,7 @@
   "DENV1/FRENCH_POLYNESIA/076/2009": "Aubry_et_al.", 
   "DENV2/THAILAND/NH55/1993": "Igarashi_et_al.", 
   "DENV3/SRI_LANKA/BIDV2410/1983": "Alpuche_et_al.", 
-  "DENV4/INDIA/NIV235/1962": "Bhagat_et_al.", 
+  "DENV2/DOMINICAN_REPUBLIC/DR23/2001": "Anzai_et_al.", 
   "DENV1/THAILAND/02/2001": "Chinnawirotpisan_et_al.", 
   "DENV1/NAURU/WESTERNPACIFICDELTA30/1974": "Jr_et_al.", 
   "DENV4/CHINA/YNDGR9/2015": "Hu_et_al.", 
@@ -2985,7 +3002,7 @@
   "DENV1/MEXICO/A5/2010": "Arellanos-Soto_et_al.", 
   "DENV2/BRAZIL/DGV34/2010": "Araujo_et_al.", 
   "DENV2/THAILAND/BANGKOK/1974": "Delecluse_et_al.", 
-  "DENV3/SRI_LANKA/REFERENCE/2000": "Bessaud_et_al.", 
+  "DENV2/SINGAPORE/0099/2007": "Lo_et_al.", 
   "DENV1/MEXICO/BIDV3705/2007": "Berlin_et_al.", 
   "DENV1/CHINA/GZHAIZHU2584/2014": "Guo_et_al.", 
   "DENV2/VENEZUELA/BIDV1457/1996": "Alvarado_et_al.", 
@@ -3073,6 +3090,7 @@
   "DENV1/NEW_CALEDONIA/2503584/2009": "Aubry_et_al.", 
   "DENV1/FRENCH_POLYNESIA/240255/2009": "Aubry_et_al.", 
   "DENV2/SURINAME/AUG/2005": "Brisse_et_al.", 
+  "DENV1/MYANMAR/MANDALAY22/2015": "Aung_et_al.", 
   "DENV2/TAIWAN/DB116/1987": "Colon_et_al.", 
   "DENV2/SINGAPORE/18722/2011": "Chua_et_al.", 
   "DENV3/SPAIN/BIDV5468/2010": "Alvarado_et_al.", 
@@ -3389,7 +3407,7 @@
   "DENV4/INDONESIA/MKS06/2007": "Bifani_et_al.", 
   "DENV3/THAILAND/285M/1977": "Chinnawirotpisan_et_al.", 
   "DENV4/BRAZIL/ROR7591/2010": "Abecasis_et_al.", 
-  "DENV2/SINGAPORE/0099/2007": "Lo_et_al.", 
+  "DENV3/SRI_LANKA/REFERENCE/2000": "Bessaud_et_al.", 
   "DENV2/THAILAND/BIDV3357/1964": "Alvarado_et_al.", 
   "DENV2/THAILAND/0240/1991": "Chinnawirotpisan_et_al.", 
   "DENV1/VENEZUELA/61084/2007": "Alvarez_et_al.", 
@@ -3653,7 +3671,6 @@
   "DENV1/INDONESIA/N009/2010": "Chidlow_et_al.", 
   "DENV1/THAILAND/0540/1985": "Chinnawirotpisan_et_al.", 
   "DENV/SRI_LANKA/SL2310GSRILANKA663/2012": "Amarasinghe_et_al.", 
-  "DENV2/AUSTRALIA/QML16/2015": "Aaskov_et_al.", 
   "DENV3/SPAIN/BIDV5467/2010": "Alvarado_et_al.", 
   "DENV1/FRENCH_POLYNESIA/230201/2007": "Aubry_et_al.", 
   "DENV1/INDONESIA/MKS2194/2008": "Bifani_et_al.", 
@@ -3663,7 +3680,7 @@
   "DENV3/CHINA/YNJH88/2013": "Hu_et_al.", 
   "DENV1/PALAU/NA/2000": "Northill_et_al.", 
   "DENV1/NEW_CALEDONIA/160791/2012": "Aaskov_et_al.", 
-  "DENV2/BRAZIL/SJRP567/2012": "Araujo_et_al.", 
+  "DENV/THAILAND/SER2AILANDNONBKKSEQ49/1999": "A-Nuegoonpipat_et_al.", 
   "DENV2/TAIWAN/21910912/2002": "Chen_et_al.", 
   "DENV2/BURKINA_FASO/BURKINAFO/1983": "Chang_et_al.", 
   "DENV1/JAPAN/MOCHIZUKI/1943": "Funada_et_al.", 
@@ -3839,6 +3856,7 @@
   "DENV3/VENEZUELA/61035/2006": "Alvarez_et_al.", 
   "DENV4/NEW_CALEDONIA/0501413/2009": "Aubry_et_al.", 
   "DENV4/FRENCH_POLYNESIA/120125/2009": "Aaskov_et_al.", 
+  "DENV1/CHINA/TZ19CHI/2016": "Shen_et_al.", 
   "DENV2/VIETNAM/A034/2009": "Giang_et_al.", 
   "DENV1/CHINA/YNGM/2015": "Fan_et_al.", 
   "DENV/INDONESIA/BALI/2013": "Cameron_et_al.", 
@@ -3989,6 +4007,7 @@
   "DENV2/NEW_CALEDONIA/UH97/1972": "Bennett_et_al.", 
   "DENV/PAPUA_NEW_GUINEA/NA/2011": "Cameron_et_al.", 
   "DENV1/CAMBODIA/BIDV1978/2000": "Alvarado_et_al.", 
+  "DENV2/CHINA/GD/2001": "Bai_et_al.", 
   "DENV2/INDIA/ILBS08/2015": "Choudhary_et_al.", 
   "DENV3/FRENCH_POLYNESIA/4190/1992": "Cassar_et_al.", 
   "DENV2/NEW_CALEDONIA/01496/1997": "Aubry_et_al.", 
@@ -4083,6 +4102,7 @@
   "DENV2/THAILAND/PDK53/1983": "Bhamarapravati_et_al.", 
   "DENV2/IRELAND/03996IRL/2011": "Cartin_et_al.", 
   "DENV3/CAMBODIA/BIDV2070/1999": "Berlin_et_al.", 
+  "DENV2/GUYANA/08221/2000": "Aaskov_et_al.", 
   "DENV2/INDIA/GWL228DI/2001": "Abhyankar_et_al.", 
   "DENV1/FRENCH_POLYNESIA/0126/2007": "Aubry_et_al.", 
   "DENV/TAIWAN/KMUH032/2014": "Chang_et_al.", 
@@ -4102,7 +4122,7 @@
   "DENV2/VIETNAM/MD861/2002": "Aslett_et_al.", 
   "DENV3/SPAIN/BIDV5449/2009": "Alvarado_et_al.", 
   "DENV1/ARGENTINA/HNRG12188/2009": "Barrero_et_al.", 
-  "DENV1/CHINA/TZ19CHI/2016": "Shen_et_al.", 
+  "DENV4/PUERTO_RICO/347751/1998": "Alvarado_et_al.", 
   "DENV/JAMAICA/95/1983": "Beltran_et_al.", 
   "DENV1/SRI_LANKA/DK87/2014": "Chernick_et_al.", 
   "DENV1/SRI_LANKA/SLGS0308/2012": "Silva_et_al.", 
@@ -4123,7 +4143,7 @@
   "DENV2/MYANMAR/RL230/2013": "Guo_et_al.", 
   "DENV1/PUERTO_RICO/BIDV2143/1987": "Alvarado_et_al.", 
   "DENV/BRAZIL/SJRP484/2012": "Araujo_et_al.", 
-  "DENV1/MYANMAR/MANDALAY22/2015": "Aung_et_al.", 
+  "DENV2/SENEGAL/0674/1970": "Diallo_et_al.", 
   "DENV3/INDONESIA/MKSWS79B/2010": "Bifani_et_al.", 
   "DENV2/BRAZIL/ACS46II/2010": "Araujo_et_al.", 
   "DENV2/PERU/IQA2042/2010": "Chen_et_al.", 
@@ -4133,7 +4153,7 @@
   "DENV3/TAIWAN/739079A/2004": "Chen_et_al.", 
   "DENV2/THAILAND/NH62/1993": "Igarashi_et_al.", 
   "DENV2/GUADELOUPE/GUAOCT/2006": "Brisse_et_al.", 
-  "DENV4/NEW_CALEDONIA/070104/2009": "Aubry_et_al.", 
+  "DENV4/BRAZIL/GUSP0730/2013": "Balarini_et_al.", 
   "DENV2/COLOMBIA/SANLV141242/2010": "Silva_et_al.", 
   "DENV1/SPAIN/BIDV3386/2007": "Alvarado_et_al.", 
   "DENV2/NEW_CALEDONIA/1202056/1999": "Aubry_et_al.", 
@@ -4151,6 +4171,7 @@
   "DENV1/VENEZUELA/BIDV3540/1997": "Alvarado_et_al.", 
   "DENV3/BRAZIL/81257PE/2002": "Cordeiro_et_al.", 
   "DENV2/FRENCH_POLYNESIA/UH50/1972": "Bennett_et_al.", 
+  "DENV3/PUERTO_RICO/429965/2006": "Alvarado_et_al.", 
   "DENV4/FRENCH_GUIANA/FGUFEV/1995": "Cesaire_et_al.", 
   "DENV1/BHUTAN/P13128/2013": "Chinnawirotpisan_et_al.", 
   "DENV1/INDIA/EAIIMSDELHI1752/2010": "Broor_et_al.", 
@@ -4457,7 +4478,7 @@
   "DENV1/BRAZIL/88463PE/2002": "Cordeiro_et_al.", 
   "DENV2/THAILAND/0021/1986": "Chinnawirotpisan_et_al.", 
   "DENV2/BANGLADESH/H64/2008": "Ali_et_al.", 
-  "DENV3/PAKISTAN/56/2008": "Hapuarachchi_et_al.", 
+  "DENV3/SRI_LANKA/3055/2003": "Andrade_et_al.", 
   "DENV1/NEW_CALEDONIA/09041/2004": "Aubry_et_al.", 
   "DENV2/INDONESIA/N100/2012": "Chidlow_et_al.", 
   "DENV2/INDONESIA/MKS0297/2007": "Bifani_et_al.", 
@@ -4483,6 +4504,7 @@
   "DENV1/CHINA/DGVGZ01/2007": "Chun_et_al.", 
   "DENV3/MALAYSIA/3952/1995": "Aw_et_al.", 
   "DENV/PUERTO_RICO/48/1991": "Beltran_et_al.", 
+  "DENV3/PAKISTAN/56/2008": "Hapuarachchi_et_al.", 
   "DENV/PHILIPPINES/IL/2012": "Cameron_et_al.", 
   "DENV2/SINGAPORE/21097/2011": "Chua_et_al.", 
   "DENV1/INDIA/RR107/2011": "Agarwal_et_al.", 
@@ -4690,6 +4712,7 @@
   "DENV4/BRAZIL/5340RJ/2012": "Chouin-Carneiro_et_al.", 
   "DENV1/COMOROS/04329/1993": "Burt_et_al.", 
   "DENV2/INDONESIA/MKSWS79A/2010": "Bifani_et_al.", 
+  "DENV4/MYANMAR/81087/2008": "Aaskov_et_al.", 
   "DENV1/MEXICO/B15/2010": "Arellanos-Soto_et_al.", 
   "DENV1/CHINA/GZE6/2014": "Li_et_al.", 
   "DENV2/SPAIN/BIDV2660/2000": "Alvarado_et_al.", 
@@ -4722,7 +4745,7 @@
   "DENV1/CAMBODIA/BIDV4256/2007": "Berlin_et_al.", 
   "DENV3/CHINA/31/2009": "Chen_et_al.", 
   "DENV4/FRENCH_POLYNESIA/26067/2010": "Aaskov_et_al.", 
-  "DENV3/SRI_LANKA/3055/2003": "Andrade_et_al.", 
+  "DENV2/AUSTRALIA/QML16/2015": "Aaskov_et_al.", 
   "DENV2/SINGAPORE/19350/2011": "Chua_et_al.", 
   "DENV4/INDONESIA/CN27/2015": "Gao_et_al.", 
   "DENV1/COLOMBIA/SANF150302912015/2014": "Silva_et_al.", 
@@ -4812,7 +4835,7 @@
   "DENV1/INDONESIA/MKS0056/2007": "Bifani_et_al.", 
   "DENV2/BRAZIL/37473PE/1997": "Cordeiro_et_al.", 
   "DENV1/BRAZIL/9808PE/2010": "Cordeiro_et_al.", 
-  "DENV/THAILAND/SER2AILANDNONBKKSEQ49/1999": "A-Nuegoonpipat_et_al.", 
+  "DENV2/BRAZIL/SJRP567/2012": "Araujo_et_al.", 
   "DENV1/ANGOLA/DB134/2013": "Merolle_et_al.", 
   "DENV3/SPAIN/BIDV3405/2007": "Alvarado_et_al.", 
   "DENV2/THAILAND/0169/1986": "Chinnawirotpisan_et_al.", 
@@ -4833,7 +4856,7 @@
   "DENV2/SOMALIA/DB124/2011": "Colon_et_al.", 
   "DENV/BRAZIL/SJPR393/2011": "Araujo_et_al.", 
   "DENV1/FRENCH_GUIANA/FGA/1989": "Courageot_et_al.", 
-  "DENV2/DOMINICAN_REPUBLIC/DR23/2001": "Anzai_et_al.", 
+  "DENV4/INDIA/NIV235/1962": "Bhagat_et_al.", 
   "DENV1/NEW_CALEDONIA/15096/2010": "Aubry_et_al.", 
   "DENV/INDIA/VCRC01/2010": "George_et_al.", 
   "DENV/INDIA/UOH1677/2014": "Gandikota_et_al.", 
