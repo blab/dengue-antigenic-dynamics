@@ -32,6 +32,8 @@ def collect_args():
 	parser.add_argument('--no_tree_freqs', default=False, action='store_true', help="skip tree (clade) frequencies")
 	parser.add_argument('--no_titers', default=False, action='store_true', help="skip titer models")
 	parser.add_argument('--titer_model', default='full_tree', choices=['full_tree', 'interserotype'], type=str)
+	parser.add_argument('--output', default=None)
+	parser.add_argument('--lam_drop', default=1.0, type=float)
 	parser.set_defaults(json = './prepared/dengue_config.json')
 	return parser
 
@@ -41,10 +43,15 @@ def make_config (prepared_json, args):
 	Configure your analysis here.
 	Parsed as a function to enable running multiple builds with one cmd.
 	"""
+	if args.output is None:
+		output = {"auspice": "../../%s_model_output/"%args.titer_model, "data": "./processed/"}
+	else:
+		output = {"auspice": args.output, "data": "./processed/"}
+
 	return {
 		"dir": "dengue",
 		"in": prepared_json,
-		"output": {"auspice": "../../%s_model_output/"%args.titer_model, "data": "./processed/"},
+		"output": output,
 		"geo_inference": ['region'], # what traits to perform this on; don't run country (too many demes, too few sequences per deme to be reliable)
 		"auspice": { ## settings for auspice JSON export
 			"extra_attr": ['serum', 'clade', 'dTiter_sanofi'], # keys from tree.tree.clade['attr'] to include in export
@@ -62,7 +69,7 @@ def make_config (prepared_json, args):
 		"titers": { # regularization parameter values and cross-validation fraction
 			"lam_avi":0.0,
 			"lam_pot":0.5,
-			"lam_drop":1.0,
+			"lam_drop":args.lam_drop,
 			"training_fraction":0.9,
 		},
 		"estimate_mutation_frequencies": not args.no_mut_freqs,
@@ -166,4 +173,4 @@ if __name__=="__main__":
 			titer_export(runner)
 
 	### Export for visualization in auspice
-		runner.auspice_export()
+		# runner.auspice_export()
