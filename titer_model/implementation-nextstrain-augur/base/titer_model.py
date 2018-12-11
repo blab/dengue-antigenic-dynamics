@@ -644,13 +644,15 @@ class TreeModel(TiterModel):
         super(TreeModel, self).__init__(*args, **kwargs)
 
 
-    def cross_validate(self, n, **kwargs):
+    def cross_validate(self, n, path, **kwargs):
         '''
         For each of n iterations, randomly re-allocate titers to training and test set.
         Fit the model using training titers, assess performance using test titers (see TiterModel.validate)
         Append dictionaries of {'abs_error': , 'rms_error': , 'values': [(actual, predicted), ...], etc.} for each iteration to the model_performance list.
         Return model_performance, and save a copy in self.cross_validation
         '''
+       from itertools import chain
+       import pandas as pd
 
         model_performance = []
         for iteration in range(n):
@@ -659,8 +661,12 @@ class TreeModel(TiterModel):
             performance = self.validate() # assess performance on the withheld test data. Returns {'values': [(actual, predicted), ...], 'metric': metric_value, ...}
             model_performance.append(performance)
 
-        self.cross_validation = model_performance
-        return self.cross_validation
+        predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in model_performance])) # flatten to one list of (actual, predicted) tuples
+        predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
+        predicted_values.to_csv(path+'predicted_titers.csv', index=False)
+
+        model_performance = pd.DataFrame(model_performance) # list of dictionaries -> df
+        model_performance.to_csv(path+'titer_model_performance.csv', index=False)
 
     def prepare(self, **kwargs):
         self.make_training_set(**kwargs)

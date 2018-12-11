@@ -104,7 +104,7 @@ def titer_model(process, sanofi_strain = None, **kwargs):
 
     if 'cross_validate' in kwargs:
         assert kwargs['training_fraction'] < 1.0
-        process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], **kwargs)
+        process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], path=process.config['output']['augur'], **kwargs)
 
     else:
         process.titer_tree.prepare(**kwargs) # make training set, find subtree with titer measurements, and make_treegraph
