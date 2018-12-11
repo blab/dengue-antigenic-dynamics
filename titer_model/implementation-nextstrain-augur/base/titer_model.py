@@ -651,8 +651,8 @@ class TreeModel(TiterModel):
         Append dictionaries of {'abs_error': , 'rms_error': , 'values': [(actual, predicted), ...], etc.} for each iteration to the model_performance list.
         Return model_performance, and save a copy in self.cross_validation
         '''
-       from itertools import chain
-       import pandas as pd
+        from itertools import chain
+        import pandas as pd
 
         model_performance = []
         for iteration in range(n):
