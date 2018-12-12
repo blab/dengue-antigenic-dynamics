@@ -147,7 +147,7 @@ if __name__=="__main__":
 						lam_avi = runner.config['titers']['lam_avi'],
 					lam_drop = runner.config['titers']['lam_drop'],
 					training_fraction = runner.config['titers']['training_fraction'],
-					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
+					# sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
 					plot=False,
 					criterium = titer_model_criterium, # calculate dTiter for all branches
 					cross_validate=100,
