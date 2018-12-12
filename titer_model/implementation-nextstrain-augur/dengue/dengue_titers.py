@@ -151,6 +151,14 @@ def titer_export(process):
 
     prefix = process.config["output"]["auspice"]+'/'+process.info["prefix"]+'_'
 
+    process.tree.export(
+        path = prefix,
+        extra_attr = process.config["auspice"]["extra_attr"] + ["muts", "aa_muts","attr", "clade", "cTiter", "dTiter"],
+        indent = 1,
+        write_seqs_json = False#"sequences" in self.config["auspice"]["extra_jsons"]
+    )
+
+
     if hasattr(process, 'titer_tree'):
         # export the raw titers
         data = process.titer_tree.compile_titers()
@@ -161,19 +169,6 @@ def titer_export(process):
                       'dTiter':{n.clade:n.dTiter for n in process.tree.tree.find_clades() if n.dTiter>1e-6}}
         write_json(tree_model, prefix+'tree_model.json')
 
-        # export model performance on test set
-        if hasattr(process.titer_tree, 'cross_validation'):
-            predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in process.titer_tree.cross_validation ])) # flatten to one list of (actual, predicted) tuples
-            predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
-            model_performance = pd.DataFrame(process.titer_tree.cross_validation) # list of dictionaries -> df
-
-            predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
-            model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
-        elif hasattr(process.titer_tree, 'validation'):
-            predicted_values = pd.DataFrame(process.titer_tree.validation.pop('values'), columns=['actual', 'predicted'])
-            model_performance = pd.DataFrame(process.titer_tree.validation)
-            predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
-            model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
 
     else:
         print('Tree model not yet trained')
