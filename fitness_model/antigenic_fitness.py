@@ -176,40 +176,6 @@ def predict_trajectories(af, initial_timepoint):
     #
     # return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
-def calc_information_gain(af):
-    ''' How much better were our predictions than the null model for time t+N? '''
-
-    def kl_divergence(af, valid_clades, starting_timepoint, null):
-        ''' Kullback-Leibler divergence '''
-        kl_div = 0.
-        for clade in valid_clades:
-            actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
-
-            if null == True:
-                null_frequency = af.actual_frequencies[clade][starting_timepoint]
-                H = abs(actual_frequency * np.log(actual_frequency / null_frequency))
-                # print '\nNULL MODEL, actual-null, H'
-                # print actual_frequency - null_frequency, H
-            else:
-                predicted_frequency = af.predicted_frequencies[clade][starting_timepoint + af.years_forward]
-                H = abs(actual_frequency * np.log(actual_frequency / predicted_frequency))
-                # print '\nACTUAL MODEL, actual-predicted, H'
-                # print actual_frequency - predicted_frequency , H
-
-            if not np.isnan(H):
-                kl_div += H
-        assert kl_div >= 0
-        return kl_div
-
-    information_gain = 0.
-    for starting_timepoint in af.timepoints[af.tp_back: -1*af.tp_forward]:
-        valid_clades = [c for c in af.clades if af.actual_frequencies[c][starting_timepoint] >= 0.1 ]
-        effective_sample_size = float(len(valid_clades))
-        model_kl_div = kl_divergence(af, valid_clades, starting_timepoint, null=False)
-        null_kl_div = kl_divergence(af, valid_clades, starting_timepoint, null=True)
-        information_gain +=  effective_sample_size * (-1.*model_kl_div + null_kl_div)
-    return information_gain
-
 def calc_delta_sse(af):
     ''' How much better were our predictions than the null model for time t+N? '''
 
@@ -274,7 +240,6 @@ def calc_model_performance(af):
     'pearson_r2': stats.linregress(actual_growth, predicted_growth)[2]**2,
     'spearman_r': stats.spearmanr(actual_growth, predicted_growth)[0],
     'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(actual_freq)),
-    'information_gain': calc_information_gain(af),
     'accuracy': calc_accuracy(af),
     'delta_sse': calc_delta_sse(af)}
 
@@ -340,6 +305,40 @@ class AntigenicFitness():
 
         if self.save:
             self.predicted_frequencies.to_csv(self.out_path+self.name+'_predicted_freqs.csv')
+
+    def simulate_forward(self):
+        '''
+        Making a "rolling prediction" of frequency for each clade.
+        Normalize these predicted frequencies so that they sum to 1. at each timepoint,
+        *** and then replace the empirical values with the predicted values before moving to the next timepoint ***
+
+        Returns pd.DataFrame(index = t+dt, columns=clades,
+                            values = simulated frequency at time t+dt, based on [actual or simulated*] frequency & fitness at time t )
+                            * for timepoints before tp_back + tp_forward, based on actual initial frequencies; for timepoints after tp_back + tp_forward, based on simulated initial frequencies
+        Xi(t+dt) = Xi(t) * e^( Fi(t) * dt), where Xi is frequency and Fi is fitness of i
+        '''
+
+        initial_timepoints = self.timepoints[self.tp_back: -1*self.tp_forward]
+        predicted_timepoints = self.timepoints[self.tp_forward+self.tp_back:]
+
+        all_predicted_frequencies = {}
+        ## To simulate forward, we just have to replace the empirical data with the predicted data before moving on to the next timepoint
+        for initial_timepoint, final_timepoint in zip(initial_timepoints, predicted_timepoints):
+            predicted_frequencies = predict_timepoint_close_frequency(self, initial_timepoint, final_timepoint)
+            self.actual_frequencies.at[final_timepoint] = predicted_frequencies
+            all_predicted_frequencies[final_timepoint] = predicted_frequencies
+
+        all_predicted_frequencies = pd.DataFrame.from_dict(all_predicted_frequencies, orient='index')
+
+        ''' CRITICAL: NEED TO ALSO UPDATE FITNESS ESTIMATES BASED ON "UPDATED" ACTUAL FREQUENCIES AT EACH STEP. NOT YET IMPLEMENTED. '''
+
+        ## Re-mask which predictions were based on low initial values? I think this is wrong / needs to be fixed. For now, leave it out.
+        # self.noisy_predictions_mask = self.actual_frequencies < 0.05 # log which initial values were low
+        # self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
+        # self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
+
+        if self.save:
+            self.actual_frequencies.to_csv(self.out_path+self.name+'_simulated_freqs.csv')
 
     def calc_growth_rates(self):
         self.predicted_growth_rates = pd.DataFrame({i:calc_timepoint_growth_rates(self, i, predicted=True) for i in self.clades})
@@ -495,7 +494,7 @@ if __name__=="__main__":
 
     args = argparse.ArgumentParser()
     args.add_argument('--frequency_path', help='actual_frequencies csv', default='../data/frequencies/southeast_asia_serotype_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.csv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/full_tree_Dij.csv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
@@ -511,10 +510,19 @@ if __name__=="__main__":
     args.add_argument('--save', help='save csv and png files?', action='store_true')
     args.add_argument('--name', type=str, help='analysis name')
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
-    args.add_argument('--mode', type=str, choices=['fit', 'run'], help='Fit parameters or run model?', default='run')
+    args.add_argument('--mode', type=str, choices=['fit', 'run', 'simulate'], help='Fit parameters, simulate, or run model?', default='simulate')
     args = args.parse_args()
 
-    if args.mode == 'fit':
+    if args.mode == 'simulate':
+        antigenic_fitness = AntigenicFitness(args)
+        antigenic_fitness.calculate_fitness()
+        antigenic_fitness.simulate_forward()
+        # antigenic_fitness.calculate_fitness()
+        # antigenic_fitness.predict_frequencies()
+        # antigenic_fitness.calc_growth_rates()
+
+
+    elif args.mode == 'fit':
 
         d1_vals = np.linspace(0,7,8)
         d2_vals = np.linspace(0,7,8)
