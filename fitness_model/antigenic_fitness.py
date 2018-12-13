@@ -324,20 +324,28 @@ class AntigenicFitness():
         all_predicted_frequencies = {}
         ## To simulate forward, we just have to replace the empirical data with the predicted data before moving on to the next timepoint
         for initial_timepoint, final_timepoint in zip(initial_timepoints, predicted_timepoints):
+            ## Re-estimate fitness based on simulated frequencies.
+            ## For timepoints before tp_back + tp_forward, these values should be unchanged. For timepoints after tp_back+tp_forward, these values will be updated.
+            t0_exposure = calc_timepoint_exposure(self, initial_timepoint)
+            t0_fitness = calc_timepoint_fitness(self, t0_exposure)
+            self.fitness.loc[initial_timepoint] = t0_fitness
+
+            ## Predict t+dt based on updated fitnesses
             predicted_frequencies = predict_timepoint_close_frequency(self, initial_timepoint, final_timepoint)
-            self.actual_frequencies.at[final_timepoint] = predicted_frequencies
-            all_predicted_frequencies[final_timepoint] = predicted_frequencies
+            ## Replace the empirical frequencies at t+dt with the predicted ones
+            self.actual_frequencies.loc[final_timepoint] = predicted_frequencies
 
-        all_predicted_frequencies = pd.DataFrame.from_dict(all_predicted_frequencies, orient='index')
+            ''' I think the predicted frequencies now become basically meaningless / can be discarded....? '''
+            # all_predicted_frequencies[final_timepoint] = predicted_frequencies
+        # all_predicted_frequencies = pd.DataFrame.from_dict(all_predicted_frequencies, orient='index')
 
-        ''' CRITICAL: NEED TO ALSO UPDATE FITNESS ESTIMATES BASED ON "UPDATED" ACTUAL FREQUENCIES AT EACH STEP. NOT YET IMPLEMENTED. '''
-
-        ## Re-mask which predictions were based on low initial values? I think this is wrong / needs to be fixed. For now, leave it out.
+        ''' Re-mask which predictions were based on low initial values? I think this is wrong / needs to be fixed. For now, leave it out. '''
         # self.noisy_predictions_mask = self.actual_frequencies < 0.05 # log which initial values were low
         # self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
         # self.predicted_frequencies = all_predicted_frequencies[~self.noisy_predictions_mask] # keep only predictions based on initial actual_frequencies at >0.1
 
         if self.save:
+            self.fitness.to_csv(self.out_path+self.name+'_fitness.csv')
             self.actual_frequencies.to_csv(self.out_path+self.name+'_simulated_freqs.csv')
 
     def calc_growth_rates(self):
