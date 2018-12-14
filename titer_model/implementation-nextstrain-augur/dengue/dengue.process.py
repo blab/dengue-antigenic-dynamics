@@ -149,26 +149,20 @@ if __name__=="__main__":
 
 				titer_model_criterium = lambda node: node.interserotype == True
 
-			titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
-						lam_pot = runner.config['titers']['lam_pot'],
-						lam_avi = runner.config['titers']['lam_avi'],
-					lam_drop = runner.config['titers']['lam_drop'],
-					training_fraction = runner.config['titers']['training_fraction'],
-					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
-					plot=False,
-					criterium = titer_model_criterium, # calculate dTiter for all branches
-					cross_validate=100,
-					) # calculate dTiter for all branches
+			lam_vals = range(0,21) + [30,50]
 
-			titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
-						lam_pot = runner.config['titers']['lam_pot'],
-						lam_avi = runner.config['titers']['lam_avi'],
-					lam_drop = runner.config['titers']['lam_drop'],
-					training_fraction = 1., # run again with all the data
-					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
-					plot=False,
-					criterium = titer_model_criterium, # calculate dTiter for all branches
-					) # calculate dTiter for all branches
+			for lam_drop in lam_vals:
+				runner.config['titers']['lam_drop'] = lam_drop
+				titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
+							lam_pot = runner.config['titers']['lam_pot'],
+							lam_avi = runner.config['titers']['lam_avi'],
+						lam_drop = runner.config['titers']['lam_drop'],
+						training_fraction = runner.config['titers']['training_fraction'],
+						plot=False,
+						criterium = titer_model_criterium, # calculate dTiter for all branches
+						cross_validate=100,
+						) # calculate dTiter for all branches
+				# break
 
 			titer_export(runner)
 

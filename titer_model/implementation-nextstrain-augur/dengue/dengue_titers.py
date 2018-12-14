@@ -102,9 +102,11 @@ def titer_model(process, sanofi_strain = None, **kwargs):
     ## TREE MODEL
     process.titer_tree = TreeModel(process.tree.tree, process.titers, **kwargs)
 
+    path = '../../lasso/lam_drop_%d/'%process.config['titers']['lam_drop']
     if 'cross_validate' in kwargs:
         assert kwargs['training_fraction'] < 1.0
-        process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], path=process.config['output']['auspice'], **kwargs)
+        path = '../../lasso/lam_drop_%d/'%lam_drop
+        process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], path=path, **kwargs)
 
     else:
         process.titer_tree.prepare(**kwargs) # make training set, find subtree with titer measurements, and make_treegraph
@@ -149,31 +151,31 @@ def titer_export(process):
     from itertools import chain
     import pandas as pd
 
-    prefix = process.config["output"]["auspice"]+'/'+process.info["prefix"]+'_'
+    path = '../../lasso/lam_drop_%d/tree_model.json'%process.config['titers']['lam_drop']
 
     if hasattr(process, 'titer_tree'):
         # export the raw titers
-        data = process.titer_tree.compile_titers()
-        write_json(data, prefix+'titers.json', indent=1)
-        # export the tree model
+        # data = process.titer_tree.compile_titers()
+        # write_json(data, prefix+'titers.json', indent=1)
+        # # export the tree model
         tree_model = {'potency':process.titer_tree.compile_potencies(),
                       'avidity':process.titer_tree.compile_virus_effects(),
                       'dTiter':{n.clade:n.dTiter for n in process.tree.tree.find_clades() if n.dTiter>1e-6}}
         write_json(tree_model, prefix+'tree_model.json')
 
-        # export model performance on test set
-        if hasattr(process.titer_tree, 'cross_validation'):
-            predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in process.titer_tree.cross_validation ])) # flatten to one list of (actual, predicted) tuples
-            predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
-            model_performance = pd.DataFrame(process.titer_tree.cross_validation) # list of dictionaries -> df
-
-            predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
-            model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
-        elif hasattr(process.titer_tree, 'validation'):
-            predicted_values = pd.DataFrame(process.titer_tree.validation.pop('values'), columns=['actual', 'predicted'])
-            model_performance = pd.DataFrame(process.titer_tree.validation)
-            predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
-            model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
+        # # export model performance on test set
+        # if hasattr(process.titer_tree, 'cross_validation'):
+        #     predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in process.titer_tree.cross_validation ])) # flatten to one list of (actual, predicted) tuples
+        #     predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
+        #     model_performance = pd.DataFrame(process.titer_tree.cross_validation) # list of dictionaries -> df
+        #
+        #     predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
+        #     model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
+        # elif hasattr(process.titer_tree, 'validation'):
+        #     predicted_values = pd.DataFrame(process.titer_tree.validation.pop('values'), columns=['actual', 'predicted'])
+        #     model_performance = pd.DataFrame(process.titer_tree.validation)
+        #     predicted_values.to_csv(prefix+'predicted_titers.csv', index=False)
+        #     model_performance.to_csv(prefix+'titer_model_performance.csv', index=False)
 
     else:
         print('Tree model not yet trained')
