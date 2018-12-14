@@ -164,7 +164,7 @@ if __name__=="__main__":
 						) # calculate dTiter for all branches
 				# break
 
-			titer_export(runner)
+				titer_export(runner)
 
 	### Export for visualization in auspice
 		# runner.auspice_export()

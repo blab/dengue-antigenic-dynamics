@@ -105,7 +105,7 @@ def titer_model(process, sanofi_strain = None, **kwargs):
     path = '../../lasso/lam_drop_%d/'%process.config['titers']['lam_drop']
     if 'cross_validate' in kwargs:
         assert kwargs['training_fraction'] < 1.0
-        path = '../../lasso/lam_drop_%d/'%lam_drop
+        path = '../../lasso/lam_drop_%d/'%process.config['titers']['lam_drop']
         process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], path=path, **kwargs)
 
     else:
