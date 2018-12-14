@@ -67,7 +67,7 @@ def make_config (prepared_json, args):
 		"timetree_options": {"Tc": False},
 		"fit_titer_model": not args.no_titers,
 		"titers": { # regularization parameter values and cross-validation fraction
-			"lam_avi":0.0,
+			"lam_avi":1.2,
 			"lam_pot":0.5,
 			"lam_drop":args.lam_drop,
 			"training_fraction":0.9,
