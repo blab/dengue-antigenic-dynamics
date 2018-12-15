@@ -161,7 +161,8 @@ def titer_export(process):
         tree_model = {'potency':process.titer_tree.compile_potencies(),
                       'avidity':process.titer_tree.compile_virus_effects(),
                       'dTiter':{n.clade:n.dTiter for n in process.tree.tree.find_clades() if n.dTiter>1e-6}}
-        write_json(tree_model, prefix+'tree_model.json')
+        path = '../../lasso/lam_drop_%d/'%process.config['titers']['lam_drop']
+        write_json(tree_model, path+'tree_model.json')
 
         # # export model performance on test set
         # if hasattr(process.titer_tree, 'cross_validation'):

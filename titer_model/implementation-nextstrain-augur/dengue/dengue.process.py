@@ -167,4 +167,4 @@ if __name__=="__main__":
 				titer_export(runner)
 
 	### Export for visualization in auspice
-		# runner.auspice_export()
+		runner.auspice_export()
