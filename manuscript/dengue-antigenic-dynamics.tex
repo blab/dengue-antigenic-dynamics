@@ -165,7 +165,7 @@ We also quantify the impact of within- and between-serotype antigenic variation 
 \subsection*{Dengue neutralization titer data}
 
 Antigenic distance between a pair of viruses $i$ and $j$ is experimentally quantified using neutralization titers, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ \textit{in vitro} \citep{russell1967dengue}.
-To measure the pairwise antigenic distances for a panel of diverse DENV viruses (Figure~\ref{titered_strains_tree}), Katzelnick et al. infected naive non-human primates (NHP) with each virus, drew sera at three months post-infection, and then titered this sera against a panel of test viruses \citep{katzelnick2015dengue}.
+To measure the pairwise antigenic distances for a panel of diverse DENV viruses (Figure~\ref{titered_strains_tree}), Katzelnick \textit{et al.} infected naive non-human primates (NHP) with each virus, drew sera at three months post-infection, and then titered this sera against a panel of test viruses \citep{katzelnick2015dengue}.
 To compare patterns of cross-protection in NHP and humans, they also drew sera from 31 study participants six weeks after inoculation with a monovalent component of the NIH dengue vaccine candidate.
 This sera was also titered against a broad panel of DENV viruses.
 As originally reported, we find generally consistent patterns of neutralization between the NHP and human sera data; see \citep{katzelnick2015dengue} for a detailed comparison.
@@ -184,7 +184,8 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 \begin{centering}
 \includegraphics[width=0.65\textwidth]{../figures/png/titer_heatmap.png}
     \caption{\textbf{Normalized antigenic distance between pairs of dengue viruses and sera.}
-    Aggregated neutralization titers from Katzelnick et al. are standardized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one, two-fold change in PRNT50 value.
+    Pairwise antigenic distances were estimated by Katzelnick \textit{et al.} using plaque reduction neutralization titers (PRNT50, see Methods).
+    Aggregated titer values are standardized such that the distance between autologous virus-serum pairs is 0, and each titer unit corresponds to one, two-fold change in PRNT50 value.
     Light gray areas represent missing data.
     Higher values correspond to greater antigenic distance.
     }
@@ -208,6 +209,9 @@ This suggests that treating each serotype as antigenically uniform overlooks pot
 Titer measurements are prone to noise, and there is a limited amount of available titer data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect that changes in antigenic phenotype correspond to underlying changes in viral genotype.
 Figure~\ref{genetic_antigenic_distance} shows the relationship between genetic and antigenic distance between each pair of viruses in our dataset.
+%%%% FIX THIS THING
+Within serotypes, there is a positive correlation between genetic and antigenic distance.
+
 There are two groups of comparisons --- between serotype and within serotype --- however, even within serotypes there is significant genetic diversity and a correlation between increased genetic distance and increased antigenic distance.
 The relationship between genetic distance and antigenic distance is consistent within and between serotypes, where increasing genetic divergence generally corresponds to increased antigenic distance.
 
@@ -234,7 +238,7 @@ The model uses convex optimization to learn the values of $d_b$ that minimize th
         All other branches are assigned $d_b = 0$.
         \textbf{B} The `full tree model' allows any branch in the phylogeny to contribute to antigenic evolution ($d_b >= 0$).
         \textbf{C,D} Predictive performance of each model on the test dataset (aggregated from 10-fold cross-validation).
-        Shading represents the 95\% confidence interval.
+        % Shading represents the 95\% confidence interval.
         }
          \label{titer_model_performance}
   \end{centering}
@@ -291,7 +295,7 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
     \textbf{A} The relative frequency of each serotype, $x_i$, in Southeast Asia is estimated every three months based on available sequence data.
     \textbf{B} We calculate antigenic fitness for each serotype over time as its frequency-weighted antigenic distance from recently circulating viruses.
     We then add this to a time-invariant intrinsic fitness value to calculate total fitness (shown here, arbitrary units).
-    \textbf{C} illustrates how the model predicts clade growth rates.
+    \textbf{C} illustrates DENV1 frequencies between 1998 and 2005 as an example of how the model predicts clade growth rates.
     At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each serotype's future trajectory based on its initial frequency, time-invariant intrinsic fitness, and antigenic fitness at time $t$ (Methods, Eq.~\ref{eq_predict_frequency}).
     We predict forward in three-month increments for a total prediction period of $dt = 5$ years.
     At each increment, we use the predicted stepwise frequency change to adjust our estimates of antigenic fitness on a rolling basis (Methods, Eq.~\ref{eq_compounding_immunity}).
@@ -317,7 +321,7 @@ This strongly suggests that antigenic fitness is a major driver of serotype popu
 This also demonstrates that this model captures key components of dengue population dynamics; examining the formulation of this model in more detail can yield insights into how antigenic relationships influence DENV population composition.
 The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in frequency prediction error relative to a null model, see Methods).
 We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 48\% per year for the first two years after primary infection.
-We also find that these dynamics are best explained by intrinsic fitness that moderately varies by by serotype (Table~\ref{parameter_values}).
+We also find that these dynamics are best explained by intrinsic fitness that moderately varies by serotype (Table~\ref{parameter_values}).
 
 \subsection*{Antigenic novelty also partially predicts genotype success}
 To estimate how well antigenic fitness predicts genotype dynamics, we used the same model to predict genotype success and decline.
@@ -388,7 +392,7 @@ Overall, we find that antigenic fitness explains a moderate portion of the obser
 Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure~\ref{genotype_fitness}C,D).
 This suggests that although genotypes are antigenically diverse, these differences do not appear to influence large-scale regional dynamics over time.
 
-However, this observation is subject to caveats imposed by the the available data and model assumptions.
+However, this observation is subject to caveats imposed by the available data and model assumptions.
 Our estimates of antigenic fitness are informed by the antigenic distances inferred by the titer tree model; thus, as above, we are unable to account for nuanced antigenic differences between sub-genotype clades of DENV due to limited titer data.
 We estimate DENV population composition over time based on available sequence data, pooled across all of Southeast Asia (Methods, Eq.~\ref{eq_estimate_frequency}).
 As the vast majority of cases of DENV are asymptomatic, sequenced viruses likely represent a biased sample of more severe cases from urban centers where patients are more likely to seek and access care.
@@ -412,10 +416,10 @@ We have provided all code, configuration files and datasets at `github.com/blab/
 \section*{Methods}
 \subsection*{Data}
 \textbf{Sequences}\\
-We downloaded all dengue virus sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained the full coding sequence of \textit{E} (total N=12,645) \citep{kuiken2011lanl}.
+We downloaded all dengue genome sequences available from the Los Alamos National Lab Hemorrhagic Fever Virus Database as of March 7, 2018, that contained at least the full coding sequence of \textit{E (envelope)} (total N=12,645) \citep{kuiken2011lanl}.
 We discarded sequences which were putative recombinants, duplicates, lab strains, or which lacked an annotated sampling location and/or sampling date.
 We then randomly subsampled up to 8 viruses per region, per month, preferentially including records with available titer data and longer sequences.
-Our final dataset consists of 2,563 viral sequences (Figure~\ref{sequence_distribution}).
+Our final dataset consists of 2,563 viral sequences (mean sequence length = 5893 bases, Figure~\ref{sequence_distribution}).
 We used the annotated reference dataset from \citep{pyke2016highly} to assign sequences to canonical genotypes.
 
 \textbf{Titers}\\
@@ -423,12 +427,12 @@ We used the annotated reference dataset from \citep{pyke2016highly} to assign se
 Antigenic distance between pairs of viruses $i$ and $j$ is experimentally measured using a neutralization titer, which measures how well serum drawn after infection with virus $i$ is able to neutralize virus $j$ \textit{in vitro} \citep{russell1967dengue}.
 Briefly, two-fold serial dilutions of serum $i$ are incubated with a fixed concentration of virus $j$.
 Titers represent the lowest serum concentration able to neutralize $50\%$ of virus, and are reported as the inverse dilution.
-We used two publicly available plaque reduction neutralization titer (PRNT50) datasets generated by Katzelnick et al. in \citep{katzelnick2015dengue}.
+We used two publicly available plaque reduction neutralization titer (PRNT50) datasets generated by Katzelnick \textit{et al.} in \citep{katzelnick2015dengue}.
 The primary dataset was generated by infecting each of 36 non-human primates with a unique strain of DENV.
 NHP sera was drawn after 12 weeks and titered against the panel of DENV viruses.
 The secondary dataset was generated by vaccinating 31 human trial participants with a monovalent component of the NIH DENV vaccine.
 Sera was drawn after 6 weeks and titered against the same panel of DENV viruses.
-As discussed in Katzelnick et al., these two datasets show similar patterns of antigenic relationships between DENV viruses.
+As discussed in Katzelnick \textit{et al.}, these two datasets show similar patterns of antigenic relationships between DENV viruses.
 In total, our dataset includes 47 virus strains, 36 serum strains, and 1182 measurements.
 
 \subsection*{Titer Model}
@@ -437,7 +441,7 @@ We compute standardized antigenic distance between virus $i$ and serum $j$ (deno
   \label{eq_titer_norm}
 D_{ij} = \mathrm{log}_2(T_{ii}) - \mathrm{log}_2(T_{ij})
 \end{equation}
-To predict unmeasured titers, we employ the `tree model' from Neher et al. and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution \citep{hadfield2017nextstrain,neher2016prediction}.
+To predict unmeasured titers, we employ the `tree model' from Neher \textit{et al.} and implemented in Nextstrain, which assumes that antigenic evolution is driven by underlying genetic evolution \citep{hadfield2017nextstrain,neher2016prediction}.
 We use RAxML version 8.2.11 and a GTRCAT nucleotide substitution model to build a maximum likelihood phylogeny of dengue viral genome sequences \citep{stamatakis2014raxml}.
 Observed titer drops are mapped to branches in the viral phylogeny after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (`row' and `column' effects, respectively):
 \begin{equation}
@@ -447,7 +451,7 @@ Observed titer drops are mapped to branches in the viral phylogeny after correct
 where $d_b$ is the titer drop assigned to each branch, $b$, in the phylogeny.
 We randomly withhold 10\% of titer measurements as a test set.
 We use the remaining 90\% of titer measurements as a training set to learn values for virus avidity, serum potency, and branch effects.
-As in Neher et al., we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function:
+As in Neher \textit{et al.}, we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function:
 \begin{equation}
   \label{eq_cost_fn}
 C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_b + \gamma \sum_{i} v_i^2 + \delta \sum_{j} p_j^2
@@ -459,7 +463,7 @@ We assess performance by comparing predicted to known titer values in our test d
 \subsection*{Viral Clade Dynamics}
 
 \textbf{Empirical Clade Frequencies}\\
-As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to present based on observed relative abundance of each clade in the `slice' of the phylogeny corresponding to each quarterly timepoint \citep{lee2018deep,neher2016prediction}.
+As discussed in Neher et al and Lee et al, we estimate empirical clade frequencies from 1970 to 2015 based on observed relative abundance of each clade in the `slice' of the phylogeny corresponding to each quarterly timepoint \citep{lee2018deep,neher2016prediction}.
 
 Briefly, the frequency trajectory of each clade in the phylogeny is modeled according to a Brownian motion diffusion process discretized to three-month intervals.
 Relative to a simple Brownian motion, the expectation includes an `inertia' term that adds velocity to the diffusion and the variance includes a term $x(1-x)$ to scale variance according to frequency following a Wright-Fisher population genetic process.
@@ -598,8 +602,8 @@ LK is supported by NIH awards R01AI114703-01 and P01AI106695.
 
 \setcounter{figure}{0}
 \setcounter{table}{0}
-\renewcommand{\thefigure}{S\arabic{figure}}
-\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}.}
+\renewcommand{\thetable}{S\arabic{table}.}
 
 \begin{centering}
   \begin{table}[h]
