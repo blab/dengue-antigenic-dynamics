@@ -33,4 +33,4 @@ pip install -r requirements
 
 ## Citation
 
-[Bell SM, Katzelnick L, Bedford T. 2018. Dengue antigenic relationships predict evolutionary dynamics. bioRxiv: 432054.](http://dx.doi.org/10.1101/432054)
+[Bell SM, Katzelnick L, Bedford T. 2018. Dengue antigenic relationships predict evolutionary dynamics. bioRxiv: 432054.](https://doi.org/10.1101/432054)

@@ -30,7 +30,7 @@ All other branches are assigned _d_<sub>_b_</sub> = 0.
 
 ## Running the titer model
 
-This model was originally published in [Neher et al (PNAS, 2016)](http://dx.doi.org/10.1073/pnas.1525578113) and implemented as part of the Nextstrain [augur package](https://github.com/nextstrain/augur). The relevant portions of the repository have been reproduced here under [`implementation-nextstrain-augur`](implementation-nextstrain-augur/). Documentation, including install instructions, for the full augur pipeline can be found [here](https://github.com/nextstrain/augur/tree/6d9f7088d8792196e5021c67b876d9de1d2a13dd).
+This model was originally published in [Neher et al (PNAS, 2016)](https://doi.org/10.1073/pnas.1525578113) and implemented as part of the Nextstrain [augur package](https://github.com/nextstrain/augur). The relevant portions of the repository have been reproduced here under [`implementation-nextstrain-augur`](implementation-nextstrain-augur/). Documentation, including install instructions, for the full augur pipeline can be found [here](https://github.com/nextstrain/augur/tree/6d9f7088d8792196e5021c67b876d9de1d2a13dd).
 
 ### 1 - Prepare input files  
 
