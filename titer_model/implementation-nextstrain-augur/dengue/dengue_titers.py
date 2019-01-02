@@ -94,81 +94,67 @@ def tree_additivity_symmetry(titer_model):
     plt.tight_layout()
     plt.savefig('./processed/titer_asymmetry.png')
 
-def titer_model(process, sanofi_strain = None, **kwargs):
+def titer_model(process, model_type='tree', **kwargs):
     '''
     estimate a titer tree model using titers in titer_fname.
     '''
     from base.titer_model import TreeModel, SubstitutionModel
-    ## TREE MODEL
-    process.titer_tree = TreeModel(process.tree.tree, process.titers, **kwargs)
-
+    if model_type=='tree':
+        titer_model = TreeModel(process.tree.tree, process.titers, **kwargs)
+    elif model_type=='substitution':
+        titer_model = SubstitutionModel(process.tree.tree, process.titers, **kwargs)
+    else:
+        raise NameError, ('model_type must be one of `tree` or `subtitution`', model_type)
     if 'cross_validate' in kwargs:
         assert kwargs['training_fraction'] < 1.0
-        process.cross_validation = process.titer_tree.cross_validate(n=kwargs['cross_validate'], path=process.config['output']['auspice'], **kwargs)
-
+        process.cross_validation = titer_model.cross_validate(n=kwargs['cross_validate'], path=process.config['output']['auspice'], **kwargs)
     else:
-        process.titer_tree.prepare(**kwargs) # make training set, find subtree with titer measurements, and make_treegraph
-        process.titer_tree.train(**kwargs)   # pick longest branch on path between each (test, ref) pair, assign titer drops to this branch
+        titer_model.prepare(**kwargs) # make training set, find subtree with titer measurements, and make_treegraph
+        titer_model.train(**kwargs)   # pick longest branch on path between each (test, ref) pair, assign titer drops to this branch
                                          # then calculate a cumulative antigenic evolution score for each node
         if kwargs['training_fraction'] != 1.0:
-            process.titer_tree.validate(kwargs)
+            titer_model.validate(kwargs)
 
+    process.titer_model = titer_model
     # add attributes for the estimated branch-specific titer drop values (dTiter)
     # and cumulative (from root) titer drop values (cTiter) to each branch
-    for n in process.tree.tree.find_clades():
-        n.attr['cTiter'] = n.cTiter
-        n.attr['dTiter'] = n.dTiter
 
-    if sanofi_strain: # calculate antigenic distance from vaccine strain for each serotype-specific build
-        # find the vaccine strain in the tree
-        sanofi_tip = [i for i in process.tree.tree.find_clades() if i.name==sanofi_strain][0]
-        # sum up dTiter on all the branches on the path between the vaccine strain and each other strain
-        for tip in process.tree.tree.find_clades():
-            if tip == sanofi_tip:
-                tip.attr['dTiter_sanofi']=0.00
-            else:
-                trace = process.tree.tree.trace(tip, sanofi_tip)
-                trace_dTiter = sum([i.dTiter for i in trace])
-                tip.attr['dTiter_sanofi']= round(trace_dTiter, 2)
-
-        # export for auspice visualization
-        process.config["auspice"]["color_options"]["dTiter_sanofi"] = {
-        "menuItem": "antigenic dist. from vaccine", "type": "continuous", "legendTitle": "log2 titer distance from sanofi vaccine strain",
-        "key": "vaccine_dTiter", "vmin": "0.0", "vmax": "2.0"}
-
-    else: # export cumulative distance for auspice vis. of the all-serotype build
-        process.config["auspice"]["color_options"]["cTiter"] = {
-        "menuItem": "antigenic dist. from root", "type": "continuous", "legendTitle": "log2 titer distance from root",
-        "key": "cTiter", "vmin": "0.0", "vmax": "2.0"}
-
-    # if kwargs['plot_symmetry']:
-    #     tree_additivity_symmetry(process.titer_tree)
-
-def titer_export(process):
+def titer_export(process, model_type='tree'):
     from base.io_util import write_json
     from itertools import chain
     import pandas as pd
 
-    prefix = process.config["output"]["auspice"]+'/'+process.info["prefix"]+'_'
+    prefix = process.config["output"]["auspice"]+'/'+process.info["prefix"]
 
-    process.tree.export(
-        path = prefix,
-        extra_attr = process.config["auspice"]["extra_attr"] + ["muts", "aa_muts","attr", "clade", "cTiter", "dTiter"],
-        indent = 1,
-        write_seqs_json = False#"sequences" in self.config["auspice"]["extra_jsons"]
-    )
-
-
-    if hasattr(process, 'titer_tree'):
+    if hasattr(process, 'titer_model'):
         # export the raw titers
-        data = process.titer_tree.compile_titers()
+        data = process.titer_model.compile_titers()
         write_json(data, prefix+'titers.json', indent=1)
-        # export the tree model
-        tree_model = {'potency':process.titer_tree.compile_potencies(),
-                      'avidity':process.titer_tree.compile_virus_effects(),
-                      'dTiter':{n.clade:n.dTiter for n in process.tree.tree.find_clades() if n.dTiter>1e-6}}
-        write_json(tree_model, prefix+'tree_model.json')
 
+        if model_type=='tree':
+            for n in process.tree.tree.find_clades():
+                n.attr['cTiter'] = n.cTiter
+                n.attr['dTiter'] = n.dTiter
+
+            process.tree.export(
+                path = prefix,
+                extra_attr = process.config["auspice"]["extra_attr"] + ["muts", "aa_muts","attr", "clade", "cTiter", "dTiter"],
+                indent = 1,
+                write_seqs_json = False#"sequences" in self.config["auspice"]["extra_jsons"]
+            )
+
+            titer_model = {'potency':process.titer_model.compile_potencies(),
+                          'avidity':process.titer_model.compile_virus_effects(),
+                          'dTiter':{n.clade:n.dTiter for n in process.tree.tree.find_clades() if n.dTiter>1e-6}}
+
+            write_json(titer_model, prefix+'tree_model.json')
+
+        elif model_type=='substitution':
+            titer_model = {'potency':process.titer_model.compile_potencies(),
+                          'avidity':process.titer_model.compile_virus_effects(),
+                          'mutations':process.titer_model.compile_substitution_effects()}
+
+            write_json(titer_model, prefix+'substitution_model.json')
 
     else:
         print('Tree model not yet trained')

@@ -575,6 +575,30 @@ class TiterModel(object):
         return np.array([x for x in W['x']])[:n_params]
 
 
+    def cross_validate(self, n, path, **kwargs):
+        '''
+        For each of n iterations, randomly re-allocate titers to training and test set.
+        Fit the model using training titers, assess performance using test titers (see TiterModel.validate)
+        Append dictionaries of {'abs_error': , 'rms_error': , 'values': [(actual, predicted), ...], etc.} for each iteration to the model_performance list.
+        Return model_performance, and save a copy in self.cross_validation
+        '''
+        from itertools import chain
+        import pandas as pd
+
+        model_performance = []
+        for iteration in range(n):
+            self.prepare(**kwargs) # randomly reassign titers to training and test sets
+            self.train(**kwargs) # train the model
+            performance = self.validate() # assess performance on the withheld test data. Returns {'values': [(actual, predicted), ...], 'metric': metric_value, ...}
+            model_performance.append(performance)
+
+        predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in model_performance])) # flatten to one list of (actual, predicted) tuples
+        predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
+        predicted_values.to_csv(path+'predicted_titers.csv', index=False)
+
+        model_performance = pd.DataFrame(model_performance) # list of dictionaries -> df
+        model_performance.to_csv(path+'titer_model_performance.csv', index=False)
+
     def fit_nnls(self):
         from scipy.optimize import nnls
         return nnls(self.design_matrix, self.titer_dist)[0]
@@ -642,31 +666,6 @@ class TreeModel(TiterModel):
     """
     def __init__(self,*args, **kwargs):
         super(TreeModel, self).__init__(*args, **kwargs)
-
-
-    def cross_validate(self, n, path, **kwargs):
-        '''
-        For each of n iterations, randomly re-allocate titers to training and test set.
-        Fit the model using training titers, assess performance using test titers (see TiterModel.validate)
-        Append dictionaries of {'abs_error': , 'rms_error': , 'values': [(actual, predicted), ...], etc.} for each iteration to the model_performance list.
-        Return model_performance, and save a copy in self.cross_validation
-        '''
-        from itertools import chain
-        import pandas as pd
-
-        model_performance = []
-        for iteration in range(n):
-            self.prepare(**kwargs) # randomly reassign titers to training and test sets
-            self.train(**kwargs) # train the model
-            performance = self.validate() # assess performance on the withheld test data. Returns {'values': [(actual, predicted), ...], 'metric': metric_value, ...}
-            model_performance.append(performance)
-
-        predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in model_performance])) # flatten to one list of (actual, predicted) tuples
-        predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
-        predicted_values.to_csv(path+'predicted_titers.csv', index=False)
-
-        model_performance = pd.DataFrame(model_performance) # list of dictionaries -> df
-        model_performance.to_csv(path+'titer_model_performance.csv', index=False)
 
     def prepare(self, **kwargs):
         self.make_training_set(**kwargs)
@@ -947,7 +946,7 @@ class SubstitutionModel(TiterModel):
                 if np.sum(col==cluster[0])>=n_measurements-colin_thres:
                     cluster[1].append(mut)
                     col_found=True
-                    print("adding",mut,"to cluster ",cluster[1])
+                    # print("adding",mut,"to cluster ",cluster[1])
                     break
             if not col_found:
                 mutation_clusters.append([col, [mut]])
