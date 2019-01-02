@@ -31,7 +31,7 @@ def collect_args():
 	parser.add_argument('--no_mut_freqs', default=True, action='store_true', help="skip mutation frequencies")
 	parser.add_argument('--no_tree_freqs', default=False, action='store_true', help="skip tree (clade) frequencies")
 	parser.add_argument('--no_titers', default=False, action='store_true', help="skip titer models")
-	parser.add_argument('--titer_model', default='full_tree', choices=['full_tree', 'interserotype'], type=str)
+	parser.add_argument('--titer_model', default='full_tree', choices=['full_tree', 'interserotype', 'substitution'], type=str)
 	parser.set_defaults(json = './prepared/dengue_config.json')
 	return parser
 
@@ -120,7 +120,9 @@ if __name__=="__main__":
 
 			if args.titer_model == 'full_tree':
 				titer_model_criterium = lambda node: True
-			else:
+				model_type='tree'
+				n=1000
+			elif args.titer_model='interserotype':
 				### Comparison: force dTiter values to be non-zero only on interserotype brances
 				def is_interserotype(node):
 					descendents = node.get_terminals()
@@ -139,34 +141,38 @@ if __name__=="__main__":
 						node.interserotype = True
 					else:
 						node.interserotype = False
-
 				titer_model_criterium = lambda node: node.interserotype == True
+				model_type = 'tree'
+				n=1000
+			elif args.titer_model = 'substitution':
+				titer_model_criterium = None
+				model_type='substitution'
+				n=10
 
-			# titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
-			# 			lam_pot = runner.config['titers']['lam_pot'],
-			# 			lam_avi = runner.config['titers']['lam_avi'],
-			# 		lam_drop = runner.config['titers']['lam_drop'],
-			# 		model_type='substitution',
-			# 		training_fraction = runner.config['titers']['training_fraction'],
-			# 		sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
-			# 		plot=False,
-			# 		criterium = titer_model_criterium, # calculate dTiter for all branches
-			# 		cross_validate=10,
-			# 		) # calculate dTiter for all branches
+			titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
+						lam_pot = runner.config['titers']['lam_pot'],
+						lam_avi = runner.config['titers']['lam_avi'],
+					lam_drop = runner.config['titers']['lam_drop'],
+					model_type=model_type,
+					training_fraction = runner.config['titers']['training_fraction'],
+					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
+					plot=False,
+					criterium = titer_model_criterium, # calculate dTiter for all branches
+					cross_validate=n,
+					) # calculate dTiter for all branches
 
 			titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
 						lam_pot = runner.config['titers']['lam_pot'],
 						lam_avi = runner.config['titers']['lam_avi'],
 					lam_drop = runner.config['titers']['lam_drop'],
-					model_type='substitution',
-
+					model_type=model_type,
 					training_fraction = 1., # run again with all the data
 					sanofi_strain = sanofi_vaccine_strains[runner.info['lineage']], # vaccine strain for each serotype-specific build
 					plot=False,
 					criterium = titer_model_criterium, # calculate dTiter for all branches
 					) # calculate dTiter for all branches
 
-			titer_export(runner, model_type='substitution')
+			titer_export(runner, model_type)#, model_type='substitution')
 
 	### Export for visualization in auspice
 		runner.auspice_export()
