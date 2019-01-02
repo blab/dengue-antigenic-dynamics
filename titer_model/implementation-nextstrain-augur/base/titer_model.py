@@ -391,7 +391,7 @@ class TiterModel(object):
         self.lam_drop = lam_drop
         if len(self.train_titers)==0:
             print('no titers to train')
-            self.model_params = np.zeros(self.genetic_params+len(self.sera))#+len(self.test_strains))
+            self.model_params = np.zeros(self.genetic_params)#+len(self.sera))#+len(self.test_strains))
         else:
             if method=='l1reg':  # l1 regularized fit, no constraint on sign of effect
                 self.model_params = self.fit_l1reg()
@@ -406,8 +406,8 @@ class TiterModel(object):
 
         # extract and save the potencies and virus effects. The genetic parameters
         # are subclass specific and need to be process by the subclass
-        self.serum_potency = {serum:self.model_params[self.genetic_params+ii]
-                              for ii, serum in enumerate(self.sera)}
+        self.serum_potency = {serum:0 for serum in self.sera}#self.model_params[self.genetic_params+ii]
+                              # for ii, serum in enumerate(self.sera)}
         self.virus_effect = {strain:0 for strain in self.test_strains}#self.model_params[self.genetic_params+len(self.sera)+ii]
                              # for ii, strain in enumerate(self.test_strains)}
 
@@ -544,7 +544,7 @@ class TiterModel(object):
         from cvxopt import matrix, solvers
         n_params = self.design_matrix.shape[1]
         n_genetic = self.genetic_params
-        n_sera = len(self.sera)
+        n_sera = 0#len(self.sera)
         n_v = 0#len(self.test_strains)
 
         # set up the quadratic matrix containing the deviation term (linear xterm below)
@@ -620,7 +620,7 @@ class TiterModel(object):
         from cvxopt import matrix, solvers
         n_params = self.design_matrix.shape[1]
         n_genetic = self.genetic_params
-        n_sera = len(self.sera)
+        n_sera = 0#len(self.sera)
         n_v = 0#len(self.test_strains)
 
         print('n_params:%d'%n_params, 'n_genetic: %d'%n_genetic, 'n_sera:%d'%n_sera)
@@ -629,8 +629,8 @@ class TiterModel(object):
         # and the l2-regulatization of the avidities and potencies
         P1 = np.zeros((n_params,n_params))
         P1[:n_params, :n_params] = self.TgT
-        for ii in xrange(n_genetic, n_genetic+n_sera):
-            P1[ii,ii]+=self.lam_pot
+        # for ii in xrange(n_genetic, n_genetic+n_sera):
+        #     P1[ii,ii]+=self.lam_pot
         # for ii in xrange(n_genetic+n_sera, n_params):
         #     P1[ii,ii]+=self.lam_avi
         P = matrix(P1)
@@ -755,7 +755,7 @@ class TreeModel(TiterModel):
         titer_dist = []
         weights = []
         # mark HI splits have to have been run before, assigning self.titer_split_count
-        n_params = self.titer_split_count + len(self.sera) #+ len(self.test_strains)
+        n_params = self.titer_split_count #+ len(self.sera) #+ len(self.test_strains)
         for (test, ref), val in self.train_titers.iteritems():
             if not np.isnan(val):
                 try:
@@ -766,10 +766,11 @@ class TreeModel(TiterModel):
                         branches = np.unique([c.titer_branch_index for c in path
                                                  if c.titer_branch_index is not None])
 
-                        if len(branches): tmp[branches] = 1
+                        if len(branches):
+                            tmp[branches] = 1
                         # add serum effect for heterologous viruses
-                        if ref[0]!=test:
-                            tmp[self.titer_split_count+self.sera.index(ref)] = 1
+                        # if ref[0]!=test:
+                        #     tmp[self.titer_split_count+self.sera.index(ref)] = 1
                         # add virus effect
                         # tmp[self.titer_split_count+len(self.sera)+self.test_strains.index(test)] = 1
                         # append model and fit value to lists tree_graph and titer_dist
