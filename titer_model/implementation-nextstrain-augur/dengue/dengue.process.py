@@ -123,7 +123,9 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 			for sero, mrca in serotype_mrcas.items():
 				descendants = mrca.get_terminals() # capture any mislabeled tips in the serotype
 				for tip in descendants:
-					tip.translations = mrca.translations # set protein sequence of each tip to the reconstructed ancestral sequence from the serotype mrca
+					tip.sequence = mrca.sequence # set sequence of each tip to the reconstructed ancestral sequence from the serotype mrca
+			runner.tree.add_translations() # translate and reassign mutations to each branch
+
 
 	titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
 				lam_pot = runner.config['titers']['lam_pot'],
