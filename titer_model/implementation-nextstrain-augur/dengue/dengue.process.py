@@ -121,9 +121,8 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 			serotype_mrcas = {sero: runner.tree.tree.common_ancestor(serotype_tips[sero]) for sero in serotypes} # find the serotype mrca
 
 			for sero, mrca in serotype_mrcas.items():
-				descendants = mrca.get_terminals() # capture any mislabeled tips in the serotype
-				for tip in descendants:
-					tip.sequence = mrca.sequence # set sequence of each tip to the reconstructed ancestral sequence from the serotype mrca
+				for k in mrca.find_clades(): # pull all descendants (nodes and tips) of the serotype mrca
+					k.sequence = mrca.sequence # set sequence of each descendant to the reconstructed ancestral sequence from the serotype mrca
 			runner.tree.add_translations() # translate and reassign mutations to each branch
 
 
