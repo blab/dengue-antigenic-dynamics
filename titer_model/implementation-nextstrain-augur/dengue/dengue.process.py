@@ -16,7 +16,7 @@ def collect_args():
 	help="Look for prepared JSON(s) like ./prepared/dengue_SEROTYPE.json; 'multiple' will run all five builds. Default='multiple'")
 	parser.add_argument('--no_tree_freqs', default=False, action='store_true', help="skip tree (clade) frequencies")
 	parser.add_argument('--no_titers', default=False, action='store_true', help="skip titer models")
-	parser.add_argument('--titer_model', default='tree', choices=['tree', 'substitution'], type=str)
+	parser.add_argument('--titer_model', default='substitution', choices=['tree', 'substitution'], type=str)
 	parser.add_argument('--titer_res', '--titer_resolution', default='full_tree', choices=['full_tree', 'interserotype'], type=str)
 	return parser
 
@@ -134,7 +134,8 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 					assert ''.join(k.sequence) == ''.join(mrca.sequence)
 					assert k.translations['E'] == mrca.translations['E']
 					assert len(k.aa_mutations['E']) == 0
-	titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
+
+	titer_model(runner, ## Run N times with a random 90:10 training:test split to estimate model performance / error
 				lam_pot = runner.config['titers']['lam_pot'],
 				lam_avi = runner.config['titers']['lam_avi'],
 			lam_drop = runner.config['titers']['lam_drop'],
