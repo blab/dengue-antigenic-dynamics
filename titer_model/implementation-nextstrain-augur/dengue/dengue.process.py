@@ -108,7 +108,7 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 			titer_criterium = lambda node: node.interserotype == True
 
 	elif args.titer_model == 'substitution':
-		n = 10
+		n = 100
 		titer_criterium = None
 
 		if args.titer_res == 'interserotype':
