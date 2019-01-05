@@ -252,7 +252,7 @@ class sequence_set(object):
         data["info"] = {
             "n(starting)": self.nstart,
             "n(final)": len(self.seqs),
-            "commit": git.Repo(search_parent_directories=True).head.object.hexsha,
+            # "commit": git.Repo(search_parent_directories=True).head.object.hexsha,
             "date_format": config["date_format"],
             "subsampled": bool(config["subsample"]),
             "traits_are_dates": [],

@@ -123,10 +123,17 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 			for sero, mrca in serotype_mrcas.items():
 				for k in mrca.find_clades(): # pull all descendants (nodes and tips) of the serotype mrca
 					k.sequence = mrca.sequence # set sequence of each descendant to the reconstructed ancestral sequence from the serotype mrca
-
+					k.translations = mrca.translations
+					k.aa_mutations = {}
 			runner.tree.add_translations() # translate and reassign mutations to each branch
 			runner.tree.refine()
 
+			for sero, mrca in serotype_mrcas.items():
+				for k in mrca.find_clades(): # pull all descendants (nodes and tips) of the serotype mrca
+					if k == mrca: continue
+					assert ''.join(k.sequence) == ''.join(mrca.sequence)
+					assert k.translations['E'] == mrca.translations['E']
+					assert len(k.aa_mutations['E']) == 0
 	titer_model(runner, ## Run 10x with a 90:10 training:test split to estimate model performance / error
 				lam_pot = runner.config['titers']['lam_pot'],
 				lam_avi = runner.config['titers']['lam_avi'],

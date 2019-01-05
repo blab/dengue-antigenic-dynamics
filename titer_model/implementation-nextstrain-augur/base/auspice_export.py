@@ -134,15 +134,15 @@ def export_metadata_json(process, prefix, indent):
     if "defaults" in process.config["auspice"]:
         meta_json["defaults"] = process.config["auspice"]["defaults"]
 
-    try:
-        from pygit2 import Repository, discover_repository
-        current_working_directory = os.getcwd()
-        repository_path = discover_repository(current_working_directory)
-        repo = Repository(repository_path)
-        commit_id = repo[repo.head.target].id
-        meta_json["commit"] = str(commit_id)
-    except ImportError:
-        meta_json["commit"] = "unknown"
+    # try:
+    #     from pygit2 import Repository, discover_repository
+    #     current_working_directory = os.getcwd()
+    #     repository_path = discover_repository(current_working_directory)
+    #     repo = Repository(repository_path)
+    #     # commit_id = repo[repo.head.target].id
+    #     # meta_json["commit"] = str(commit_id)
+    # except ImportError:
+    #     meta_json["commit"] = "unknown"
     if len(process.config["auspice"]["controls"]):
         meta_json["controls"] = process.make_control_json(process.config["auspice"]["controls"])
     meta_json["geo"] = process.lat_longs

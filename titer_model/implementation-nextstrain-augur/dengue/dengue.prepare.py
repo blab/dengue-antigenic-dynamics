@@ -80,7 +80,7 @@ def make_config(serotype, params):
         file_prefix = "dengue_%s" % serotype
 
     if params.sequences is not None:
-        input_paths = [params.sequences]
+        input_paths = params.sequences
     elif os.path.isfile("../../../../data/sequences/dengue_%s.fasta"%serotype): #is file: # Look for a serotype-specific fasta
         input_paths = ["../../../../data/sequences/dengue_%s.fasta"%serotype]
     else: # If it doesn't exist, try to pull serotype-specific sequences out of the all-serotype fasta (warn the user of this behavior)
@@ -109,12 +109,12 @@ def make_config(serotype, params):
         "input_paths": input_paths,
         "header_fields": {0:'strain', 1:'accession', 2:'date', 3:'region', 4:'country',
                         5:'division', 6: 'location', 7: 'authors', 8: 'url'},
-        "filters": (("Dropped Strains", lambda s: s.id not in [fix_names(x) for x in dropped_strains]),
-            ("Bad Region", lambda s: any([
-                                        s.attributes['region'] not in ['', ' ', '?'],
-                                        s.attributes['accession'] in force_include,
-                                        s.attributes['strain'] in force_include
-                                        ]))),
+        "filters": (),#("Dropped Strains", lambda s: s.id not in [fix_names(x) for x in dropped_strains]),
+            # ("Bad Region", lambda s: any([
+            #                             s.attributes['region'] not in ['', ' ', '?'],
+            #                             s.attributes['accession'] in force_include,
+            #                             s.attributes['strain'] in force_include
+            #                             ]))),
 
         "subsample": dengue_subsampling(params, years_back, titer_values,
         force_include),
