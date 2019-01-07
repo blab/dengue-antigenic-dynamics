@@ -11,7 +11,7 @@
     ], 
     "subsampled": false, 
     "input_file": "./prepared/dengue_E_sequences.fasta", 
-    "prefix": "dengue_all", 
+    "prefix": "titered", 
     "segment": "genome", 
     "lineage": "all", 
     "date_format": [
