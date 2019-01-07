@@ -91,7 +91,7 @@ class tree(object):
         except:
             return False
 
-    def build_newick(self, newick_file, nthreads=2, method="raxml", raxml_options={},
+    def build_newick(self, newick_file, nthreads=2, method="iqtree", raxml_options={},
                      iqtree_options={}, debug=False):
         make_dir(self.run_dir)
         os.chdir(self.run_dir)
