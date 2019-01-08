@@ -1,0 +1,244 @@
+{
+ "updated": "8 Jan 2019", 
+ "author_info": {
+  "Alvarado_et_al.": {
+   "title": "?", 
+   "n": 15
+  }, 
+  "Buchy_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Diallo_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Leitmeyer_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Aaskov_et_al.": {
+   "title": "?", 
+   "n": 17
+  }, 
+  "Manap_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Chanock_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Girerd_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Cardosa_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Barde_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Jr_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Gubler_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Biedrzycka_et_al.": {
+   "title": "?", 
+   "n": 1
+  }, 
+  "Blaney_et_al.": {
+   "title": "?", 
+   "n": 3
+  }, 
+  "Bhamarapravati_et_al.": {
+   "title": "?", 
+   "n": 1
+  }
+ }, 
+ "virus_count": 47, 
+ "color_options": {
+  "gt": {
+   "menuItem": "genotype", 
+   "type": "discrete", 
+   "legendTitle": "Genotype", 
+   "key": "genotype"
+  }, 
+  "num_date": {
+   "menuItem": "date", 
+   "type": "continuous", 
+   "legendTitle": "Sampling date", 
+   "key": "num_date"
+  }
+ }, 
+ "seq_author_map": {
+  "DENV1/CAMBODIA/BIDV1995/2003": "Alvarado_et_al.", 
+  "DENV3/CAMBODIA/AC23/2011": "Aaskov_et_al.", 
+  "DENV3/FIJI/29472/1992": "Gubler_et_al.", 
+  "DENV2/SENEGAL/0674/1970": "Diallo_et_al.", 
+  "DENV2/CAMBODIA/BIDV3924/2008": "Alvarado_et_al.", 
+  "DENV2/CAMBODIA/BIDV4265/2007": "Alvarado_et_al.", 
+  "DENV1/BOLIVIA/FSB3363/2010": "Aaskov_et_al.", 
+  "DENV2/INDIA/742295/1974": "Barde_et_al.", 
+  "DENV4/NICARAGUA/703/1999": "Aaskov_et_al.", 
+  "DENV1/PERU/IQT6152/2000": "Blaney_et_al.", 
+  "DENV4/INDONESIA/AC36/1973": "Aaskov_et_al.", 
+  "DENV2/VIETNAM/BIDV735/2006": "Alvarado_et_al.", 
+  "DENV1/MYANMAR/61117/2005": "Aaskov_et_al.", 
+  "DENV4/INDONESIA/S1228/1978": "Girerd_et_al.", 
+  "DENV1/VIETNAM/BIDV1937/2008": "Alvarado_et_al.", 
+  "DENV2/TONGA/DELTA30/1974": "Blaney_et_al.", 
+  "DENV4/DOMINICA/814669DELTA30/1981": "Chanock_et_al.", 
+  "DENV1/PUERTO_RICO/BIDV852/2006": "Alvarado_et_al.", 
+  "DENV1/NAURU/WESTERNPACIFICDELTA30/1974": "Jr_et_al.", 
+  "DENV1/CAMBODIA/BIDV1991/2003": "Alvarado_et_al.", 
+  "DENV4/CAMBODIA/AC33/2011": "Aaskov_et_al.", 
+  "DENV4/PUERTO_RICO/347751/1998": "Alvarado_et_al.", 
+  "DENV3/MYANMAR/80931/2008": "Aaskov_et_al.", 
+  "DENV3/VIETNAM/BIDV1817/2007": "Alvarado_et_al.", 
+  "DENV3/PUERTO_RICO/429965/2006": "Alvarado_et_al.", 
+  "DENV1/VENEZUELA/OBT1298/2000": "Aaskov_et_al.", 
+  "DENV4/THAILAND/D85052/1985": "Blaney_et_al.", 
+  "DENV4/MYANMAR/81087/2008": "Aaskov_et_al.", 
+  "DENV4/CAMBODIA/NA/2010": "Buchy_et_al.", 
+  "DENV1/THAILAND/16007/1964": "Bhamarapravati_et_al.", 
+  "DENV2/CAMBODIA/D2T0601085/2009": "Aaskov_et_al.", 
+  "DENV2/NICARAGUA/BIDV571/2006": "Alvarado_et_al.", 
+  "DENV3/INDONESIA/SLEMANDELTA30/1978": "Aaskov_et_al.", 
+  "DENV2/MALAYSIA/DKD811/2008": "Manap_et_al.", 
+  "DENV2/VIETNAM/AC21/2003": "Aaskov_et_al.", 
+  "DENV4/BRAZIL/NA/2012": "Aaskov_et_al.", 
+  "DENV3/VIETNAM/BIDV1329/2006": "Alvarado_et_al.", 
+  "DENV3/PUERTO_RICO/S228762/1963": "Aaskov_et_al.", 
+  "DENV2/GUYANA/08221/2000": "Aaskov_et_al.", 
+  "DENV2/VIETNAM/AC20/2003": "Aaskov_et_al.", 
+  "DENV4/PUERTO_RICO/BIDV2446/1999": "Alvarado_et_al.", 
+  "DENV4/MALAYSIA/P731120/1973": "Cardosa_et_al.", 
+  "DENV2/PERU/IQT2913/1996": "Leitmeyer_et_al.", 
+  "DENV2/PAPUANEWGUINEA/NEWGUINEAC/1944": "Biedrzycka_et_al.", 
+  "DENV2/BRAZIL/BR161/2004": "Aaskov_et_al.", 
+  "DENV3/NICARAGUA/BIDV4753/2009": "Alvarado_et_al.", 
+  "DENV2/NICARAGUA/BIDV533/2005": "Alvarado_et_al."
+ }, 
+ "panels": [
+  "tree", 
+  "map", 
+  "entropy"
+ ], 
+ "geo": {
+  "country": {
+   "brazil": {
+    "latitude": -10.3333332, 
+    "longitude": -53.1999999
+   }, 
+   "tonga": {
+    "latitude": -19.9160818, 
+    "longitude": -175.2026423
+   }, 
+   "australia": {
+    "latitude": -24.7761085, 
+    "longitude": 134.755
+   }, 
+   "usa": {
+    "latitude": 39.7837304, 
+    "longitude": -100.4458824
+   }, 
+   "myanmar": {
+    "latitude": 21.0, 
+    "longitude": 96.0
+   }, 
+   "fiji": {
+    "latitude": -18.1239695, 
+    "longitude": 179.0122737
+   }, 
+   "indonesia": {
+    "latitude": -5.0, 
+    "longitude": 120.0
+   }, 
+   "india": {
+    "latitude": 22.3511148, 
+    "longitude": 78.6677428
+   }, 
+   "cambodia": {
+    "latitude": 13.0, 
+    "longitude": 105.0
+   }, 
+   "puerto_rico": {
+    "latitude": 18.2459121, 
+    "longitude": -66.4164147
+   }, 
+   "malaysia": {
+    "latitude": 2.3923759, 
+    "longitude": 112.8471939
+   }, 
+   "senegal": {
+    "latitude": 14.5, 
+    "longitude": -14.25
+   }, 
+   "vietnam": {
+    "latitude": 16.16667, 
+    "longitude": 107.83333
+   }, 
+   "peru": {
+    "latitude": -10.0, 
+    "longitude": -75.25
+   }, 
+   "guyana": {
+    "latitude": 5.0, 
+    "longitude": -59.0
+   }, 
+   "thailand": {
+    "latitude": 14.8971921, 
+    "longitude": 100.83273
+   }, 
+   "bolivia": {
+    "latitude": -17.0, 
+    "longitude": -65.0
+   }, 
+   "nicaragua": {
+    "latitude": 13.0, 
+    "longitude": -85.0
+   }, 
+   "venezuela": {
+    "latitude": 8.0, 
+    "longitude": -66.0
+   }, 
+   "dominica": {
+    "latitude": 15.5, 
+    "longitude": -61.33333
+   }
+  }, 
+  "region": {
+   "oceania": {
+    "latitude": -25.0562891, 
+    "longitude": 152.008576
+   }, 
+   "south_america": {
+    "latitude": -13.083583, 
+    "longitude": -58.470721
+   }, 
+   "africa": {
+    "latitude": 4.070194, 
+    "longitude": 21.824559
+   }, 
+   "southeast_asia": {
+    "latitude": 3.020567, 
+    "longitude": 112.390683
+   }, 
+   "south_asia": {
+    "latitude": 24.485438, 
+    "longitude": 76.513158
+   }, 
+   "north_america": {
+    "latitude": 28.2367447, 
+    "longitude": -97.738017
+   }
+  }
+ }
+}
