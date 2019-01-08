@@ -32,6 +32,21 @@ auspice_output_path = "../../%s_%s_output/"%(args.titer_model, args.titer_res)
 if not os.path.isdir(auspice_output_path):
 	os.mkdir(auspice_output_path)
 
+titer_hyperparameters = {
+"tree": {
+		"lam_avi": 3.0,
+		"lam_drop": 1.5,
+		"lam_pot": 1.5,
+		"training_fraction": 0.9
+		},
+"substitution": {
+		"lam_avi": 2.4,
+		"lam_drop": 1.5,
+		"lam_pot": 2.4,
+		"training_fraction": 0.9
+		}
+}
+
 ### Specify analysis config ###
 config = {
 "dir": "dengue",
@@ -42,12 +57,7 @@ config = {
 "estimate_tree_frequencies": not args.no_tree_freqs,
 
 "fit_titer_model": not args.no_titers,
-"titers": { # regularization parameter values and cross-validation fraction
-	"lam_avi":0.0,
-	"lam_pot":0.5,
-	"lam_drop":1.0,
-	"training_fraction":0.9,
-	},
+"titers": titer_hyperparameters[args.titer_model],
 
 "clean": args.clean,
 "pivot_spacing": 1.0/4, # pivots = time points; 1/N timepoints per year
