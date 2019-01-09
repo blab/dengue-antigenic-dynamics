@@ -40,9 +40,9 @@ titer_hyperparameters = {
 		"training_fraction": 0.9
 		},
 "substitution": {
-		"lam_avi": 2.4,
-		"lam_drop": 1.5,
-		"lam_pot": 2.4,
+		"lam_avi": 0.6,
+		"lam_drop": 3.0,
+		"lam_pot": 1.2,
 		"training_fraction": 0.9
 		}
 }
@@ -145,16 +145,16 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 					assert k.translations['E'] == mrca.translations['E']
 					assert len(k.aa_mutations['E']) == 0
 
-	titer_model(runner, ## Run N times with a random 90:10 training:test split to estimate model performance / error
-				lam_pot = runner.config['titers']['lam_pot'],
-				lam_avi = runner.config['titers']['lam_avi'],
-			lam_drop = runner.config['titers']['lam_drop'],
-			model_type=args.titer_model,
-			training_fraction = runner.config['titers']['training_fraction'],
-			plot=False,
-			criterium = titer_criterium, # calculate dTiter for all branches
-			cross_validate=n,
-			) # calculate dTiter for all branches
+	# titer_model(runner, ## Run N times with a random 90:10 training:test split to estimate model performance / error
+	# 			lam_pot = runner.config['titers']['lam_pot'],
+	# 			lam_avi = runner.config['titers']['lam_avi'],
+	# 		lam_drop = runner.config['titers']['lam_drop'],
+	# 		model_type=args.titer_model,
+	# 		training_fraction = runner.config['titers']['training_fraction'],
+	# 		plot=False,
+	# 		criterium = titer_criterium, # calculate dTiter for all branches
+	# 		cross_validate=n,
+	# 		) # calculate dTiter for all branches
 
 	titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
 				lam_pot = runner.config['titers']['lam_pot'],
