@@ -950,6 +950,16 @@ class SubstitutionModel(TiterModel):
                     break
             if not col_found:
                 mutation_clusters.append([col, [mut]])
+
+        colinear_mutation_log = []
+        for array, mcluster in mutation_clusters:
+            if len(mcluster) < 2:
+                continue
+            colinear_mutation_log.append([':'.join(m) for m in mcluster])
+        with open('./colinear_mutations.txt', 'w') as ofile:
+            for l in colinear_mutation_log:
+                ofile.write(' '.join(l)+'\n')
+
         print("dimensions of old design matrix",self.design_matrix.shape)
         self.design_matrix = np.hstack((np.array([c[0] for c in mutation_clusters]).T,
                                      self.design_matrix[:,self.genetic_params:]))
