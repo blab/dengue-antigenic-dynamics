@@ -18,6 +18,7 @@ def collect_args():
 	parser.add_argument('--no_titers', default=False, action='store_true', help="skip titer models")
 	parser.add_argument('--titer_model', default='substitution', choices=['tree', 'substitution'], type=str)
 	parser.add_argument('--titer_res', '--titer_resolution', default='full_tree', choices=['full_tree', 'interserotype'], type=str)
+	parser.add_argument('--no_titer_norm', default=False, action='store_true', help="disable virus avidities and serum potencies")
 	return parser
 
 parser = collect_args()
@@ -37,13 +38,15 @@ titer_hyperparameters = {
 		"lam_avi": 3.0,
 		"lam_drop": 1.5,
 		"lam_pot": 1.5,
-		"training_fraction": 0.9
+		"training_fraction": 0.9,
+		"no_norm": args.no_titer_norm
 		},
 "substitution": {
 		"lam_avi": 0.6,
 		"lam_drop": 3.0,
 		"lam_pot": 1.2,
-		"training_fraction": 0.9
+		"training_fraction": 0.9,
+		"no_norm": args.no_titer_norm
 		}
 }
 
@@ -156,6 +159,7 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 	# 		plot=False,
 	# 		criterium = titer_criterium, # calculate dTiter for all branches
 	# 		cross_validate=n,
+			# no_norm = runner.config['titers']['no_norm']
 	# 		) # calculate dTiter for all branches
 
 	titer_model(runner, ## Run once more with all the data to estimate branch effects for downstream analysis
@@ -166,6 +170,7 @@ if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neh
 			training_fraction = 1., # run again with all the data
 			plot=False,
 			criterium = titer_criterium, # calculate dTiter for all branches
+			no_norm = runner.config['titers']['no_norm']
 			) # calculate dTiter for all branches
 
 	titer_export(runner, args.titer_model)

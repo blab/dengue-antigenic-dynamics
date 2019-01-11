@@ -307,6 +307,11 @@ class TiterModel(object):
 
         # Determine distinct sera, reference strains, and test strains.
         self.sera, self.ref_strains, self.test_strains = self.titers.strain_census(self.titers.titers_normalized)
+
+        if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+            print("Running titer model without avidities or potencies")
+        else:
+            print('found kwargs:', self.kwargs)
         print("Normalized titers and restricted to measurements in tree:")
         self.titer_stats()
 
@@ -391,7 +396,12 @@ class TiterModel(object):
         self.lam_drop = lam_drop
         if len(self.train_titers)==0:
             print('no titers to train')
-            self.model_params = np.zeros(self.genetic_params)#+len(self.sera))#+len(self.test_strains))
+            if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+                print('Running without avidities or potencies')
+                self.model_params = np.zeros(self.genetic_params) # no pb or avi params
+            else:
+                self.model_params = np.zeros(self.genetic_params+len(self.sera)+len(self.test_strains)) # all params
+
         else:
             if method=='l1reg':  # l1 regularized fit, no constraint on sign of effect
                 self.model_params = self.fit_l1reg()
@@ -406,10 +416,15 @@ class TiterModel(object):
 
         # extract and save the potencies and virus effects. The genetic parameters
         # are subclass specific and need to be process by the subclass
-        self.serum_potency = {serum:0 for serum in self.sera}#self.model_params[self.genetic_params+ii]
-                              # for ii, serum in enumerate(self.sera)}
-        self.virus_effect = {strain:0 for strain in self.test_strains}#self.model_params[self.genetic_params+len(self.sera)+ii]
-                             # for ii, strain in enumerate(self.test_strains)}
+
+            if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+                self.virus_effect = {strain:0 for strain in self.test_strains}
+                self.serum_potency = {serum:0 for serum in self.sera}
+            else:
+                self.serum_potency = {sera: self.model_params[self.genetic_params+ii]
+                                    for ii, serum in enumerate(self.sera)}
+                self.virus_effect = {strain: self.model_params[self.genetic_params+len(self.sera)+ii]
+                                 for ii, strain in enumerate(self.test_strains)}
 
 
     def fit_func(self):
@@ -544,9 +559,15 @@ class TiterModel(object):
         from cvxopt import matrix, solvers
         n_params = self.design_matrix.shape[1]
         n_genetic = self.genetic_params
-        n_sera = 0#len(self.sera)
-        n_v = 0#len(self.test_strains)
 
+        if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+            n_v = 0
+            n_sera = 0
+        else:
+            n_v = len(self.test_strains)
+            n_sera = len(self.sera)
+
+        print('n_params:%d'%n_params, 'n_genetic: %d'%n_genetic, 'n_sera:%d'%n_sera, 'n_viruses:%d'%n_v)
         # set up the quadratic matrix containing the deviation term (linear xterm below)
         # and the l2-regulatization of the avidities and potencies
         P1 = np.zeros((n_params+n_genetic,n_params+n_genetic))
@@ -620,19 +641,26 @@ class TiterModel(object):
         from cvxopt import matrix, solvers
         n_params = self.design_matrix.shape[1]
         n_genetic = self.genetic_params
-        n_sera = 0#len(self.sera)
-        n_v = 0#len(self.test_strains)
 
-        print('n_params:%d'%n_params, 'n_genetic: %d'%n_genetic, 'n_sera:%d'%n_sera)
+        if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+            n_v = 0
+            n_sera = 0
+        else:
+            n_v = len(self.test_strains)
+            n_sera = len(self.sera)
+
+        print('n_params:%d'%n_params, 'n_genetic: %d'%n_genetic, 'n_sera:%d'%n_sera, 'n_viruses:%d'%n_v)
 
         # set up the quadratic matrix containing the deviation term (linear xterm below)
         # and the l2-regulatization of the avidities and potencies
         P1 = np.zeros((n_params,n_params))
         P1[:n_params, :n_params] = self.TgT
-        # for ii in xrange(n_genetic, n_genetic+n_sera):
-        #     P1[ii,ii]+=self.lam_pot
-        # for ii in xrange(n_genetic+n_sera, n_params):
-        #     P1[ii,ii]+=self.lam_avi
+
+        if 'no_norm' not in self.kwargs or self.kwargs['no_norm'] != True:
+            for ii in xrange(n_genetic, n_genetic+n_sera):
+                P1[ii,ii]+=self.lam_pot
+            for ii in xrange(n_genetic+n_sera, n_params):
+                P1[ii,ii]+=self.lam_avi
         P = matrix(P1)
 
         # set up cost for auxillary parameter and the linear cross-term
@@ -755,7 +783,11 @@ class TreeModel(TiterModel):
         titer_dist = []
         weights = []
         # mark HI splits have to have been run before, assigning self.titer_split_count
-        n_params = self.titer_split_count #+ len(self.sera) #+ len(self.test_strains)
+        if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+            n_params = self.titer_split_count
+        else:
+            n_params = self.titer_split_count + len(self.sera) + len(self.test_strains)
+
         for (test, ref), val in self.train_titers.iteritems():
             if not np.isnan(val):
                 try:
@@ -769,10 +801,11 @@ class TreeModel(TiterModel):
                         if len(branches):
                             tmp[branches] = 1
                         # add serum effect for heterologous viruses
-                        # if ref[0]!=test:
-                        #     tmp[self.titer_split_count+self.sera.index(ref)] = 1
-                        # add virus effect
-                        # tmp[self.titer_split_count+len(self.sera)+self.test_strains.index(test)] = 1
+                        if 'no_norm' not in self.kwargs or self.kwargs['no_norm'] != True:
+                            if ref[0]!=test:
+                                tmp[self.titer_split_count+self.sera.index(ref)] = 1
+                            tmp[self.titer_split_count+len(self.sera)+self.test_strains.index(test)] = 1
+
                         # append model and fit value to lists tree_graph and titer_dist
                         tree_graph.append(tmp)
                         titer_dist.append(val)
@@ -895,8 +928,11 @@ class SubstitutionModel(TiterModel):
         seq_graph = []
         titer_dist = []
         weights = []
+        if 'no_norm' in self.kwargs and self.kwargs['no_norm'] == True:
+            n_params = self.genetic_params
+        else:
+            n_params = self.genetic_params + len(self.sera) + len(self.test_strains)
 
-        n_params = self.genetic_params + len(self.sera) + len(self.test_strains)
         # loop over all measurements and encode the HI model as [0,1,0,1,0,0..] vector:
         # 1-> mutation present, 0 not present, same for serum and virus effects
         for (test, ref), val in self.train_titers.iteritems():
@@ -910,11 +946,13 @@ class SubstitutionModel(TiterModel):
                     mutation_indices = np.unique([self.relevant_muts.index(mut) for mut in muts
                                                   if mut in self.relevant_muts])
                     if len(mutation_indices): tmp[mutation_indices] = 1
+
                     # add serum effect for heterologous viruses
-                    if test!=ref[0]:
-                        tmp[self.genetic_params+self.sera.index(ref)] = 1
-                    # add virus effect
-                    # tmp[self.genetic_params+len(self.sera)+self.test_strains.index(test)] = 1
+                    if 'no_norm' not in self.kwargs or self.kwargs['no_norm'] != True:
+                        if ref[0]!=test:
+                            tmp[self.genetic_params+self.sera.index(ref)] = 1
+                        tmp[self.genetic_params+len(self.sera)+self.test_strains.index(test)] = 1
+
                     # append model and fit value to lists seq_graph and titer_dist
                     seq_graph.append(tmp)
                     titer_dist.append(val)
