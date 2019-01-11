@@ -188,7 +188,7 @@ class tree(object):
                 except:
                     pass
             else:
-                node.attr = {}
+                node.attr = {'region': '', 'num_date': None}
 
         if nodefile is not None:
             self.logger('reading node properties from file: '+nodefile,2)

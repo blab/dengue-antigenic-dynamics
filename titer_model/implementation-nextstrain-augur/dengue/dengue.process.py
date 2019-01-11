@@ -66,8 +66,7 @@ config = {
 
 "clean": args.clean,
 "pivot_spacing": 1.0/4, # pivots = time points; 1/N timepoints per year
-}
-# "geo_inference": ['region'], # what traits to perform this on; don't run country (too many demes, too few sequences per deme to be reliable)
+"geo_inference": ['region']} # what traits to perform this on; don't run country (too many demes, too few sequences per deme to be reliable)
 # "auspice": { ## settings for auspice JSON export
 # 	"extra_attr": ['serum', 'clade', 'dTiter', 'cTiter'], # keys from tree.tree.clade['attr'] to include in export
 # 	"color_options": { # which traits to color the tree by in auspice; titer colorbys are added in dengue_titers
@@ -89,7 +88,7 @@ runner = process(config) # parse
 runner.align() # run alignment with mafft
 runner.build_tree() # build tree with fasttree -> raxml
 runner.timetree_setup_filter_run() # infer ML ancestral states (geo traits, node dates, mutations)
-# runner.run_geo_inference() # run mugration model to infer transmissions
+runner.run_geo_inference() # run mugration model to infer transmissions
 
 # estimate tree frequencies here.
 if runner.config["estimate_tree_frequencies"]:
