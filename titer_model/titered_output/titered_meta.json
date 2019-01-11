@@ -1,5 +1,5 @@
 {
- "updated": "8 Jan 2019", 
+ "updated": "10 Jan 2019", 
  "author_info": {
   "Alvarado_et_al.": {
    "title": "?", 
@@ -153,9 +153,9 @@
     "latitude": 21.0, 
     "longitude": 96.0
    }, 
-   "fiji": {
-    "latitude": -18.1239695, 
-    "longitude": 179.0122737
+   "nicaragua": {
+    "latitude": 13.0, 
+    "longitude": -85.0
    }, 
    "indonesia": {
     "latitude": -5.0, 
@@ -201,9 +201,9 @@
     "latitude": -17.0, 
     "longitude": -65.0
    }, 
-   "nicaragua": {
-    "latitude": 13.0, 
-    "longitude": -85.0
+   "fiji": {
+    "latitude": -18.1239695, 
+    "longitude": 179.0122737
    }, 
    "venezuela": {
     "latitude": 8.0, 

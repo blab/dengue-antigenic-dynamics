@@ -28,7 +28,7 @@ if args.json is None:  # Look for ./prepared/dengue_SEROTYPE.json if no file pat
 	args.json = './prepared/dengue_%s.json'%args.serotypes
 assert os.path.isfile(args.json)
 
-auspice_output_path = "../../%s_%s_output/"%(args.titer_model, args.titer_res)
+auspice_output_path = "../../%s_output/"%(args.json.split('/')[-1].split('.json')[0])
 if not os.path.isdir(auspice_output_path):
 	os.mkdir(auspice_output_path)
 
@@ -54,6 +54,7 @@ config = {
 "output": {"auspice": auspice_output_path,
 			"data": "./processed/"},
 "timetree_options": {"Tc": False},
+"clock_filter": False,
 "estimate_tree_frequencies": not args.no_tree_freqs,
 
 "fit_titer_model": not args.no_titers,
