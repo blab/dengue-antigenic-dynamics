@@ -54,7 +54,8 @@ config = {
 "output": {"auspice": auspice_output_path,
 			"data": "./processed/"},
 "timetree_options": {"Tc": False},
-"clock_filter": False,
+					# "reroot": None}, ## only for seasia treetime
+# "clock_filter": False, ## only for seasia treetime
 "estimate_tree_frequencies": not args.no_tree_freqs,
 
 "fit_titer_model": not args.no_titers,
