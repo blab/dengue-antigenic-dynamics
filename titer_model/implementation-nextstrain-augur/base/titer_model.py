@@ -422,7 +422,7 @@ class TiterModel(object):
                 self.serum_potency = {serum:0 for serum in self.sera}
             else:
                 self.serum_potency = {sera: self.model_params[self.genetic_params+ii]
-                                    for ii, serum in enumerate(self.sera)}
+                                    for ii, sera in enumerate(self.sera)}
                 self.virus_effect = {strain: self.model_params[self.genetic_params+len(self.sera)+ii]
                                  for ii, strain in enumerate(self.test_strains)}
 
