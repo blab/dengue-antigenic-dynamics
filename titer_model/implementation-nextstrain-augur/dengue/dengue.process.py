@@ -98,7 +98,7 @@ if runner.config["estimate_tree_frequencies"]:
 # titers
 if runner.config["fit_titer_model"] and runner.config["titers"]: # methods @ Neher et al., PNAS 2016
 	if args.titer_model=='tree':
-		n=1000
+		n=100
 
 		if args.titer_res == 'full_tree':
 			titer_criterium = lambda node: True
