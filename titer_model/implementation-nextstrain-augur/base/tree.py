@@ -155,12 +155,14 @@ class tree(object):
             for line in tmp_seqs:
                 ofile.write(line.replace('/', '_X_X_'))
 
+        iqmodel='GTR+I+G15'
         if iqmodel:
-            call = ["iqtree", "-nt", str(nthreads), "-s", aln_file, "-m", iqmodel, "-fast",
+            call = ["iqtree", "-nt", str(nthreads), "-s", aln_file, "-m", iqmodel,
                 ">", "iqtree.log"]
         else:
             call = ["iqtree", "-nt", str(nthreads), "-s", aln_file, ">", "iqtree.log"]
 
+        print('Running iqtree with call: ', " ".join(call))
         os.system(" ".join(call))
         T = Phylo.read(aln_file+".treefile", 'newick')
         for n in T.get_terminals():
