@@ -48,9 +48,16 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
     if frequencies is None:
         frequencies = af.actual_frequencies
 
+    def get_Dij(j, i):
+        serotype_of = lambda genotype: genotype.split('_')[0]
+        try:
+            return af.titers[(j, i)]
+        except KeyError:
+            return af.titers[(serotype_of(j), serotype_of(i))]
+            
     def sum_over_j(i, past_timepoint):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
-        antigenic_distance = [ af.titers[tuple(sorted([i,j]))] if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between i and j
+        antigenic_distance = [ get_Dij(j, i) if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between virus i and serum j
         probability_protected = [ max(-1.*af.sigma*Dij + 1., 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
         # probability_protected = [ np.exp(-1.*af.sigma*Dij) for Dij in antigenic_distance]
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
@@ -271,7 +278,8 @@ class AntigenicFitness():
         self.trajectories = {}
 
         # load pre-computed antigenic distances between clades
-        self.titers = {(str(k1), str(k2)):v for (k1,k2),v in pd.Series.from_csv(args.titer_path, header=None,index_col=[0,1]).to_dict().items()}
+        self.titers = {(serum,virus): Dij for (serum,virus), Dij in
+                        pd.Series.from_csv(args.titer_path, header=None,index_col=[0,1], sep='\t').to_dict().items()}
 
         if self.save == True:
             assert self.name, 'ERROR: Please provide an analysis name if you wish to save output'
@@ -501,8 +509,8 @@ if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
 
     args = argparse.ArgumentParser()
-    args.add_argument('--frequency_path', help='actual_frequencies csv', default='../data/frequencies/southeast_asia_serotype_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/full_tree_Dij.csv')
+    args.add_argument('--frequency_path', help='actual_frequencies csv', default='../data/frequencies/seasia_serotype_frequencies.csv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.tsv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
@@ -534,7 +542,7 @@ if __name__=="__main__":
 
         d1_vals = np.linspace(0,7,8)
         d2_vals = np.linspace(0,7,8)
-        d3_vals = np.linspace(0,4.5,8)
+        d3_vals = np.linspace(0,7,8)
 
         output = []
         for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
@@ -544,11 +552,8 @@ if __name__=="__main__":
             setattr(args, 'DENV3_f0', d3)
             antigenic_fitness = AntigenicFitness(args)
             if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-                print 'calculating fitness'
                 antigenic_fitness.calculate_fitness()
-            print 'predicting frequencies'
             antigenic_fitness.predict_frequencies()
-            print 'calculating growth rates'
             antigenic_fitness.calc_growth_rates()
 
             model_performance = calc_model_performance(antigenic_fitness)
