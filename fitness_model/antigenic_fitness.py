@@ -570,6 +570,8 @@ if __name__=="__main__":
         antigenic_fitness.calculate_fitness()
         antigenic_fitness.predict_frequencies()
         antigenic_fitness.calc_growth_rates()
+        model_performance = calc_model_performance(antigenic_fitness)
+        print model_performance
 
         if args.trajectory:
             assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
