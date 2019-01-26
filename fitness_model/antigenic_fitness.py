@@ -558,12 +558,12 @@ if __name__=="__main__":
 
             model_performance = calc_model_performance(antigenic_fitness)
             model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
-            sorted_param_vals = sorted(model_performance.keys())
-            print sorted_param_vals
-            model_performance_str = ','.join([str(model_performance[k]) for k in sorted_param_vals])
-            output.append(model_performance_str)
+            output.append(model_performance)
 
-        open(args.out_path+args.name+'.csv', 'w').write('\n'.join(output))
+
+        output = pd.DataFrame(output)
+        output = output.reindex(columns=sorted(output.columns.values))
+        output.to_csv(args.out_path+args.name+'.csv')
 
     else:
         antigenic_fitness = AntigenicFitness(args)
