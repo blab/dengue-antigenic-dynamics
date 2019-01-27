@@ -54,7 +54,7 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
             return af.titers[(j, i)]
         except KeyError:
             return af.titers[(serotype_of(j), serotype_of(i))]
-            
+
     def sum_over_j(i, past_timepoint):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
         antigenic_distance = [ get_Dij(j, i) if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between virus i and serum j
@@ -540,9 +540,9 @@ if __name__=="__main__":
 
     elif args.mode == 'fit':
 
-        d1_vals = np.linspace(0,7,8)
-        d2_vals = np.linspace(0,7,8)
-        d3_vals = np.linspace(0,7,8)
+        d1_vals = np.linspace(1,3,8)
+        d2_vals = np.linspace(1,3,8)
+        d3_vals = np.linspace(0,2,8)
 
         output = []
         for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
