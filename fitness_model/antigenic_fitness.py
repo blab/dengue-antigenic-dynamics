@@ -541,7 +541,7 @@ if __name__=="__main__":
     elif args.mode == 'fit':
 
         d1_vals = np.linspace(1,3,8)
-        d2_vals = np.linspace(1,3,8)
+        d2_vals = np.linspace(1.5,3.5,8)
         d3_vals = np.linspace(0,2,8)
 
         output = []
