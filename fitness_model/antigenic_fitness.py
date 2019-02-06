@@ -78,7 +78,15 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
     return exposure
 
 def calc_timepoint_fitness(af, exposure):
+    # full model
     fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) - af.beta*exposure for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+
+    # antigenic null (intrinsic only)
+    # fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+
+    # complete null (all equal)
+    # fitness = { i: 0. for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+
     return fitness
 
 def predict_single_frequency(initial_frequency, initial_fitness, years_forward):
