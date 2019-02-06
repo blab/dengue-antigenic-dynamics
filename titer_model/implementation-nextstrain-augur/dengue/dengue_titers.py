@@ -13,7 +13,9 @@ def tree_additivity_symmetry(titer_model):
     Code adapted from https://github.com/blab/nextflu/blob/pnas-hi-titers/augur/src/diagnostic_figures.py#L314
     '''
     import numpy as np
-    from matplotlib import pyplot as plt
+    import matplotlib
+    matplotlib.use('TkAgg')
+    import matplotlib.pyplot as plt
 
     reciprocal_measurements = []
     reciprocal_measurements_titers = []
@@ -33,8 +35,8 @@ def tree_additivity_symmetry(titer_model):
                                                   (val_fwd - titer_model.serum_potency[serum] - titer_model.virus_effect[testvir]),
                                                   (val_bwd - titer_model.serum_potency[v[1]] - titer_model.virus_effect[serum[0]]),
                                                   ])
+    fig, ax = plt.subplots(figsize=(6,4))
     plt.figure(figsize=(9,6))
-    ax = plt.subplot(121)
     # multiple the difference by the +/- one to polarize all comparisons by date
     vals= [x[2]*x[-1] for x in reciprocal_measurements]
     plt.hist(vals, alpha=0.7, label=r"Raw $T_{ij}-T_{ji}$", normed=True)
@@ -47,51 +49,51 @@ def tree_additivity_symmetry(titer_model):
     plt.legend(fontsize=12, handlelength=0.8)
     plt.tight_layout()
 
-    ####  Analyze all cliques #######################################################
-    all_reciprocal = list(set([v[1] for v in reciprocal_measurements_titers]))
-
-    import networkx as nx
-    from random import sample
-    G = nx.Graph()
-    G.add_nodes_from(all_reciprocal)
-    for vi,v in enumerate(all_reciprocal):
-        for w in all_reciprocal[:vi]:
-            if ((v[0], w) in titer_model.titers.titers_normalized) and ((w[0], v) in titer_model.titers.titers_normalized):
-                G.add_edge(v,w)
-    C = nx.find_cliques(G)
-    def symm_distance(v,w):
-        res =  titer_model.titers.titers_normalized[(v[0], w)] - titer_model.virus_effect[v[0]] - titer_model.serum_potency[w]
-        res += titer_model.titers.titers_normalized[(w[0], v)] - titer_model.virus_effect[w[0]] - titer_model.serum_potency[v]
-        return res*0.5
-
-    additivity_test = {'test':[], 'control':[]}
-    n_quartets = 1000
-    for clique in C:
-        if len(clique)>8:
-            for i in xrange(n_quartets):
-                Q = sample(clique, 4)
-                dists = []
-                for (a,b) in [((0,1), (2,3)),((0,2), (1,3)), ((0,3), (1,2))]:
-                    dists.append(symm_distance(Q[a[0]], Q[a[1]])+symm_distance(Q[b[0]], Q[b[1]]))
-                dists.sort(reverse=True)
-                additivity_test['test'].append(dists[0]-dists[1])
-
-                dists = []
-                for di in range(3):
-                    a,b,c,d = sample(clique,4)
-                    dists.append(symm_distance(a, b)+symm_distance(c,d))
-                dists.sort(reverse=True)
-                additivity_test['control'].append(dists[0]-dists[1])
-
-    ax=plt.subplot(122)
-    plt.hist(additivity_test['control'], alpha=0.7,normed=True, bins = np.linspace(0,3,18),
-             label = 'Control, mean='+str(np.round(np.mean(additivity_test['control']),2)))
-    plt.hist(additivity_test['test'], alpha=0.7,normed=True, bins = np.linspace(0,3,18),
-             label = 'Quartet, mean='+str(np.round(np.mean(additivity_test['test']),2)))
-    ax.tick_params(axis='both', labelsize=12)
-    plt.xlabel(r'$\Delta$ top two distance sums', fontsize = 12)
-    plt.legend(fontsize=12, handlelength=0.8)
-    plt.tight_layout()
+    # ####  Analyze all cliques #######################################################
+    # all_reciprocal = list(set([v[1] for v in reciprocal_measurements_titers]))
+    #
+    # import networkx as nx
+    # from random import sample
+    # G = nx.Graph()
+    # G.add_nodes_from(all_reciprocal)
+    # for vi,v in enumerate(all_reciprocal):
+    #     for w in all_reciprocal[:vi]:
+    #         if ((v[0], w) in titer_model.titers.titers_normalized) and ((w[0], v) in titer_model.titers.titers_normalized):
+    #             G.add_edge(v,w)
+    # C = nx.find_cliques(G)
+    # def symm_distance(v,w):
+    #     res =  titer_model.titers.titers_normalized[(v[0], w)] - titer_model.virus_effect[v[0]] - titer_model.serum_potency[w]
+    #     res += titer_model.titers.titers_normalized[(w[0], v)] - titer_model.virus_effect[w[0]] - titer_model.serum_potency[v]
+    #     return res*0.5
+    #
+    # additivity_test = {'test':[], 'control':[]}
+    # n_quartets = 1000
+    # for clique in C:
+    #     if len(clique)>8:
+    #         for i in xrange(n_quartets):
+    #             Q = sample(clique, 4)
+    #             dists = []
+    #             for (a,b) in [((0,1), (2,3)),((0,2), (1,3)), ((0,3), (1,2))]:
+    #                 dists.append(symm_distance(Q[a[0]], Q[a[1]])+symm_distance(Q[b[0]], Q[b[1]]))
+    #             dists.sort(reverse=True)
+    #             additivity_test['test'].append(dists[0]-dists[1])
+    #
+    #             dists = []
+    #             for di in range(3):
+    #                 a,b,c,d = sample(clique,4)
+    #                 dists.append(symm_distance(a, b)+symm_distance(c,d))
+    #             dists.sort(reverse=True)
+    #             additivity_test['control'].append(dists[0]-dists[1])
+    #
+    # ax=plt.subplot(122)
+    # plt.hist(additivity_test['control'], alpha=0.7,normed=True, bins = np.linspace(0,3,18),
+    #          label = 'Control, mean='+str(np.round(np.mean(additivity_test['control']),2)))
+    # plt.hist(additivity_test['test'], alpha=0.7,normed=True, bins = np.linspace(0,3,18),
+    #          label = 'Quartet, mean='+str(np.round(np.mean(additivity_test['test']),2)))
+    # ax.tick_params(axis='both', labelsize=12)
+    # plt.xlabel(r'$\Delta$ top two distance sums', fontsize = 12)
+    # plt.legend(fontsize=12, handlelength=0.8)
+    # plt.tight_layout()
     plt.savefig('./processed/titer_asymmetry.png')
 
 def titer_model(process, model_type='tree', **kwargs):
@@ -115,6 +117,7 @@ def titer_model(process, model_type='tree', **kwargs):
         if kwargs['training_fraction'] != 1.0:
             titer_model.validate(kwargs)
 
+    tree_additivity_symmetry(titer_model)
     process.titer_model = titer_model
     # add attributes for the estimated branch-specific titer drop values (dTiter)
     # and cumulative (from root) titer drop values (cTiter) to each branch
