@@ -623,8 +623,35 @@ LK is supported by NIH awards R01AI114703-01 and P01AI106695.
     \end{tabular}
     }
   \label{parameter_values}
+  \caption{\textbf{Fit parameter values for fitness model}}
 \end{table}
 \end{centering}
+
+\begin{centering}
+  \begin{table}[h]
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}[ht]{ l | l | r | r }
+      \hline
+      Genetic resolution & Fitness & $\Delta$ SSE & Pearson $R^2$ \\
+      \hline
+      Serotype & Intrinsic & -18.37 & 0.07\\
+      Serotype & Equal &  0.00 &  0.00\\       \hline
+      Genotype & Intrinsic &  &  \\
+      Genotype & Equal &  &  \\       \hline
+      \hline
+    \end{tabular}
+    }
+  \label{null_model_performance}
+  \caption{
+  \textbf{Fitness model null formulation performance}
+  The fitness model was run under two null models.
+  In the `intrinsic' null model formulation, only the serotype-specific, time-invariant intrinsic fitness values contribute to contribute to clade fitness (i.e., antigenic fitness is set to 0).
+  In the `equal' null model, all clades are assigned equal fitness (i.e., antigenic and intrinsic fitness are set to 0).
+  For both formulations, all other parameters were set to the values reported in Table~\ref{parameter_values} (optimized for $\Delta$ SSE).
+  }
+\end{table}
+\end{centering}
+
 
 \begin{figure}[h]
 \centering
