@@ -1,14 +1,14 @@
-\begin{tabular}{llllrr}
+\begin{tabular}{llllll}
 \toprule
-{} &         Model &     Resolution & \$v\_a\$ and \$p\_b\$ &  RMSE &  Pearson R\textasciicircum2 \\
+{} &         Model &     Resolution & \$v\_a\$ and \$p\_b\$ &               RMSE &        Pearson R\textasciicircum2 \\
 \midrule
-0 &  Substitution &      Full tree &              No &  1.13 &         0.50 \\
-1 &  Substitution &      Full tree &             Yes &  0.75 &         0.78 \\
-2 &  Substitution &  Interserotype &              No &  0.86 &         0.71 \\
-3 &  Substitution &  Interserotype &             Yes &  0.86 &         0.72 \\
-4 &          Tree &      Full tree &              No &  1.40 &         0.24 \\
-5 &          Tree &      Full tree &             Yes &  0.84 &         0.72 \\
-6 &          Tree &  Interserotype &              No &  0.86 &         0.72 \\
-7 &          Tree &  Interserotype &             Yes &  0.87 &         0.70 \\
+0 &  Substitution &      Full tree &              No &  1.13 (1.11, 1.16) &  0.50 (0.48, 0.52) \\
+1 &  Substitution &      Full tree &             Yes &  0.75 (0.74, 0.77) &  0.78 (0.77, 0.79) \\
+2 &  Substitution &  Interserotype &              No &  0.86 (0.84, 0.87) &  0.71 (0.70, 0.72) \\
+3 &  Substitution &  Interserotype &             Yes &  0.86 (0.85, 0.88) &  0.72 (0.70, 0.73) \\
+4 &          Tree &      Full tree &              No &  1.40 (1.38, 1.42) &  0.24 (0.23, 0.26) \\
+5 &          Tree &      Full tree &             Yes &  0.84 (0.83, 0.86) &  0.72 (0.71, 0.73) \\
+6 &          Tree &  Interserotype &              No &  0.86 (0.84, 0.88) &  0.72 (0.71, 0.73) \\
+7 &          Tree &  Interserotype &             Yes &  0.87 (0.85, 0.88) &  0.70 (0.69, 0.71) \\
 \bottomrule
 \end{tabular}

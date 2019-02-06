@@ -607,7 +607,38 @@ LK is supported by NIH awards R01AI114703-01 and P01AI106695.
 
 \begin{centering}
   \begin{table}[h]
-    \caption{\textbf{Fit parameter values for fitness model}}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}[ht]{ l | l | l | r | r | r | r | r | r | r | r }
+      Model &     Antigenic resolution & $v_a$ and $p_b$ &               RMSE &        Pearson $R^2$% \\
+      \hline
+      Substitution &      Full tree &             Yes &  0.75 (0.74, 0.77) &  0.78 (0.77, 0.79) \\
+      Substitution &      Full tree &              No &  1.13 (1.11, 1.16) &  0.50 (0.48, 0.52) \\
+      Substitution &  Interserotype &             Yes &  0.86 (0.85, 0.88) &  0.72 (0.70, 0.73) \\
+      Substitution &  Interserotype &              No &  0.86 (0.84, 0.87) &  0.71 (0.70, 0.72) \\
+      Tree &      Full tree &             Yes &  0.84 (0.83, 0.86) &  0.72 (0.71, 0.73) \\
+      Tree &      Full tree &              No &  1.40 (1.38, 1.42) &  0.24 (0.23, 0.26) \\
+      Tree &  Interserotype &             Yes &  0.87 (0.85, 0.88) &  0.70 (0.69, 0.71) \\
+      Tree &  Interserotype &              No &  0.86 (0.84, 0.88) &  0.72 (0.71, 0.73) \\
+    \hline
+    \end{tabular}
+    \label{null_model_performance}
+    \caption{
+    \textbf{Titer model performance comparisons}
+    We compared performance across several different variations of the titer model.
+    As described in \ref{neher2016prediction}, incremental antigenic change can be assigned to either amino acid substitutions (`Substitution' model) or to branches in the phylogeny (`Tree' model).
+    For each of these models, we can constrain the model such that antigenic change is allowed to occur only between serotypes (`Interserotype') or between AND within serotypes (`Full tree').
+    For the substitution model, we constrain the interserotype model by reconstructing the amino acid sequence of the most recent common ancestor for each serotype and allowing the model to assign antigenic change only to mutations between these ancestral sequences.
+    For the tree model, we constrain the interserotype model by allowing the model to assign antigenic change only to branches in the phylogeny that lie between serotypes.
+    We also assess the impact of the virus avidity and serum potency terms, $v_a$ and $p_b$.
+    For all models and metrics, we report the mean and 95\% confidence interval across 100-fold Monte Carlo cross validation with random 90\%:10\%, training:test splits.
+    }
+  }
+\end{table}
+\end{centering}
+
+
+\begin{centering}
+  \begin{table}[h]
     \resizebox{\textwidth}{!}{
     \begin{tabular}[ht]{ l | l | l | r | r | r | r | r | r | r | r }
       \hline
