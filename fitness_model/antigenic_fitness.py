@@ -472,46 +472,50 @@ def plot_trajectory(af, trajectory, ax=None):
         actual_vals = af.actual_frequencies[clade][past_timepoints]
         ax.plot(actual_vals.index.values, actual_vals.values, c=colors[clade], label=clade)
         ax.plot(clade_trajectory.index.values, clade_trajectory.values, c=colors[clade], linestyle='--')
-        ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':')
+        # ax.plot(actual_vals.index.values, af.fitness[clade][actual_vals.index.values], c=colors[clade], linestyle=':')
     ax.set_xlim(past_timepoints[0], trajectory.index.values[-1])
+    ax.set_ylim(0,1)
     # ax.set_ylim(-0.05,1.05)
 
     plt.legend()
     plt.tight_layout()
+    # if af.save:
+    #     plt.savefig(af.out_path + af.name + '%.1f_trajectory.png'%initial_timepoint, dpi=300, bbox_inches='tight')
+    # else:
+    #     plt.show()
+#
+def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4):
+    sns.set(style='whitegrid', font_scale=0.8)
+
+    if starting_timepoints == None:
+        starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
+        starting_timepoints.append(1984.)
+        starting_timepoints = sorted(starting_timepoints)
+
+    ncols = len(starting_timepoints)
+
+    if len(af.clades) > n_clades_per_plot:
+        nrows = int(ceil(len(af.clades)/n_clades_per_plot))
+        fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
+        clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
+        zipped = zip(clade_sets, axes)
+    else:
+        fig, axes = plt.subplots(1, ncols, figsize=(3*ncols, 2),sharex=False, sharey=True)
+        zipped = [(af.clades, axes)]
+
+    for clade_set, row in zipped:
+        for tp, ax in zip(starting_timepoints, row):
+            trajectory = predict_trajectories(af, tp)
+            plot_trajectory(af, trajectory, ax)
+
+    ax.legend()
+    plt.tight_layout()
     if af.save:
-        plt.savefig(af.out_path + af.name + '%.1f_trajectory.png'%initial_timepoint, dpi=300, bbox_inches='tight')
+        plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
     else:
         plt.show()
-#
-# def plot_trajectory_multiples(af, starting_timepoints=None, n_clades_per_plot=4):
-#     sns.set(style='whitegrid', font_scale=0.8)
-#
-#     if starting_timepoints == None:
-#         starting_timepoints = af.timepoints[af.tp_forward+af.tp_back::af.tp_forward]
-#
-#     ncols = len(starting_timepoints)
-#
-#     if len(af.clades) > n_clades_per_plot:
-#         nrows = int(ceil(len(af.clades)/n_clades_per_plot))
-#         fig, axes = plt.subplots(nrows, ncols, figsize=(3*ncols, 2*nrows),sharex=False, sharey=True)
-#         clade_sets = [af.clades[i:i + n_clades_per_plot] for i in xrange(0, len(af.clades), n_clades_per_plot)]
-#         zipped = zip(clade_sets, axes)
-#     else:
-#         fig, axes = plt.subplots(1, ncols, figsize=(3*ncols, 2),sharex=False, sharey=True)
-#         zipped = [(af.clades, axes)]
-#
-#     for clade_set, row in zipped:
-#         for tp, ax in zip(starting_timepoints, row):
-#             plot_trajectory(af, tp, clade_set, ax)
-#
-#     ax.legend()
-#     plt.tight_layout()
-#     if af.save:
-#         plt.savefig(af.out_path+af.name+'_trajectories.png', bbox_inches='tight', dpi=300)
-#     else:
-#         plt.show()
-#     plt.clf()
-#     plt.close()
+    plt.clf()
+    plt.close()
 
 if __name__=="__main__":
     sns.set(style='whitegrid')#, font_scale=1.5)
@@ -580,6 +584,7 @@ if __name__=="__main__":
         antigenic_fitness.calc_growth_rates()
         model_performance = calc_model_performance(antigenic_fitness)
         print model_performance
+        plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=4)
 
         if args.trajectory:
             assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
