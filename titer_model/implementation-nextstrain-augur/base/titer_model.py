@@ -444,9 +444,12 @@ class TiterModel(object):
         if validation_set is None:
             validation_set=self.test_titers
         validation = {}
+        serum_predictions = defaultdict(list)
+
         for key, val in validation_set.iteritems():
             pred_titer = self.predict_titer(key[0], key[1], cutoff=cutoff)
             validation[key] = (val, pred_titer)
+            serum_predictions[key[1][0]].append({'actual': val, 'predicted': pred_titer})
 
         validation_array = np.array(validation.values())
         actual = validation_array[:,0]
@@ -461,7 +464,7 @@ class TiterModel(object):
                         'rms_error': np.sqrt(np.mean((actual-predicted)**2)),
         }
         pprint(model_performance)
-        model_performance['values'] = validation.values()
+        model_performance['values'] = serum_predictions
 
         self.validation = model_performance
         # if plot:
@@ -613,9 +616,15 @@ class TiterModel(object):
             performance = self.validate() # assess performance on the withheld test data. Returns {'values': [(actual, predicted), ...], 'metric': metric_value, ...}
             model_performance.append(performance)
 
-        predicted_values = list(chain.from_iterable([iteration.pop('values') for iteration in model_performance])) # flatten to one list of (actual, predicted) tuples
-        predicted_values = pd.DataFrame(predicted_values, columns=['actual', 'predicted']) # cast to df so we can easily write to csv
-        predicted_values.to_csv(path+'predicted_titers.csv', index=False)
+        for iteration in model_performance:
+            predictions = iteration.pop('values')
+            serum_predictions = []
+            for serum, vals in predictions.items():
+                df = pd.DataFrame(vals)
+                df['serum'] = serum
+                serum_predictions.append(df)
+            serum_predictions = pd.concat(serum_predictions)
+            serum_predictions.to_csv(path+'predicted_titers.csv', index=False)
 
         model_performance = pd.DataFrame(model_performance) # list of dictionaries -> df
         model_performance.to_csv(path+'titer_model_performance.csv', index=False)
