@@ -120,6 +120,19 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
         interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
                                                                 final_timepoint=numdate+interval_years,
                                                                 fitness=fitness, frequencies=frequencies)
+
+        ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
+        model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
+        model_SE = model_SE**2
+        model_SE = model_SE.sum()
+
+        null_SE = af.actual_frequencies.loc[numdate] - af.actual_frequencies.loc[numdate+interval_years]
+        null_SE = null_SE**2
+        null_SE = null_SE.sum()
+
+        af.model_sse += model_SE
+        af.null_sse += null_SE
+
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
     af.trajectories[current_timepoint] = frequencies.loc[x0:]
@@ -194,29 +207,31 @@ def predict_trajectories(af, initial_timepoint):
 def calc_delta_sse(af):
     ''' How much better were our predictions than the null model for time t+N? '''
 
-    def calc_sse(af, valid_clades, starting_timepoint, null):
-        sse = 0.
-        for clade in valid_clades:
-            actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
+    return af.null_sse - af.model_sse
 
-            if null == True:
-                null_frequency = af.actual_frequencies[clade][starting_timepoint]
-                squared_error = (actual_frequency - null_frequency)**2
-            else:
-                predicted_frequency = af.predicted_frequencies[clade][starting_timepoint + af.years_forward]
-                squared_error = (actual_frequency - predicted_frequency)**2
-
-            if not np.isnan(squared_error):
-                sse += squared_error
-        return sse
-
-    d_sse = 0.
-    for starting_timepoint in af.timepoints[af.tp_back: -1*af.tp_forward]:
-        valid_clades = [c for c in af.clades if af.actual_frequencies[c][starting_timepoint] >= 0.1 ]
-        model_sse = calc_sse(af, valid_clades, starting_timepoint, null=False)
-        null_sse = calc_sse(af, valid_clades, starting_timepoint, null=True)
-        d_sse +=  null_sse - model_sse
-    return d_sse
+    # def calc_sse(af, valid_clades, starting_timepoint, null):
+    #     sse = 0.
+    #     for clade in valid_clades:
+    #         actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
+    #
+    #         if null == True:
+    #             null_frequency = af.actual_frequencies[clade][starting_timepoint]
+    #             squared_error = (actual_frequency - null_frequency)**2
+    #         else:
+    #             predicted_frequency = af.predicted_frequencies[clade][starting_timepoint + af.years_forward]
+    #             squared_error = (actual_frequency - predicted_frequency)**2
+    #
+    #         if not np.isnan(squared_error):
+    #             sse += squared_error
+    #     return sse
+    #
+    # d_sse = 0.
+    # for starting_timepoint in af.timepoints[af.tp_back: -1*af.tp_forward]:
+    #     valid_clades = [c for c in af.clades if af.actual_frequencies[c][starting_timepoint] >= 0.1 ]
+    #     model_sse = calc_sse(af, valid_clades, starting_timepoint, null=False)
+    #     null_sse = calc_sse(af, valid_clades, starting_timepoint, null=True)
+    #     d_sse +=  null_sse - model_sse
+    # return d_sse
 
 def calc_accuracy(af):
 
@@ -282,6 +297,9 @@ class AntigenicFitness():
         self.noisy_predictions_mask.index = self.noisy_predictions_mask.index.map(lambda x: x+self.years_forward)
 
         self.fitness = None
+
+        self.model_sse = 0.
+        self.null_sse = 0.
 
         self.trajectories = {}
 
@@ -584,7 +602,7 @@ if __name__=="__main__":
         antigenic_fitness.calc_growth_rates()
         model_performance = calc_model_performance(antigenic_fitness)
         print model_performance
-        plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=4)
+        # plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=4)
 
         if args.trajectory:
             assert args.save or args.plot, 'only bother computing trajectories if we are going to save and/or plot them'
