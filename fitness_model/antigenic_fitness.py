@@ -207,31 +207,31 @@ def predict_trajectories(af, initial_timepoint):
 def calc_delta_sse(af):
     ''' How much better were our predictions than the null model for time t+N? '''
 
-    return af.null_sse - af.model_sse
+    # return af.null_sse - af.model_sse
 
-    # def calc_sse(af, valid_clades, starting_timepoint, null):
-    #     sse = 0.
-    #     for clade in valid_clades:
-    #         actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
-    #
-    #         if null == True:
-    #             null_frequency = af.actual_frequencies[clade][starting_timepoint]
-    #             squared_error = (actual_frequency - null_frequency)**2
-    #         else:
-    #             predicted_frequency = af.predicted_frequencies[clade][starting_timepoint + af.years_forward]
-    #             squared_error = (actual_frequency - predicted_frequency)**2
-    #
-    #         if not np.isnan(squared_error):
-    #             sse += squared_error
-    #     return sse
-    #
-    # d_sse = 0.
-    # for starting_timepoint in af.timepoints[af.tp_back: -1*af.tp_forward]:
-    #     valid_clades = [c for c in af.clades if af.actual_frequencies[c][starting_timepoint] >= 0.1 ]
-    #     model_sse = calc_sse(af, valid_clades, starting_timepoint, null=False)
-    #     null_sse = calc_sse(af, valid_clades, starting_timepoint, null=True)
-    #     d_sse +=  null_sse - model_sse
-    # return d_sse
+    def calc_sse(af, valid_clades, starting_timepoint, null):
+        sse = 0.
+        for clade in valid_clades:
+            actual_frequency = af.actual_frequencies[clade][starting_timepoint + af.years_forward]
+
+            if null == True:
+                null_frequency = af.actual_frequencies[clade][starting_timepoint]
+                squared_error = (actual_frequency - null_frequency)**2
+            else:
+                predicted_frequency = af.predicted_frequencies[clade][starting_timepoint + af.years_forward]
+                squared_error = (actual_frequency - predicted_frequency)**2
+
+            if not np.isnan(squared_error):
+                sse += squared_error
+        return sse
+
+    d_sse = 0.
+    for starting_timepoint in af.timepoints[af.tp_back: -1*af.tp_forward]:
+        valid_clades = [c for c in af.clades if af.actual_frequencies[c][starting_timepoint] >= 0.1 ]
+        model_sse = calc_sse(af, valid_clades, starting_timepoint, null=False)
+        null_sse = calc_sse(af, valid_clades, starting_timepoint, null=True)
+        d_sse +=  null_sse - model_sse
+    return d_sse
 
 def calc_accuracy(af):
 
@@ -543,7 +543,7 @@ if __name__=="__main__":
     args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.tsv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
-    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
+    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
     args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.86)
     args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.43)
     args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=2.57)
