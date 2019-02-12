@@ -267,7 +267,7 @@ def calc_model_performance(af):
     performance = {
     'pearson_r2': stats.linregress(actual_growth, predicted_growth)[2]**2,
     'spearman_r': stats.spearmanr(actual_growth, predicted_growth)[0],
-    'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(actual_freq)),
+    'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(predicted_freq)),
     'accuracy': calc_accuracy(af),
     'delta_sse': calc_delta_sse(af)}
 
