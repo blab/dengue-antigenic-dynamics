@@ -122,16 +122,16 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
                                                                 fitness=fitness, frequencies=frequencies)
 
         ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
-        model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
-        model_SE = model_SE**2
-        model_SE = model_SE.sum()
-
-        null_SE = af.actual_frequencies.loc[numdate] - af.actual_frequencies.loc[numdate+interval_years]
-        null_SE = null_SE**2
-        null_SE = null_SE.sum()
-
-        af.model_sse += model_SE
-        af.null_sse += null_SE
+        # model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
+        # model_SE = model_SE**2
+        # model_SE = model_SE.sum()
+        #
+        # null_SE = af.actual_frequencies.loc[numdate] - af.actual_frequencies.loc[numdate+interval_years]
+        # null_SE = null_SE**2
+        # null_SE = null_SE.sum()
+        #
+        # af.model_sse += model_SE
+        # af.null_sse += null_SE
 
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
@@ -206,8 +206,6 @@ def predict_trajectories(af, initial_timepoint):
 
 def calc_delta_sse(af):
     ''' How much better were our predictions than the null model for time t+N? '''
-
-    # return af.null_sse - af.model_sse
 
     def calc_sse(af, valid_clades, starting_timepoint, null):
         sse = 0.
@@ -298,8 +296,8 @@ class AntigenicFitness():
 
         self.fitness = None
 
-        self.model_sse = 0.
-        self.null_sse = 0.
+        # self.model_sse = 0.
+        # self.null_sse = 0.
 
         self.trajectories = {}
 
