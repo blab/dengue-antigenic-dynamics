@@ -543,7 +543,7 @@ if __name__=="__main__":
     args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.tsv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
-    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=5)
+    args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
     args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.86)
     args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.43)
     args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=2.57)
