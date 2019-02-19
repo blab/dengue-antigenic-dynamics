@@ -133,6 +133,18 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
         # af.model_sse += model_SE
         # af.null_sse += null_SE
 
+
+        null_interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
+                                                                final_timepoint=numdate+interval_years,
+                                                                fitness='null', frequencies=frequencies)
+
+        null_SE = null_interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
+        null_SE = null_SE**2
+        null_SE = null_SE.sum()
+
+        af.model_sse += model_SE
+        af.null_sse += null_SE
+
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
     af.trajectories[current_timepoint] = frequencies.loc[x0:]
@@ -146,19 +158,28 @@ def predict_timepoint_close_frequency(af, current_timepoint, final_timepoint, fi
     For each clade i, predict the frequency of i based on
     its fitness and initial frequency at time t-years_forward
     '''
+    years_forward = final_timepoint - current_timepoint
+
     if fitness is None:
         fitness = af.fitness
+    elif type(fitness) == str and fitness == 'null':
+        assert years_forward <= 1.0
     if frequencies is None:
         frequencies = af.actual_frequencies
 
-    years_forward = final_timepoint - current_timepoint
     if years_forward <= 1.0:
-        initial_fitnesses = fitness.loc[current_timepoint]
         initial_frequencies = frequencies.loc[current_timepoint]
-        predicted_frequencies = { i : predict_single_frequency(initial_frequencies[i],
-                                                        initial_fitnesses[i],
-                                                        final_timepoint - current_timepoint)
-                                for i in af.clades }
+        if type(fitness) == str and fitness == 'null':
+            predicted_frequencies = { i:predict_single_frequency(initial_frequencies[i],
+                                                            0.,
+                                                            final_timepoint - current_timepoint)
+                                        for i in af.clades }
+        else:
+            initial_fitnesses = fitness.loc[current_timepoint]
+            predicted_frequencies = { i : predict_single_frequency(initial_frequencies[i],
+                                                            initial_fitnesses[i],
+                                                            final_timepoint - current_timepoint)
+                                    for i in af.clades }
     else:
         predicted_frequencies = predict_timepoint_distant_frequency(af, current_timepoint)
 
@@ -568,9 +589,9 @@ if __name__=="__main__":
 
     elif args.mode == 'fit':
 
-        d1_vals = np.linspace(0.55,1.45,7)
-        d2_vals = np.linspace(0.55,1.45,7)
-        d3_vals = np.linspace(0.05,0.95,7)
+        d1_vals = np.linspace(0,.9,7)
+        d2_vals = np.linspace(0,.9,7)
+        d3_vals = np.linspace(0,.9,7)
 
         output = []
         for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
