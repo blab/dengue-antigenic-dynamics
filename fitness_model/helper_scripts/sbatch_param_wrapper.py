@@ -15,7 +15,7 @@ if not os.path.isdir(out_path):
 	os.mkdir(out_path)
 
 beta_vals = np.linspace(0.05,0.95,7)
-gamma_vals = np.linspace(0.45,1.45,7)
+gamma_vals = np.linspace(0.05,0.95,7)
 sigma_vals = np.linspace(0.45,1.45,7)
 
 for (b,g,s) in product(beta_vals, gamma_vals, sigma_vals):
