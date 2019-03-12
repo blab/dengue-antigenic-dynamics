@@ -133,11 +133,16 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
         ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
         actual_frequencies = af.actual_frequencies.loc[numdate+interval_years]
 
+        initial_frequencies = af.actual_frequencies.loc[numdate]
+
         if interval_frequencies.name <= initial_timepoint + 0.25:
 
             # print("interval_frequencies", interval_frequencies)
             # print("null_interval_frequencies", null_interval_frequencies)
             # print("actual_frequencies", actual_frequencies)
+
+            for ifreq, pfreq, afreq, nfreq in zip(initial_frequencies, interval_frequencies, actual_frequencies, null_interval_frequencies):
+                print(str(ifreq) + "\t" + str(pfreq) + "\t" + str(afreq) + "\t" + str(nfreq))
 
             model_SE = interval_frequencies - actual_frequencies
             model_SE = model_SE**2
@@ -153,9 +158,9 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
             initial_frequencies = af.actual_frequencies.loc[initial_timepoint]
             actual_interval_frequencies = af.actual_frequencies.loc[interval_frequencies.name]
             for s in sorted(initial_frequencies.index.values):
-                if initial_frequencies[s] >= 0.1:
-                    af.one_step_predicted_growth.append(safe_ratio(interval_frequencies[s], initial_frequencies[s]))
-                    af.one_step_actual_growth.append(safe_ratio(actual_interval_frequencies[s], initial_frequencies[s]))
+                # if initial_frequencies[s] >= 0.1:
+                af.one_step_predicted_growth.append(safe_ratio(interval_frequencies[s], initial_frequencies[s]))
+                af.one_step_actual_growth.append(safe_ratio(actual_interval_frequencies[s], initial_frequencies[s]))
 
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
