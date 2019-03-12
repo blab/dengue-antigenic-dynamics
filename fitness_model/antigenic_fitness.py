@@ -121,6 +121,8 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
                                                                 final_timepoint=numdate+interval_years,
                                                                 fitness=fitness, frequencies=frequencies)
 
+        print("interval_frequencies", interval_frequencies)
+
         ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
         model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
         model_SE = model_SE**2
