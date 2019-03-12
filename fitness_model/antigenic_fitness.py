@@ -107,6 +107,11 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
     ### Step through each intermediate timepoint, calculating known frequencies --> fitness --> predicted frequencies --> fitness
     interval_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
 
+    print("interval_timepoints", interval_timepoints)
+
+    initial_timepoint = interval_timepoints[0]
+    print("initial_timepoint", initial_timepoint)
+
     for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
         if tp_idx == x0_idx: ## we already know fitness for x0; just predict forward
             interval_fitness = fitness.loc[x0]
@@ -121,21 +126,29 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
                                                                 final_timepoint=numdate+interval_years,
                                                                 fitness=fitness, frequencies=frequencies)
 
-        ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
-        model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
-        model_SE = model_SE**2
-        model_SE = model_SE.sum()
-
         null_interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
                                                                 final_timepoint=numdate+interval_years,
                                                                 fitness='null', frequencies=frequencies)
 
-        null_SE = null_interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
-        null_SE = null_SE**2
-        null_SE = null_SE.sum()
+        ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
+        actual_frequencies = af.actual_frequencies.loc[numdate+interval_years]
 
-        af.model_sse += model_SE
-        af.null_sse += null_SE
+        if interval_frequencies.name <= initial_timepoint + 0.25:
+
+            # print("interval_frequencies", interval_frequencies)
+            # print("null_interval_frequencies", null_interval_frequencies)
+            # print("actual_frequencies", actual_frequencies)
+
+            model_SE = interval_frequencies - actual_frequencies
+            model_SE = model_SE**2
+            model_SE = model_SE.sum()
+
+            null_SE = null_interval_frequencies - actual_frequencies
+            null_SE = null_SE**2
+            null_SE = null_SE.sum()
+
+            af.model_sse += model_SE
+            af.null_sse += null_SE
 
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
