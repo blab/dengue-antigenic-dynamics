@@ -107,10 +107,10 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
     ### Step through each intermediate timepoint, calculating known frequencies --> fitness --> predicted frequencies --> fitness
     interval_timepoints = af.timepoints[x0_idx : x0_idx+tp_forward]
 
-    print("interval_timepoints", interval_timepoints)
+    # print("interval_timepoints", interval_timepoints)
 
     initial_timepoint = interval_timepoints[0]
-    print("initial_timepoint", initial_timepoint)
+    # print("initial_timepoint", initial_timepoint)
 
     for tp_idx, numdate in enumerate(interval_timepoints, start=x0_idx):
         if tp_idx == x0_idx: ## we already know fitness for x0; just predict forward
@@ -149,6 +149,13 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
 
             af.model_sse += model_SE
             af.null_sse += null_SE
+
+            initial_frequencies = af.actual_frequencies.loc[initial_timepoint]
+            actual_interval_frequencies = af.actual_frequencies.loc[interval_frequencies.name]
+            for s in sorted(initial_frequencies.index.values):
+                if initial_frequencies[s] >= 0.1:
+                    af.one_step_predicted_growth.append(safe_ratio(interval_frequencies[s], initial_frequencies[s]))
+                    af.one_step_actual_growth.append(safe_ratio(actual_interval_frequencies[s], initial_frequencies[s]))
 
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
@@ -294,6 +301,7 @@ def calc_model_performance(af):
 
     performance = {
     'pearson_r2': stats.linregress(actual_growth, predicted_growth)[2]**2,
+    'one_step_pearson_r2': stats.linregress(af.one_step_actual_growth, af.one_step_predicted_growth)[2]**2,
     'spearman_r': stats.spearmanr(actual_growth, predicted_growth)[0],
     'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(predicted_freq)),
     'accuracy': calc_accuracy(af),
@@ -326,6 +334,9 @@ class AntigenicFitness():
 
         self.model_sse = 0.
         self.null_sse = 0.
+
+        self.one_step_predicted_growth = []
+        self.one_step_actual_growth = []
 
         self.trajectories = {}
 
