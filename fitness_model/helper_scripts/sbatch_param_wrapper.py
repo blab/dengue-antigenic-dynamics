@@ -14,7 +14,7 @@ out_path = '../southeast_asia/%s/%s_model/'%(clade_resolution, antigenic_resolut
 if not os.path.isdir(out_path):
 	os.mkdir(out_path)
 
-beta_vals = np.linspace(0.,3.,7)
+beta_vals = np.linspace(2.,5.,7)
 gamma_vals = np.linspace(0.,3.,7)
 sigma_vals = np.linspace(0.,3.,7)
 
