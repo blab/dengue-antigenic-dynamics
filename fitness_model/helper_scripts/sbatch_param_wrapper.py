@@ -14,9 +14,9 @@ out_path = '../southeast_asia/%s/%s_model/'%(clade_resolution, antigenic_resolut
 if not os.path.isdir(out_path):
 	os.mkdir(out_path)
 
-beta_vals = np.linspace(1.,4.,7)
-gamma_vals = np.linspace(0.,3.,7)
-sigma_vals = np.linspace(0.,3.,7)
+beta_vals = np.linspace(3.05,3.95,7)
+gamma_vals = np.linspace(2.05,2.95,7)
+sigma_vals = np.linspace(1.05,1.95,7)
 
 for (b,g,s) in product(beta_vals, gamma_vals, sigma_vals):
 	name = ''.join(random.choice('0123456789abcdef') for n in xrange(30))
