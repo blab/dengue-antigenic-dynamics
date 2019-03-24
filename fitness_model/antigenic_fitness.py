@@ -583,9 +583,9 @@ if __name__=="__main__":
 
     elif args.mode == 'fit':
 
-        d1_vals = np.linspace(0,6,7)
-        d2_vals = np.linspace(0,6,7)
-        d3_vals = np.linspace(0,6,7)
+        d1_vals = np.linspace(0,.45,4)
+        d2_vals = np.linspace(0,.45,4)
+        d3_vals = np.linspace(0,.45,4)
 
         output = []
         for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
