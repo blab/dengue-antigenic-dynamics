@@ -4,7 +4,7 @@ import random
 from itertools import product
 import sys
 
-frequency_path = './simulation_freqs.csv'
+frequency_path = './simulated_freqs.csv'
 titer_path = '../../data/frequencies/interserotype_Dij.tsv'
 out_path = './model_performance/'
 
@@ -20,5 +20,5 @@ for (b,g,s) in product(beta_vals, gamma_vals, sigma_vals):
 	cmd = 'python ../antigenic_fitness.py --mode fit --frequency_path %s --titer_path %s --out_path %s --name %s --years_back 2 --years_forward 2 --beta %f --gamma %f --sigma %f --DENV4_f0 0'%(frequency_path, titer_path, out_path, name, b,g,s)
 
 	print cmd
-	os.system# ('sbatch -t 20:00:00 --mem 1024 --wrap="%s"'%cmd)
-# 	os.system('sleep 0.05')
+	os.system('sbatch -t 20:00:00 --mem 1024 --wrap="%s"'%cmd)
+	os.system('sleep 0.05')
