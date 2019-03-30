@@ -290,7 +290,7 @@ def calc_model_performance(af):
     }
     # 'delta_sse': calc_delta_sse(af)}
 
-    return performance
+    return {k: round(v, 3) for k,v in performance.items()}
 
 class AntigenicFitness():
     def __init__(self, args):
