@@ -79,13 +79,17 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
 
 def calc_timepoint_fitness(af, exposure):
     # full model
-    fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) - af.beta*exposure for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+    if af.model == 'antigenic':
+        fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) - af.beta*exposure for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
 
-    # antigenic null (intrinsic only)
-    # fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+    elif af.model == 'intrinsic_null':
+        fitness = { i: getattr(af, 'DENV%s_f0'%i[4]) for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
 
-    # complete null (all equal)
-    # fitness = { i: 0. for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+    elif af.model == 'equal_null':
+        fitness = { i: 0. for i, exposure in exposure.iteritems() } ## convert from population exposure to fitness
+
+    else:
+        raise ValueError, 'Model not recognized (choose antigenic, intrinsic_null, or equal_null). (What are you doing? :)'
 
     return fitness
 
@@ -575,6 +579,10 @@ if __name__=="__main__":
     args.add_argument('--name', type=str, help='analysis name')
     args.add_argument('--out_path', type=str, help='where to save csv and png files', default='./')
     args.add_argument('--mode', type=str, choices=['fit', 'run', 'simulate'], help='Fit parameters, simulate, or run model?', default='run')
+    args.add_argument('--model', type=str, choices=['antigenic', 'equal_null', 'intrinsic_null'], default='antigenic',
+                        help='Predictions informed by antigenic and intrinsic fitness (`full`)? \
+                        Intrinsic fitness only (`intrinsic_null`)? \
+                        Or assume equal fitness (`equal_null`)?')
     args = args.parse_args()
 
     if args.mode == 'simulate':
