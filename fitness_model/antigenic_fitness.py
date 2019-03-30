@@ -8,7 +8,7 @@ from random import choice
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import seaborn as sns
-from math import ceil
+from math import ceil, sqrt
 from itertools import product
 from copy import deepcopy
 from pprint import pprint
@@ -123,19 +123,21 @@ def predict_timepoint_distant_frequency(af, current_timepoint):
 
         ## calculate model and null SSE contribution and add to af.model_sse / af.null_sse
         model_SE = interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
+        af.N_sse += float(len(model_SE))
+
         model_SE = model_SE**2
         model_SE = model_SE.sum()
-
-        null_interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
-                                                                final_timepoint=numdate+interval_years,
-                                                                fitness='null', frequencies=frequencies)
-
-        null_SE = null_interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
-        null_SE = null_SE**2
-        null_SE = null_SE.sum()
-
         af.model_sse += model_SE
-        af.null_sse += null_SE
+
+        # null_interval_frequencies = predict_timepoint_close_frequency(af, current_timepoint=numdate, ## predict frequencies for each interval
+        #                                                         final_timepoint=numdate+interval_years,
+        #                                                         fitness='null', frequencies=frequencies)
+        #
+        # null_SE = null_interval_frequencies - af.actual_frequencies.loc[numdate+interval_years]
+        # null_SE = null_SE**2
+        # null_SE = null_SE.sum()
+
+        # af.null_sse += null_SE
 
         frequencies = frequencies.append(interval_frequencies) ## record predicted fitness vals
 
@@ -217,10 +219,10 @@ def predict_trajectories(af, initial_timepoint):
     #
     # return pd.Series(predicted_trajectory, index=predicted_timepoints, name=i)
 
-def calc_delta_sse(af):
-    ''' How much better were our predictions than the null model for time t+N? '''
-
-    return af.null_sse - af.model_sse
+# def calc_delta_sse(af):
+#     ''' How much better were our predictions than the null model for time t+N? '''
+#
+#     return af.null_sse - af.model_sse
 
     # def calc_sse(af, valid_clades, starting_timepoint, null):
     #     sse = 0.
@@ -284,7 +286,9 @@ def calc_model_performance(af):
     'spearman_r': stats.spearmanr(actual_growth, predicted_growth)[0],
     'abs_error': sum([abs(a - p) for (a,p) in zip(actual_freq, predicted_freq)]) / float(len(predicted_freq)),
     'accuracy': calc_accuracy(af),
-    'delta_sse': calc_delta_sse(af)}
+    'rmse': sqrt(af.model_sse / af.N_sse),
+    }
+    # 'delta_sse': calc_delta_sse(af)}
 
     return performance
 
@@ -312,7 +316,8 @@ class AntigenicFitness():
         self.fitness = None
 
         self.model_sse = 0.
-        self.null_sse = 0.
+        # self.null_sse = 0.
+        self.N_sse = 0.
 
         self.trajectories = {}
 
