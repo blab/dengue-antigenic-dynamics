@@ -598,7 +598,7 @@ if __name__=="__main__":
 
         d1_vals = np.linspace(0.55,1.45,7)
         d2_vals = np.linspace(0.55,1.45,7)
-        d3_vals = np.linspace(0.55,1.45,7)
+        d3_vals = np.linspace(0.1,1.,7)
 
         output = []
         for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
