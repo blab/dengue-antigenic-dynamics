@@ -301,7 +301,7 @@ Thus, if antigenic novelty constitutes a fitness advantage for DENV, then we wou
     \textbf{A} The relative frequency of each serotype, $x_i$, in Southeast Asia is estimated every three months based on available sequence data.
     \textbf{B} We calculate antigenic fitness for each serotype over time as its frequency-weighted antigenic distance from recently circulating viruses.
     We then add this to a time-invariant intrinsic fitness value to calculate total fitness (shown here, arbitrary units).
-    \textbf{C} illustrates DENV1 frequencies between 1983 and 1987 as an example of how the model predicts clade growth rates.
+    \textbf{C} illustrates DENV1 frequencies between 1994 and 1996 as an example of how the model predicts clade growth rates.
     At each timepoint $t$, we blind the model to all empirical data from timepoints later than $t$ and predict each serotype's future trajectory based on its initial frequency, time-invariant intrinsic fitness, and antigenic fitness at time $t$ (Methods, Eq.~\ref{eq_predict_frequency}).
     We predict forward in three-month increments for a total prediction period of $dt = 2$ years.
     At each increment, we use the predicted stepwise frequency change to adjust our estimates of antigenic fitness on a rolling basis (Methods, Eq.~\ref{eq_compounding_immunity}).
@@ -323,13 +323,13 @@ To isolate the extent to which antigenic fitness contributes to clade success an
 We estimate the antigenic fitness of clade $i$ at time $t$ as a function of its antigenic distance from each viral clade $j$ that has circulated in the same population over the previous two years, weighted by the relative frequency of $j$ and adjusted for waning population immunity (Figure~\ref{serotype_fitness_model}B; Methods, Eq.~\ref{eq_waning_immunity}).
 Growth rates are estimated based on a two year sliding window (Figure~\ref{serotype_fitness_model}C).
 
-This simple model explains 48\% of the observed variation in serotype growth rates, and predicts serotype growth vs. decline correctly for 66\% of predictions (Figure~\ref{serotype_fitness_model}D).
+This simple model explains 56.8\% of the observed variation in serotype growth rates, and predicts serotype growth vs. decline correctly for 66.7\% of predictions (Figure~\ref{serotype_fitness_model}D).
 This suggests that antigenic fitness is a major driver of serotype population dynamics.
 This also demonstrates that this model captures key components of dengue population dynamics; examining the formulation of this model in more detail can yield insights into how antigenic relationships influence DENV population composition.
-The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (reduction in frequency prediction error relative to a null model, see Methods).
-We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 16\% per year for the first two years after primary infection.
+The fitness model includes eight free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (minimizing the RMSE of frequency predictions, see Methods).
+We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with titers dropping by about 55\% per year for the first two years after primary infection.
 We also find that these dynamics are best explained by intrinsic fitness that moderately varies by serotype (Table~\ref{fitness_model_parameters}).
-However, intrinsic fitness alone is unable to predict serotype dynamics (Table~\ref{fitness_model_performance})
+However, intrinsic fitness alone is unable to predict serotype dynamics (Table~\ref{fitness_model_performance}).
 
 \subsection*{Antigenic novelty also partially predicts genotype success}
 To estimate how well antigenic fitness predicts genotype dynamics, we used the same model to predict genotype success and decline.
