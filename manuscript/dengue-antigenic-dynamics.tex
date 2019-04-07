@@ -579,7 +579,7 @@ We then calculate clade growth rates, defined as the fold-change in relative cla
 \frac{\hat{x_i}(t+dt)}{x_i(t)}
 \end{equation}
 
-\subsubsection{Null model and model performance}\\
+\subsubsection{Null models}\\
 To quantify the impact of antigenic fitness on DENV clade success, we compare our antigenically-informed model to two null models.
 
 Under the `equal null' model, all viruses have equal total fitness (antigenic and intrinsic fitness) at all timepoints:
@@ -601,23 +601,12 @@ Under the `antigenic null' model, all viruses have equal antigenic fitness but s
 \hat{x_i}^{antigenic_null}(t+dt) = x_i(t) e^f_0
 \end{equation}
 
-We assess predictive power as the sum of squared error between predicted and empirical clade frequencies.
-As above, we divide the interval between $t$ and $dt$ into a total of $U$ 3 month timepoints, $[t+u, t+2u, ... t+U]$, such that $t+U=dt$.
-We sum the squared prediction error at each of these intermediate timepoints for each prediction to assess both the final frequeny predictions and the predicted clade trajectories:
-
-\begin{equation}
-  \label{eq_sse}
-SSE = \sum_{i,t} \left( \sum_{u} \hat{x_i}(t+u) - x_{i}(t+u) \right)^2
-\end{equation}
-
-We can then estimate how much more error is present in the `equal null' model than the antigenically-informed model:
-\begin{equation}
-  \label{eq_delta_sse}
-\Delta SSE = SSE^{equal_null} - SSE^{model}
-\end{equation}
+\subsubsection{Model performance and parameter fitting}\\
+We assess predictive power as the root mean squared error between predicted and empirical clade frequencies.
+To assess both the final frequency predictions and the predicted clade trajectories, this RMSE includes error for each clade, for each starting timepoint $t$, and for each intermediate predicted timepoint $t+u$).
 
 Our frequency prediction model has a total of 8 free parameters.
-For each dataset, we jointly fit these parameters to maximize $\Delta SSE$ via a sweep through parameter space (Table~\ref{fitness_model_parameters}).
+For each dataset, we jointly fit these parameters to minimize RMSE of serotype frequency predictions via a sweep through parameter space (Table~\ref{fitness_model_parameters}).
 Optimization was confirmed by inspecting the profile likelihoods of each parameter.
 
 \begin{table}[ht!]
