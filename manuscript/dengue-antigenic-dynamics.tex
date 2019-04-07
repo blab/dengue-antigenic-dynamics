@@ -196,15 +196,15 @@ To fully map the relationship between DENV genetic and antigenic evolution, we a
 Conceptually, this model predicts titer values through three steps.
 First, we align \textit{E} gene sequences from titered dengue viruses and catalog the mutations between each serum strain and test virus strain in our dataset.
 Next, we infer how much antigenic change is attributable to specific mutations by mapping normalized antigenic distances to observed mutations.
-This assigns each mutation $b$ an antigenic effect size, $d_b$; forward and reverse mutations are assigned separate values of $d_b$.
-With this in hand, we estimate the asymmetrical antigenic distance between all pairs of sera and test viruses by summing over $d_b$ for all mutations observed between the serum and the test virus (Methods, Eq.~\ref{eq_predicted_titers}).
+This assigns each mutation $m$ an antigenic effect size, $d_m$; forward and reverse mutations are assigned separate values of $d_m$.
+With this in hand, we estimate the asymmetrical antigenic distance between all pairs of sera and test viruses by summing over $d_m$ for all mutations observed between the serum and the test virus (Methods, Eq.~\ref{eq_predicted_titers}).
 
-To learn these values of $d_b$, we first split our dataset into training (random 90\% of measurements) and test data (the remaining 10\% of values).
-We take the training data and fit $d_b$ for each mutation that is observed two or more times, subject to regularization as follows (also detailed in Methods, Eq.~\ref{eq_cost_fn}).
-Parsimoniously, we expect that antigenic change is more likely to occur through larger changes incurred by a few mutations than through small changes across many mutations; correspondingly, our prior expectation of values of $d_b$ is exponentially distributed such that most values of $d_b = 0$.
+To learn these values of $d_m$, we first split our dataset into training (random 90\% of measurements) and test data (the remaining 10\% of values).
+We take the training data and fit $d_m$ for each mutation that is observed two or more times, subject to regularization as follows (also detailed in Methods, Eq.~\ref{eq_cost_fn}).
+Parsimoniously, we expect that antigenic change is more likely to occur through larger changes incurred by a few mutations than through small changes across many mutations; correspondingly, our prior expectation of values of $d_m$ is exponentially distributed such that most values of $d_m = 0$.
 This is analogous to lasso regression to identify a few parameters with positive weights and set other parameters to 0.
 Additionally, some viruses have greater binding avidity, and some sera are more potent than others (Figure~\ref{titer_asymmetry}); these `row' and `column' effects, respectively, are normally distributed and are taken into account when training the model.
-The model uses convex optimization to learn the values of $d_b$ that minimize the sum of squared errors (SSE) between observed and predicted titers in the training data.
+The model uses convex optimization to learn the values of $d_m$ that minimize the sum of squared errors (SSE) between observed and predicted titers in the training data.
 We thus learn model parameters from the training data, and then use those parameters to predict test data values.
 We assess model performance by comparing the predicted test titer values to the actual values, aggregated across 100-fold Monte Carlo cross validation.
 
@@ -377,7 +377,7 @@ This supports and expands upon previous reports \citep{katzelnick2015dengue} tha
 
 This set of identified antigenic mutations includes four pairs of reversions, where both the forward and reverse mutations at the same site confer antigenic change: L122S, I129V, I162A, and N203E (and their respective inverse mutations).
 To investigate the impact of these reversions, we compared this `substitution' model to a similar model formulation which does not permit separate antigenic effects for forward and backward mutations.
-This comparison model, termed the `tree model', assigns $d_b$ values to individual branches in the phylogeny, rather than to individual mutations, and estimates symmetrical titer distances as the sum of $d_b$ values along the shortest path separating two viruses in the phylogeny.
+This comparison model, termed the `tree model', assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, and estimates symmetrical titer distances as the sum of $d_m$ values along the shortest path separating two viruses in the phylogeny.
 By definition, branches in the phylogeny directly capture the effect of all mutations that occurred along each branch, except for reversions.
 \sbc{@trvrb: is this true for just reversion, or all repeat mutations?}
 This tree model also explains observed antigenic phenotypes to a reasonable degree, but has higher error and less predictive power than the asymemtrical substitution model presented here.
@@ -482,17 +482,17 @@ We used mafft v7.305b to align nucleotide \textit{E} gene sequences for each tit
 In the substitution model, observed titer drops are mapped to mutations between each serum and test virus strain after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (`row' and `column' effects, respectively):
 \begin{equation}
   \label{eq_predicted_titers}
-\hat{D}_{ij} \approx D_{ij} = \sum_{b} d_b + v_i + p_j
+\hat{D}_{ij} \approx D_{ij} = \sum_{b} d_m + v_i + p_j
 \end{equation}
-where $d_b$ is the titer drop assigned to each mutation, $b$, between serum $i$ and virus $j$.
+where $d_m$ is the titer drop assigned to each mutation, $m$, between serum $i$ and virus $j$.
 We randomly withhold 10\% of titer measurements as a test set.
 We use the remaining 90\% of titer measurements as a training set to learn values for virus avidity, serum potency, and mutation effects.
 As in Neher \textit{et al.}, we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function:
 \begin{equation}
   \label{eq_cost_fn}
-C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_b + \gamma \sum_{i} v_i^2 + \delta \sum_{j} p_j^2
+C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_m + \gamma \sum_{i} v_i^2 + \delta \sum_{j} p_j^2
 \end{equation}
-Respectively, these terms represent the squared training error; an L1 regularization term on mutation effects, such that most values of $d_b = 0$; and L2 regularization terms on virus avidities and serum potencies, such that they are normally distributed.
+Respectively, these terms represent the squared training error; an L1 regularization term on mutation effects, such that most values of $d_m = 0$; and L2 regularization terms on virus avidities and serum potencies, such that they are normally distributed.
 These parameter values are then used to predict the antigenic distance between all pairs of viruses, $i$ and $j$.
 We assess performance by comparing predicted to known titer values in our test data set, and present test error (aggregated from 100-fold Monte Carlo cross-validation) throughout the manuscript.
 
@@ -683,7 +683,7 @@ LK is supported by NIH awards R01AI114703-01 and P01AI106695.
   \begin{table}[ht]
     \resizebox{\textwidth}{!}{
     \begin{tabular}{llrr}
-Mutation & Serotype & Effect size $d_b$ & Count \\
+Mutation & Serotype & Effect size $d_m$ & Count \\
 \hline
  I6V,S29G,F90Y,T176P,V197I,L475M &          DENV1 &  0.71 &     50 \\
  I6V,S29G,F90Y,T176P,V197I,L475M &          DENV2 &  0.71 &     96 \\
@@ -832,13 +832,12 @@ Mutation & Serotype & Effect size $d_b$ & Count \\
 \label{antigenic_mutations}
 \caption{
 \textbf{Antigenically relevant mutations}
-Each row represents a mutation (or colinear cluster of mutations) inferred by the titer model to have a non-zero antigenic effect size $d_b$.
+Each row represents a mutation (or colinear cluster of mutations) inferred by the titer model to have a non-zero antigenic effect size $d_m$.
 We also report the number of times each mutation was observed in our dataset, within and between serotypes (among all asymmetrical pairwise sequence comparisons).
 }
 \end{table}
 \end{centering}
 
-% add table of antigenic mutations here
 
 \begin{centering}
   \begin{table}[ht]
