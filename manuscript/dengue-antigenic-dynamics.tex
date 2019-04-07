@@ -876,23 +876,25 @@ We also report the number of times each mutation was observed in our dataset, wi
     \resizebox{\textwidth}{!}{
     \begin{tabular}[ht]{ l | l | r | r }
       \hline
-      Genetic resolution & Fitness model & $\Delta$ SSE & Pearson $R^2$ & Accuracy & Mean absolute error\\
+      Genetic resolution & Fitness model & RMSE & Pearson $R^2$ & Accuracy \\
       \hline
-      Serotype & Interserotype & 3.67 & 0.48 & 0.66 & 0.11 \\
-      Genotype & Full tree & 2.56 & 0.22 & 0.62 & 0.10 \\
-      Gentoype & Interserotype & 2.49 & 0.26 & 0.66 & 0.10 \\ \hline
+      Serotype & Interserotype & 0.11 & 0.57 & 0.67 \\ \hline
+      Serotype & Equal null & 0.13 & 0.00 & 0.48 \\
+      Serotype & Antigenic null & 0.14 & 0.05 & 0.53 \\ \hline
 
-      Serotype & Antigenic null & -1.06 & 0.03 & 0.52 & 0.13 \\
-      Serotype & Equal null & 0.0 & 0.0 & 0.47 & 0.13\\     \hline
-
-      Genotype & Antigenic null & -0.7 & 0.03 & 0.52 & 0.11 \\
-      Genotype & Equal null & 0.0 & 0.0 & 0.43 & 0.11 \\     \hline
+      Genotype & Full tree & 0.07 & 0.17 & 0.58 \\
+      Gentoype & Interserotype & 0.06 & 0.30 & 0.66 \\ \hline
+      Genotype & Equal null & 0.07 & 0.00 & 0.44 \\
+      Genotype & Antigenic null & 0.07 & 0.03 & 0.54 \\
     \end{tabular}
     }
   \label{fitness_model_performance}
   \caption{
   \textbf{Fitness model performance comparisons}
-  Here we compare the performance of the `antigenically informed' fitness model to model performance under two null formulations.
+  Here we compare the performance of the `antigenically informed' fitness models to model performance under two null formulations.
+  Root mean squared error (RMSE) assesses the error between predicted and observed clade frequencies, assessed for each clade, for each prediction timepoint $t$, and each intermediate timepoint $t+u$.
+  Pearson $R^2$ compares predicted versus observed clade growth rates.
+  Accuracy compares predicted versus observed clade growth versus decline.
   In the `equal' null model, all clades are assigned equal fitness (i.e., antigenic and intrinsic fitness are set to 0).
   In the `intrinsic' null model formulation, only the serotype-specific, time-invariant intrinsic fitness values contribute to clade fitness (i.e., antigenic fitness is set to 0).
   For both formulations, all other parameters were set to the values reported in Table~\ref{fitness_model_parameterss} (optimized for $\Delta$ SSE).
