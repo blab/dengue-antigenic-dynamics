@@ -591,14 +591,14 @@ f_i^{equal_null}(t) = 0
 \hat{x_i}^{equal_null}(t+dt) = x_i(t) e^0 = x_i(t)
 \end{equation}
 
-Under the `antigenic null' model, all viruses have equal antigenic fitness but serotype-specific intrinsic fitness at all timepoints:
+Under the `intrinsic null' model, all viruses have equal antigenic fitness but serotype-specific intrinsic fitness at all timepoints:
 
 \begin{equation}
-  \label{antigenic_null}
-  f_i^{antigenic_null}(t) = f_0
+  \label{intrinsic_null}
+  f_i^{intrinsic_null}(t) = f_0
 \end{equation}
 \begin{equation}
-\hat{x_i}^{antigenic_null}(t+dt) = x_i(t) e^f_0
+\hat{x_i}^{intrinsic_null}(t+dt) = x_i(t) e^f_0
 \end{equation}
 
 \subsubsection{Model performance and parameter fitting}\\
@@ -879,18 +879,18 @@ We also report the number of times each mutation was observed in our dataset, wi
       \hline
       Serotype & Interserotype & 0.11 & 0.57 & 0.67 \\ \hline
       Serotype & Equal null & 0.13 & 0.00 & 0.48 \\
-      Serotype & Antigenic null & 0.14 & 0.05 & 0.53 \\ \hline
+      Serotype & Intrinsic null & 0.14 & 0.05 & 0.53 \\ \hline
 
-      Genotype & Full tree & 0.07 & 0.17 & 0.58 \\
+      Genotype & Intergenotype & 0.07 & 0.17 & 0.58 \\
       Gentoype & Interserotype & 0.06 & 0.30 & 0.66 \\ \hline
       Genotype & Equal null & 0.07 & 0.00 & 0.44 \\
-      Genotype & Antigenic null & 0.07 & 0.03 & 0.54 \\
+      Genotype & Intrinsic null & 0.07 & 0.03 & 0.54 \\
     \end{tabular}
     }
   \label{fitness_model_performance}
   \caption{
   \textbf{Fitness model performance comparisons}
-  Here we compare the performance of the `antigenically informed' fitness models to model performance under two null formulations.
+  Here we compare the performance of the antigenically-informed fitness models to model performance under two null formulations.
   Root mean squared error (RMSE) assesses the error between predicted and observed clade frequencies, assessed for each clade, for each prediction timepoint $t$, and each intermediate timepoint $t+u$.
   Pearson $R^2$ compares predicted versus observed clade growth rates.
   Accuracy compares predicted versus observed clade growth versus decline.
