@@ -610,7 +610,7 @@ if __name__=="__main__":
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
             model_performance = calc_model_performance(antigenic_fitness)
-            
+
             return model_performance['rmse']
 
         from scipy.optimize import minimize
@@ -619,8 +619,7 @@ if __name__=="__main__":
         (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
         (args),
         tol=0.01,
-        method='nelder-mead',
-        options={'maxiter': 2, 'maxfev': 2})
+        method='nelder-mead')
         print optimizer
         ofile = open('./scipy_optimize_output.csv', 'w')
         ofile.write(','.join(['%.3f'%v for v in optimizer.x]))
