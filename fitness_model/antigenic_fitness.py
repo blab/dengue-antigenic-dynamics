@@ -294,7 +294,8 @@ def calc_model_performance(af):
     }
     # 'delta_sse': calc_delta_sse(af)}
 
-    return {k: round(v, 3) for k,v in performance.items()}
+    return performance
+    # return {k: round(v, 3) for k,v in performance.items()}
 
 class AntigenicFitness():
     def __init__(self, args):
@@ -595,31 +596,36 @@ if __name__=="__main__":
 
 
     elif args.mode == 'fit':
-
-        d1_vals = np.linspace(0.,6.,7)
-        d2_vals = np.linspace(0.,6.,7)
-        d3_vals = np.linspace(0.,6.,7)
-
-        output = []
-        for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
+        def run((beta, gamma, sigma, DENV1_f0, DENV2_f0, DENV3_f0), args):
             args = deepcopy(args)
-            setattr(args, 'DENV1_f0', d1)
-            setattr(args, 'DENV2_f0', d2)
-            setattr(args, 'DENV3_f0', d3)
+            setattr(args, 'beta', beta)
+            setattr(args, 'gamma', gamma)
+            setattr(args, 'sigma', sigma)
+            setattr(args, 'DENV1_f0', DENV1_f0)
+            setattr(args, 'DENV2_f0', DENV2_f0)
+            setattr(args, 'DENV3_f0', DENV3_f0)
+
             antigenic_fitness = AntigenicFitness(args)
-            if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-                antigenic_fitness.calculate_fitness()
+            antigenic_fitness.calculate_fitness()
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
-
             model_performance = calc_model_performance(antigenic_fitness)
-            model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
-            output.append(model_performance)
+            
+            return model_performance['rmse']
 
+        from scipy.optimize import minimize
 
-        output = pd.DataFrame(output)
-        output = output.reindex(columns=sorted(output.columns.values))
-        output.to_csv(args.out_path+args.name+'.csv')
+        optimizer = minimize(run,
+        (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
+        (args),
+        tol=0.01,
+        method='nelder-mead',
+        options={'maxiter': 2, 'maxfev': 2})
+        print optimizer
+        ofile = open('./scipy_optimize_output.csv', 'w')
+        ofile.write(','.join(['%.3f'%v for v in optimizer.x]))
+        ofile.write('\n')
+        ofile.write(optimizer.message)
 
     else:
         antigenic_fitness = AntigenicFitness(args)
