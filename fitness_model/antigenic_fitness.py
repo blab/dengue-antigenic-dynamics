@@ -294,7 +294,8 @@ def calc_model_performance(af):
     }
     # 'delta_sse': calc_delta_sse(af)}
 
-    return {k: round(v, 3) for k,v in performance.items()}
+    return performance
+    # return {k: round(v, 3) for k,v in performance.items()}
 
 class AntigenicFitness():
     def __init__(self, args):
@@ -566,12 +567,12 @@ if __name__=="__main__":
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
-    args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.55)
-    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=2.35)
-    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=0.7)
-    args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 0.7)
-    args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 0.85)
-    args.add_argument('--DENV3_f0', type=float, help='Relative intrinsic fitness value for DENV3', default = 0.4)
+    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=1.02)
+    args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.83)
+    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.76)
+    args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 0.74)
+    args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 0.84)
+    args.add_argument('--DENV3_f0', type=float, help='Relative intrinsic fitness value for DENV3', default = 0.50)
     args.add_argument('--DENV4_f0', type=float, help='Relative intrinsic fitness value for DENV4', default = 0.)
     args.add_argument('--trajectory', type=float, nargs='*', help='timepoint(s) to compute trajectories for')
     args.add_argument('--plot', help='make plots?', action='store_true')
@@ -595,31 +596,35 @@ if __name__=="__main__":
 
 
     elif args.mode == 'fit':
-
-        d1_vals = np.linspace(0.55,1.45,7)
-        d2_vals = np.linspace(0.55,1.45,7)
-        d3_vals = np.linspace(0.55,1.45,7)
-
-        output = []
-        for (d1,d2,d3) in product(d1_vals, d2_vals, d3_vals):
+        def run((beta, gamma, sigma, DENV1_f0, DENV2_f0, DENV3_f0), args):
             args = deepcopy(args)
-            setattr(args, 'DENV1_f0', d1)
-            setattr(args, 'DENV2_f0', d2)
-            setattr(args, 'DENV3_f0', d3)
+            setattr(args, 'beta', beta)
+            setattr(args, 'gamma', gamma)
+            setattr(args, 'sigma', sigma)
+            setattr(args, 'DENV1_f0', DENV1_f0)
+            setattr(args, 'DENV2_f0', DENV2_f0)
+            setattr(args, 'DENV3_f0', DENV3_f0)
+
             antigenic_fitness = AntigenicFitness(args)
-            if not isinstance(antigenic_fitness.fitness, pd.DataFrame):
-                antigenic_fitness.calculate_fitness()
+            antigenic_fitness.calculate_fitness()
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
-
             model_performance = calc_model_performance(antigenic_fitness)
-            model_performance.update({ 'beta': args.beta, 'sigma': args.sigma, 'gamma': args.gamma, 'DENV1_f0': args.DENV1_f0, 'DENV2_f0': args.DENV2_f0, 'DENV3_f0': args.DENV3_f0})
-            output.append(model_performance)
 
+            return model_performance['rmse']
 
-        output = pd.DataFrame(output)
-        output = output.reindex(columns=sorted(output.columns.values))
-        output.to_csv(args.out_path+args.name+'.csv')
+        from scipy.optimize import minimize
+
+        optimizer = minimize(run,
+        (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
+        (args),
+        tol=0.01,
+        method='nelder-mead')
+        print optimizer
+        ofile = open('./scipy_optimize_output.csv', 'w')
+        ofile.write(','.join(['%.3f'%v for v in optimizer.x]))
+        ofile.write('\n')
+        ofile.write(optimizer.message)
 
     else:
         antigenic_fitness = AntigenicFitness(args)
