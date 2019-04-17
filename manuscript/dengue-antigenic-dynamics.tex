@@ -552,6 +552,8 @@ Similar to the model implemented in {\L}uksza and L\"assig, we estimate predicte
 \end{equation}
 for short-term predictions (where $dt < 1$ year).
 
+We do not attempt to predict future frequencies for clades with $x_i(t) < 0.05$.
+
 For long-term predictions, we must account for immunity accrued at each intermediate timepoint between $t$ and $dt$.
 \sbc{I think this U notation is incorrect. Check this.}
 We divide the interval between $t$ and $dt$ into a total of $U$ 3 month timepoints, $[t+u, t+2u, ... t+U]$, such that $t+U=dt$.
