@@ -1,0 +1,2 @@
+3.094,0.556,2.571,0.718,0.783,0.409
+Optimization terminated successfully.
