@@ -179,6 +179,7 @@ In total, our dataset consists of 454 NHP sera titrations spanning the breadth o
 To standardize these measurements, we first take the log$_2$ of each value, such that one titer unit corresponds to one, two-fold drop in neutralization.
 We then define antigenic distance between autologous virus-sera pairs (i.e., virus $i$ and serum $i$) as zero.
 Normalized antigenic distance between $i$ and $j$ is thus calculated as $D_{ij} = \mathrm{log}_2(T_{ii}) - \mathrm{log}_2(T_{ij})$, such that a higher value of $D_{ij}$ indicates that serum $i$ is less effective at neutralizing virus $j$, implying greater antigenic distance between viruses $i$ and $j$.
+For brevity, these normalized titer values are hereafter referred to simply as $log_2(titers)$.
 
 The full dataset of standardized titer values is shown in Figure~\ref{titer_tree_heatmap}B.
 Here, we see that homotypic virus-serum pairs are more closely related antigenically than heterotypic pairs.
@@ -194,7 +195,7 @@ The assay used to generate this titer dataset captures neutralization, but does 
 
 To fully map the relationship between DENV genetic and antigenic evolution, we adapt a substitution-based model originally developed for influenza \citep{neher2016prediction}.
 Conceptually, this model predicts titer values through three steps.
-First, we align \textit{E} gene sequences from titered dengue viruses and catalog the mutations between each serum strain and test virus strain in our dataset.
+First, we align \textit{E} gene sequences from titered dengue viruses and catalog the amino acid mutations between each serum strain and test virus strain in our dataset.
 Next, we infer how much antigenic change is attributable to specific mutations by mapping normalized antigenic distances to observed mutations.
 This assigns each mutation $m$ an antigenic effect size, $d_m$; forward and reverse mutations are assigned separate values of $d_m$.
 With this in hand, we estimate the asymmetrical antigenic distance between all pairs of sera and test viruses by summing over $d_m$ for all mutations observed between the serum and the test virus (Methods, Eq.~\ref{eq_predicted_titers}).
@@ -210,8 +211,8 @@ We assess model performance by comparing the predicted test titer values to the 
 
 This model formulation is an effective tool for estimating antigenic relationships between viruses based on their genetic sequences.
 On average, this model predicts titers in the test set within 0.75 log$_2$ titer units of the true value (95\% CI 0.74---0.77, root mean squared error, RMSE), and explains 78\% of the observed variation in neutralization titers overall (95\% CI 0.77---0.79, Pearson $R^2$).
-Prediction error was comparable between human and non-human primate sera (Figure ~\ref{species_titers}).
 This is comparable to the model error from a cartography-based characterization of the same dataset (RMSE 0.65---0.8 log$_2$ titer units) \citep{katzelnick2015dengue}.
+Prediction error was comparable between human and non-human primate sera, indicating that these viral determinants of antigenic phenotypes are not species-specific (Figure~\ref{species_titers}).
 
 \begin{figure}[ht]
   \begin{centering}
@@ -225,23 +226,23 @@ This is comparable to the model error from a cartography-based characterization 
   \end{centering}
 \end{figure}
 
+
 \begin{figure}[ht]
   \begin{centering}
   \includegraphics[width=\textwidth]{../figures/png/mutations_position_db.png}
-  	\caption{
-    \textbf{Distribution and effect size of antigenic mutations_db}
-    As in Figure~\ref{mutations_db}, each point represents one antigenically relevant mutation or colinear mutation cluster.
+  	\caption{\textbf{Distribution and effect size of antigenic mutations.}
+	As in Figure~\ref{mutations_db}, each point represents one antigenically relevant mutation or colinear mutation cluster.
     Clustered mutations are connected with dashed lines with point size proportionate to cluster size (N=2---6).
     Color indicates the number of times a given mutation was observed in our dataset between heterotypic pairs (\textbf{A}) or homotypic pairs of viruses (\textbf{C---F}).
     The x axis indicates mutations' position in \textit{E}, relative to each functional domain as noted in \textbf{B}.
-    The y axis indicates antigenic effect size (note that \textbf{A} has an independent y scale for visual clarity);
-  	\label{antigenic_mutations}
+    The y axis indicates antigenic effect size (note that \textbf{A} has an independent y scale for visual clarity).}
+  	\label{mutation_positions}
   \end{centering}
 \end{figure}
 
 The 48 strains included in the titer dataset (as serum strains, test virus strains, or both) are 25.7\% divergent on average (amino acid differences in \textit{E}).
 Pairwise comparisons of all serum strains and test viruses yields 1,534 unique mutations that are observed at least twice.
-Our parsimonious model attributes antigenic change to a total of 49 specific mutations and 4 colinear mutation clusters (each consisting of 2---6 co-occurring mutations).
+Our parsimonious model attributes antigenic change to a total of 49 specific mutations and 4 colinear mutation clusters (each consisting of 2---6 co-occurring mutations) (Figures~\ref{mutations_db},~\ref{mutation_positions},  Table~\ref{antigenic_mutations}).
 Each of these mutations confers 0.01---2.11 (median 0.19) log$_2$ titer units of antigenic change (Figure~\ref{mutations_db}).
 As seen in Figure~\ref{mutation_positions}, these mutations span all major domains of \textit{E}, and most occur both between and within serotypes.
 
@@ -262,7 +263,7 @@ This has important ramifications for vaccine design and trial evaluation.
 \begin{figure}[ht]
 \centering
 	\includegraphics[width=0.75\textwidth]{../figures/png/genotype_dTiter_heatmap.png}
-	\caption{\textbf{Titer distance by genotype}
+	\caption{\textbf{Titer distance by genotype.}
   Values represent the mean interpolated antigenic distance between canonical dengue genotypes (in standardized log$_2$ titer units).
   }
 	\label{genotype_dTiter_heatmap}
@@ -333,14 +334,14 @@ To estimate how well antigenic fitness predicts genotype dynamics, we used the s
 As before, fitness of genotype $i$ is based on the intrinsic fitness of the serotype $i$ belongs to, and the antigenic distance between $i$ and each other genotype, $j$, that has recently circulated (Figure~\ref{genotype_fitness}B).
 For genotypes, we can calculate antigenic distance between $i$ and $j$ at either the serotype level or the genotype level.
 In the `interserotype model', we treat each serotype as antigenically uniform, and assign the mean serotype-level antigenic distances to all pairs of constituent genotypes.
-In the `intergenotype model', we incorporate the observed within-serotype heterogeneity, and use the mean genotype-level antigenic distances.
+In the `intergenotype model', we incorporate the observed within-serotype heterogeneity, and use the mean genotype-level antigenic distances (as shown in Figure~\ref{genotype_dTiter_heatmap}).
 If within-serotype antigenic heterogeneity contributes to genotype fitness, then we would expect estimates of antigenic fitness based on the `intergenotype model' to better predict genotype growth rates.
 
 We find that antigenic fitness contributes to genotype turnover, although it explains less of the observed variation than for serotypes.
 As for serotypes, intrinsic fitness alone was unable to predict genotype turnover (Table~\ref{fitness_model_performance}).
 When antigenic distance is estimated from the `interserotype model', we find that our model of antigenic fitness explains approximately 28.6\% of the observed variation in genotype growth rates, and correctly predicts genotype growth vs. decline 66.6\% of the time (Figure~\ref{genotype_fitness}C).
 Perhaps surprisingly, more precise estimates of antigenic distance between genotypes from the `intergenotype model' does not improve our predictions of genotype success ($R^2 = 0.254$, 61.0\% accuracy; Figure~\ref{genotype_fitness}D, Table~\ref{fitness_model_performance}).
-This suggests that although we find strong evidence that genotypes vary in their ability to escape neutralizing antibodies (Figures~\ref{titer_model_performance}, \ref{genotype_dTiter_heatmap}), these differences are subtle enough that they do not impact broad-scale regional dynamics over time.
+This suggests that although we find strong evidence that genotypes vary in their ability to escape neutralizing antibodies, these differences are subtle enough that they do not impact broad-scale regional dynamics over time.
 
 \begin{figure}[ht]
   \begin{centering}
@@ -349,7 +350,7 @@ This suggests that although we find strong evidence that genotypes vary in their
     \textbf{A} Relative frequencies of each canonical dengue genotype across Southeast Asia, estimated from available sequence data.
     \textbf{B} Antigenic fitness is calculated for each genotype as its frequency-weighted antigenic distance from recently circulating genotypes.
     We then add this to a time-invariant, serotype-specific intrinsic fitness value to calculate total fitness (shown here, arbitrary units).
-    We assess antigenic distance at either the `intergenotype' or the `interserotype' resolution (Figure~\ref{genotype_dTiter_heatmap}).
+    We assess antigenic distance at either the `intergenotype' or the `interserotype' resolution.
     In this panel, we show total fitness over time, incorporating estimates of antigenic fitness derived from the `intergenotype' model.
     \textbf{C, D}  Fitness estimates were used to predict clade growth rates over 2 years, compounding immunity every three months based on predicted frequency changes (Methods Eq.~\ref{eq_compounding_immunity}).
     Here, we compare observed vs. predicted growth rates for both formulations of the fitness model (using fitness derived from either `interserotype' or `intergenotype' antigenic distances).
@@ -374,11 +375,10 @@ This supports and expands upon previous reports \citep{katzelnick2015dengue} tha
 
 This set of identified antigenic mutations includes four pairs of reversions, where both the forward and reverse mutations at the same site confer antigenic change: L122S, I129V, I162A, and N203E (and their respective inverse mutations).
 To investigate the impact of these reversions, we compared this `substitution' model to a similar model formulation which does not permit separate antigenic effects for forward and backward mutations.
-This comparison model, termed the `tree model', assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, and estimates symmetrical titer distances as the sum of $d_m$ values along the shortest path separating two viruses in the phylogeny.
+This comparison model, termed the `tree model', assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, and estimates symmetrical titer distances as the sum of $d_m$ values along the shortest path separating two viruses in the phylogeny \citep{neher2016prediction}.
 By definition, branches in the phylogeny directly capture the effect of all mutations that occurred along each branch, except for reversions.
 \sbc{@trvrb: is this true for just reversion, or all repeat mutations?}
-This tree model also explains observed antigenic phenotypes to a reasonable degree, but has higher error and less predictive power than the asymemtrical substitution model presented here.
-\sbc{@trvrb: are we sure this isn't just a function of the number of parameters? I think it's fine as we're assessing out of sample test error, but wanted to check.}
+This tree model also explains observed antigenic phenotypes to a reasonable degree, but has higher error and less predictive power than the asymmetrical substitution model presented here (Table ~\ref{titer_model_performance}).
 This suggests that accounting for repeated mutations in the same site is necessary to most accurately explain observed antigenic variation.
 Speculatively, this is consistent with the hypothesis previously suggested by \sbc{look up ref} that dengue antigenic evolution is shaped by both a `push' to antigenically diverge and a `pull' to remain close enough antigenically to other serotypes so as to cause ADE, resulting in higher viremia and thus greater probability of onward transmission.
 
@@ -388,7 +388,7 @@ This is consistent with previous reports of genotype-specific interactions betwe
 We hypothesize that this observed within-serotype variation primarily effects heterotypic secondary infection outcomes, rather than modulating homotypic immunity.
 
 Overall, we expect that these antigenic phenotypes represent a lower-bound on the extent, magnitude, and nature of antigenic heterogeneity with DENV.
-Our current titer dataset spans the breadth of DENV diversity, but due to small sample size, it lacks the resolution to detect most sub-genotype antigenic variation or to identify which specific mutations correspond to changes in antigenic phenotype.
+Our current titer dataset spans the breadth of DENV diversity, but due to small sample size, it lacks the resolution to detect most sub-genotype antigenic variation.
 The appearance of the deep antigenic divergence of the four serotypes, and the more recent antigenic divergences within each serotype, suggest that DENV antigenic evolution is likely an ongoing, though gradual, process.
 We therefore expect that future studies with richer datasets will find additional antigenic variation within each genotype.
 This dataset also contains many left-censored titer values, where we know two viruses are at least $T$ titer units apart, but do not know exactly how far apart.
@@ -407,8 +407,8 @@ This model places a fitness value on each serotype that derives from a constant 
 Antigenic fitness declines with population immunity, which is accumulated via the recent circulation of antigenically similar viruses.
 
 We find that antigenic fitness is able to explain much of the observed variation in serotype growth and decline (Figure~\ref{serotype_fitness_model}).
-Intrinsic fitness alone is unable to explain serotype fluctuations, although forward simulations under the optimized parameter set display damped oscillations around the serotype-specific `set points' determined by intrinsic fitnesses (Figure~\ref{simulated_frequencies_modelParameters}).
-This demonstrates that antigenic fitness is a substantial determinant of DENV serotype dynamics in a real-world, hyperendemic population, although intrinsic fitness plays an important role in dictating long term dynamics.
+Forward simulations under the optimized parameter set display damped oscillations around the serotype-specific `set points' determined by intrinsic fitnesses, but intrinsic fitness alone is unable to explain serotype fluctuations ($R^2=0.04$; Table~\ref{fitness_model_performance}, Figure~\ref{simulated_frequencies_modelParameters}).
+This demonstrates that although intrinsic fitness plays an important role in dictating long term dynamics, antigenic fitness is a substantial determinant of DENV serotype dynamics in a real-world, hyperendemic population.
 \sbc{@trvrb: I'm not sure I'm explaining this correctly. Can you help with this paragraph?}
 
 We similarly use this model to quantify the effect of within-serotype antigenic variation on the success and decline of canonical DENV genotypes (Figure~\ref{genotype_fitness}).
@@ -489,6 +489,7 @@ As in Neher \textit{et al.}, we formulate this as a convex optimization problem 
   \label{eq_cost_fn}
 C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_m + \gamma \sum_{i} v_i^2 + \delta \sum_{j} p_j^2
 \end{equation}
+We used $\lambda = 3.0$, $\gamma = 0.6$, and $\delta = 1.2$ to minimize test error. \sbc{@trvrb - is there a different standard notation to replace $\gamma$ here? It's also used in the fitness model notation.}
 Respectively, these terms represent the squared training error; an L1 regularization term on mutation effects, such that most values of $d_m = 0$; and L2 regularization terms on virus avidities and serum potencies, such that they are normally distributed.
 These parameter values are then used to predict the antigenic distance between all pairs of viruses, $i$ and $j$.
 We assess performance by comparing predicted to known titer values in our test data set, and present test error (aggregated from 100-fold Monte Carlo cross-validation) throughout the manuscript.
@@ -555,7 +556,6 @@ for short-term predictions (where $dt < 1$ year).
 We do not attempt to predict future frequencies for clades with $x_i(t) < 0.05$.
 
 For long-term predictions, we must account for immunity accrued at each intermediate timepoint between $t$ and $dt$.
-\sbc{I think this U notation is incorrect. Check this.}
 We divide the interval between $t$ and $dt$ into a total of $U$ 3 month timepoints, $[t+u, t+2u, ... t+U]$, such that $t+U=dt$.
 We then compound immunity based on predicted clade frequencies at each intermediate timepoint:
 \begin{equation}
@@ -585,28 +585,28 @@ To quantify the impact of antigenic fitness on DENV clade success, we compare ou
 Under the `equal null' model, all viruses have equal total fitness (antigenic and intrinsic fitness) at all timepoints:
 \begin{equation}
   \label{equal_null}
-f_i^{equal null}(t) = 0
+f_i^{equal}(t) = 0
 \end{equation}
 \begin{equation}
-\hat{x_i}^{equal null}(t+dt) = x_i(t) e^0 = x_i(t)
+\hat{x_i}^{equal}(t+dt) = x_i(t) e^0 = x_i(t)
 \end{equation}
 
 Under the `intrinsic null' model, all viruses have equal antigenic fitness but serotype-specific intrinsic fitness at all timepoints:
 
 \begin{equation}
   \label{intrinsic_null}
-  f_i^{intrinsic null}(t) = f_0
+  f_i^{intrinsic}(t) = f_0
 \end{equation}
 \begin{equation}
-\hat{x_i}^{intrinsic null}(t+dt) = x_i(t) e^{f_0}
+\hat{x_i}^{intrinsic}(t+dt) = x_i(t) e^{f_0}
 \end{equation}
 
-\subsubsection{Model performance and parameter fitting}
+\subsubsection{Model performance assessment and parameter fitting}
 We assess predictive power as the root mean squared error between predicted and empirical clade frequencies.
-To assess both the final frequency predictions and the predicted clade trajectories, this RMSE includes error for each clade, for each starting timepoint $t$, and for each intermediate predicted timepoint $t+u$).
+To assess both the final frequency predictions and the predicted clade trajectories, this RMSE includes error for each clade, for each starting timepoint $t$, and for each intermediate predicted timepoint $t+u$.
 
 Our frequency prediction model has a total of 8 free parameters.
-For each dataset, we jointly fit these parameters to minimize RMSE of serotype frequency predictions via the Nelder-Mead algorithm as implemented in SciPy v.1.0.0 (Table~\ref{fitness_model_parameters})~\citep{Jones:2001aa,gao2012implementing}.
+We jointly fit these parameters to minimize RMSE of serotype frequency predictions via the Nelder-Mead algorithm as implemented in SciPy v.1.0.0 (Table~\ref{fitness_model_parameters}) \citep{Jones:2001aa,gao2012implementing}.
 
 \begin{table}[ht!]
   \begin{center}
@@ -619,10 +619,10 @@ For each dataset, we jointly fit these parameters to minimize RMSE of serotype f
       $\sigma$ & 0.76 & Proportion of titers waning each year since primary infection\\
       $N$ & 2 & Number of years of previous immunity that contribute to antigenic fitness\\
       $dt$ & 2 & Number of years in the future to predict clade frequencies\\
-      $DENV1 f_{0}$ & 0.74 & Relative intrinsic fitness of DENV1\\
-      $DENV2 f_{0}$ & 0.84 & Relative intrinsic fitness of DENV2\\
-      $DENV3 f_{0}$ & 0.50 & Relative intrinsic fitness of DENV3\\
-      $DENV4 f_{0}$ & 0. & Relative intrinsic fitness of DENV4 (fixed)\\
+      DENV1 $f_{0}$ & 0.74 & Relative intrinsic fitness of DENV1\\
+      DENV2 $f_{0}$ & 0.84 & Relative intrinsic fitness of DENV2\\
+      DENV3 $f_{0}$ & 0.50 & Relative intrinsic fitness of DENV3\\
+      DENV4 $f_{0}$ & 0. & Relative intrinsic fitness of DENV4 (fixed)\\
     \end{tabular}
     \caption{
     \textbf{Fitness model parameters}
@@ -631,7 +631,7 @@ For each dataset, we jointly fit these parameters to minimize RMSE of serotype f
 \end{table}
 
 \subsubsection{Simulations}
-To ensure the model machinery functions correctly, we seeded a forward simulation of clade dynamics with two years of empirical frequencies and simulated predicted dynamics over the remainder of the time course (Figure~\ref{simulated_frequencies_high_beta}).
+To ensure the model machinery functions correctly, we seeded a forward simulation of clade dynamics with two years of empirical frequencies and simulated predicted dynamics over the remainder of the time course (Figure~\ref{simulation_parameter_recovery}).
 We then fit model parameters as described above, and obtained the following:
 
 \begin{table}[ht!]
@@ -648,7 +648,7 @@ We then fit model parameters as described above, and obtained the following:
       $DENV3 f_{0}$ & 0.40 & 0.41 \\
     \end{tabular}
     \caption{
-    \textbf{Simulations recover input parameters}
+    \textbf{Simulations parameter recovery.}
     }
   \end{center}
 \end{table}
@@ -827,7 +827,7 @@ Mutation & Serotype & Effect size $d_m$ & Count \\
 \end{tabular}
 \label{antigenic_mutations}
 \caption{
-\textbf{Antigenically relevant mutations}
+\textbf{Antigenically relevant mutations.}
 Each row represents a mutation (or colinear cluster of mutations) inferred by the titer model to have a non-zero antigenic effect size $d_m$.
 We also report the number of times each mutation was observed in our dataset, within and between serotypes (among all asymmetrical pairwise sequence comparisons).}
 }
@@ -853,7 +853,7 @@ We also report the number of times each mutation was observed in our dataset, wi
     \end{tabular}
     \label{titer_model_performance}
     \caption{
-    \textbf{Titer model performance comparisons}
+    \textbf{Titer model performance comparisons.}
     We compared performance across several different variations of the titer model.
     As described in \ref{neher2016prediction}, incremental antigenic change can be assigned to either amino acid substitutions (`Substitution' model) or to branches in the phylogeny (`Tree' model).
     For each of these models, we can constrain the model such that antigenic change is allowed to occur only between serotypes (`Interserotype') or between AND within serotypes (`Full tree').
@@ -885,11 +885,11 @@ We also report the number of times each mutation was observed in our dataset, wi
     }
   \label{fitness_model_performance}
   \caption{
-  \textbf{Fitness model performance comparisons}
+  \textbf{Fitness model performance comparisons.}
   Here we compare the performance of the antigenically-informed fitness models to model performance under two null formulations.
   In the `equal' null model, all clades are assigned equal fitness (i.e., antigenic and intrinsic fitness are set to 0).
   In the `intrinsic' null model formulation, only the serotype-specific, time-invariant intrinsic fitness values contribute to clade fitness (i.e., antigenic fitness is set to 0).
-  For both formulations, all other parameters were set to the values reported in Table~\ref{fitness_model_parameterss} (optimized for RMSE).
+  For both formulations, all other parameters were set to the values reported in Table~\ref{fitness_model_parameters} (optimized for RMSE).
   }
 \end{table}
 \end{centering}
@@ -897,7 +897,7 @@ We also report the number of times each mutation was observed in our dataset, wi
 \begin{figure}[ht]
 \centering
 	\includegraphics[width=0.75\textwidth]{../figures/png/titer_species_error.png}
-	\caption{\textbf{Titer prediction error by serum strain and species}
+	\caption{\textbf{Titer prediction error by serum strain and species.}
   Human sera was raised against four different virus strains (the monovalent vaccine components); non-human primate (NHP) sera was raised against many different virus strains.
   Here, we excluded NHP sera raised against the monovalent vaccine components, such that each normalized titer measurement is aggregated across individuals, but not across species.
   We report the out-of-sample titer prediction error for each serum strain (versus all available test viruses), aggregated across 100-fold monte carlo cross-validation.
@@ -909,7 +909,7 @@ We also report the number of times each mutation was observed in our dataset, wi
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.75\textwidth]{../figures/png/titer_asymmetry.png}
-  \caption{\textbf{Titer value symmetry}
+  \caption{\textbf{Titer value symmetry.}
   Some viruses have greater avidity overall, and some sera are more potent overall.
   We normalize for these row and column effects ($v_a$ and $p_b$, respectively) in the titer model.
   Once overall virus avidity and serum potency are accounted for, titers are roughly symmetric (i.e., $D_{ij} \approx D_{ji}$).
@@ -920,11 +920,12 @@ We also report the number of times each mutation was observed in our dataset, wi
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{../figures/png/thai_frequencies_comparison.png}
-  \caption{\textbf{Case counts versus clade frequencies (Thailand)}
+  \caption{\textbf{Case counts versus clade frequencies (Thailand).}
   As described in the Methods, we estimate clade frequencies based on observed relative abundance in the `slice' of the phylogeny at each quarterly timepoint.
   These frequency estimates are smoothed using a discretized Brownian motion diffusion process.
   Here, we compare estimated serotype frequencies across Thailand (all available high quality sequences) to case counts from a hospital in Bangkok between 1975 -- 2010\citep{reich2013interactions}.
-  Biweekly case counts were aggregated into quarterly timepoints, but were not smoothed.}
+  Biweekly case counts were aggregated into quarterly timepoints, but were not smoothed.
+  While there are some instances where case counts and frequencies diverge (e.g., DENV4 in the early 1990s), the noisy nature of the unsmoothed case counts artificially deflates estimates of concordance.}
 \label{thai_frequencies_comparison}
 \end{figure}
 
@@ -932,7 +933,7 @@ We also report the number of times each mutation was observed in our dataset, wi
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{../figures/png/simulated_frequencies_high_beta.png}
-  \caption{\textbf{Simulated serotype frequencies}
+  \caption{\textbf{Simulated serotype frequencies.}
   As described in the Methods, we seeded a simulation with two years of empirical frequencies and predicted forward to simulate the remainder of the timecourse.
   Here, we simulated under the model parameters described in Table~\ref{simulation_parameters}}
 \label{simulation_parameter_recovery}
@@ -941,7 +942,7 @@ We also report the number of times each mutation was observed in our dataset, wi
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{../figures/png/simulated_fitParameters_freqs.png}
-  \caption{\textbf{Simulated serotype frequencies (model parameters)}
+  \caption{\textbf{Simulated serotype frequencies (model parameters).}
   As described in the Methods, we seeded a simulation with two years of empirical frequencies and predicted forward to simulate the remainder of the timecourse.
   Here, we simulated under the model parameters described in Table~\ref{fitness_model_parameters}.
   This results in damped oscillations around the intrinsic fitness value for each serotype, but these intrinsic fitnesses alone are unable to predict observed clade dynamics (Table~\ref{fitness_model_performance}).}
