@@ -210,7 +210,7 @@ We thus learn model parameters from the training data, and then use those parame
 We assess model performance by comparing the predicted test titer values to the actual values, aggregated across 100-fold Monte Carlo cross validation.
 
 This model formulation is an effective tool for estimating antigenic relationships between viruses based on their genetic sequences.
-On average across cross-validation replicates, this model yields a root mean squared error (RMSE) of 0.75 when predicting titers relative to their true value (95\% CI 0.74--0.77, RMSE), \tbc{the sentence that this model predicts within 0.75 implies absolute error, but the parethentical says RMSE, I've revised with the assumption that this is indeed RMSE} and explains 78\% of the observed variation in neutralization titers overall (95\% CI 0.77--0.79, Pearson $R^2$).
+On average across cross-validation replicates, this model yields a root mean squared error (RMSE) of 0.75 when predicting titers relative to their true value (95\% CI 0.74--0.77, RMSE), and explains 78\% of the observed variation in neutralization titers overall (95\% CI 0.77--0.79, Pearson $R^2$).
 This is comparable to the model error from a cartography-based characterization of the same dataset (RMSE 0.65--0.8 log$_2$ titer units) \citep{katzelnick2015dengue}.
 Prediction error was comparable between human and non-human primate sera, indicating that these viral determinants of antigenic phenotypes are not species-specific (Figure~\ref{species_titers}).
 
@@ -384,7 +384,6 @@ Speculatively, this is consistent with the hypothesis previously suggested by \s
 
 To investigate the impact of this observed variation, we examine patterns of neutralization in response to vaccination with each monovalent component of the NIH vaccine candidate.
 Here, we see that each monovalent component elicits broad homotypic protection, but levels of heterotypic cross protection vary widely between heterotypic genotypes.
-\tbc{Should discuss \citet{juraska2018viral} in a sentence here.}
 This is consistent with previous reports of genotype-specific interactions between standing population immunity and subsequent heterotypic epidemics as modulating epidemic severity \citep{ohainle2011dynamics, kochel2002effect}.
 We hypothesize that this observed within-serotype variation primarily effects heterotypic secondary infection outcomes, rather than modulating homotypic immunity.
 
@@ -480,7 +479,7 @@ In the substitution model, observed titer drops are mapped to mutations between 
   \label{eq_predicted_titers}
 \hat{D}_{ij} \approx D_{ij} = \sum_{b} d_m + v_i + p_j,
 \end{equation}
-where $d_m$ is the titer drop assigned to each mutation, $m$, between serum $i$ and virus $j$, and $b$ iterates over mutations.
+where $d_m$ is the titer drop assigned to each mutation, $m$, between serum $i$ and virus $j$, and $m$ iterates over mutations.
 We randomly withhold 10\% of titer measurements as a test set.
 We use the remaining 90\% of titer measurements as a training set to learn values for virus avidity, serum potency, and mutation effects.
 As in \citet{neher2016prediction}, we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function
@@ -656,6 +655,8 @@ We then fit model parameters as described above, and obtained parameter values t
 
 \subsection*{Data and software availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
+Our work relies upon many open source Python packages and software tools, including iPython \cite{perez2007ipython}, Matplotlib \cite{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \cite{mckinney2010data}, CVXOPT \cite{andersen2013cvxopt}, NumPy \cite{van2011numpy,gao2012implementing}, Biopython \cite{cock2009biopython}, SciPy \cite{jones2001scipy}, Statsmodels \cite{seabold2010statsmodels}, Nextstrain \cite{hadfield2017nextstrain}, MAFFT \cite{katoh2013mafft}, and IQ-TREE \cite{nguyen2014iq}.
+Package versions are documented in the github repository.
 
 \section*{Acknowledgements}
 We would like to thank Richard Neher, John Huddleston, Andrew Rambaut, Molly OhAinle, David Shaw, Paul Edlefsen, Michal Juraska, and all members of the Bedford Lab for useful discussion and advice.
@@ -663,8 +664,7 @@ SB is a Graduate Research Fellow and is supported by NSF DGE-1256082.
 TB is a Pew Biomedical Scholar and is supported by NIH R35 GM119774-01.
 LK is supported by NIH awards R01AI114703-01 and P01AI106695.
 Our work depends on open data sharing and many open source software tools.
-We gratefully acknowledge the authors \citep{katzelnick2015dengue} and developers \cite{andersen2013cvxopt,cock2009biopython,gao2012implementing,hadfield2017nextstrain,Hunter2007computing,Jones2001scipy,katoh2013mafft,mckinney2010data,nguyen2014iq,perez2007ipython,seabold2010statsmodels,van2011numpy} who make our work possible.
-\tbc{I've never seen citations in acknowledgements. You should spell these out if you want to include them. But citing software is good and I'd move these as citations to Methods somewhere. Perhaps in Data Availability.}
+We gratefully acknowledge the authors and developers who make our work possible.
 
 \bibliographystyle{format}
 \bibliography{dengue-antigenic-dynamics}
@@ -793,8 +793,8 @@ We gratefully acknowledge the authors \citep{katzelnick2015dengue} and developer
     Serotype            & Interserotype  & 0.105  & 0.547         & 0.660 \\
     Serotype            & Equal null     & 0.130  & 0.000         & 0.480 \\
     Serotype            & Intrinsic null & 0.140  & 0.042         & 0.510 \\
-    Genotoype           & Interserotype  & 0.062  & 0.286         & 0.666 \\
-    Genotype            & Intergenotype  & 0.062  & 0.254         & 0.610 \\
+    Genotype            & Interserotype  & 0.062  & 0.286         & 0.666 \\
+        Genotype            & Intergenotype  & 0.062  & 0.254         & 0.610 \\
     Genotype            & Equal null     & 0.070  & 0.000         & 0.440 \\
     Genotype            & Intrinsic null & 0.072  & 0.032         & 0.530 \\
     \hline
