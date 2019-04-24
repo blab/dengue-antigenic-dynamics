@@ -463,7 +463,7 @@ To predict unmeasured titers, we employ the `substitution model' from \citet{neh
 In the substitution model, observed titer drops are mapped to mutations between each serum and test virus strain after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (`row' and `column' effects, respectively), so that
 \begin{equation}
   \label{eq_predicted_titers}
-\hat{D}_{ij} \approx D_{ij} = \sum_{b} d_m + v_i + p_j,
+\hat{D}_{ij} \approx D_{ij} = \sum_{m} d_m + v_i + p_j,
 \end{equation}
 where $d_m$ is the titer drop assigned to each mutation, $m$, between serum $i$ and virus $j$, and $m$ iterates over mutations.
 We randomly withhold 10\% of titer measurements as a test set.
@@ -471,7 +471,7 @@ We use the remaining 90\% of titer measurements as a training set to learn value
 As in \citet{neher2016prediction}, we formulate this as a convex optimization problem and solve for these parameter values to minimize the cost function
 \begin{equation}
   \label{eq_cost_fn}
-C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{b} d_m + \kappa \sum_{i} v_i^2 + \delta \sum_{j} p_j^2.
+C = \sum_{i,j} (\hat{D}_{ij} - D_{ij})^2 + \lambda \sum_{m} d_m + \kappa \sum_{i} v_i^2 + \delta \sum_{j} p_j^2.
 \end{equation}
 We used $\lambda = 3.0$, $\kappa = 0.6$, and $\delta = 1.2$ to minimize test error.
 Respectively, these terms represent the squared training error; an L1 regularization term on mutation effects, such that most values of $d_m = 0$; and L2 regularization terms on virus avidities and serum potencies, such that they are normally distributed.
