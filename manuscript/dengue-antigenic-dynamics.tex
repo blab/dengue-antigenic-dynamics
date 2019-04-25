@@ -363,9 +363,9 @@ This supports and expands upon previous reports \citep{katzelnick2015dengue,fors
 
 Consistent with the relatively long timescale of dengue evolution, we observe many sites in the dengue phylogeny to have mutated multiple times.
 These represent instances of parallelism, reversion and homoplasy.
-For example, we observe that site 390 is consitently S in DENV1, N in DENV3 and H in DENV4, while DENV2 genoptypes show a mixture of D, N and S (\ref{phylogeny_homoplasy}).
+For example, we observe that site 390 is consitently S in DENV1, N in DENV3 and H in DENV4, while DENV2 genotypes show a mixture of D, N and S (\ref{phylogeny_homoplasy}).
 We estimate an antigenic impact of 0.18 log$_2$ titers of the N390S mutation.
-Our model predicts that the parallel N390S mutations in DENV1 and DENV2 Cosmopolitan makes these viruses slightly more antigenically similar rather than antigenically distinct.
+Our model predicts that the parallel N390S mutations in DENV1 and DENV2 Cosmopolitan makes these viruses slightly more antigenically similar rather than more antigenically distinct.
 Along these lines, we compared the `substitution' model to a similar model formulation (termed the `tree' model) which assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, so that each branch with a positive $d_m$ value increases antigenic distance between strains \citep{neher2016prediction}.
 As expected from the high degree of homoplasy across the dengue phylogeny, we observe that the `substitution' model outperforms the `tree' model in predicting titers in validation datasets (Table ~\ref{titer_model_performance}).
 
@@ -741,7 +741,7 @@ We gratefully acknowledge the authors and developers who make our work possible.
     \textbf{Titer model performance comparisons.}
     We compared performance across several different variations of the titer model.
     As described in \citet{neher2016prediction}, incremental antigenic change can be assigned to either amino acid substitutions (`Substitution' model) or to branches in the phylogeny (`Tree' model).
-    For each of these models, we can constrain the model such that antigenic change is allowed to occur only between serotypes (`Interserotype') or between AND within serotypes (`Full tree').
+    For each of these models, we can constrain the model such that antigenic change is allowed to occur only between serotypes (`Interserotype') or between AND within serotypes (`Full').
     For the substitution model, we constrain the interserotype model by reconstructing the amino acid sequence of the most recent common ancestor for each serotype and allowing the model to assign antigenic change only to mutations between these ancestral sequences.
     For the tree model, we constrain the interserotype model by allowing the model to assign antigenic change only to branches in the phylogeny that lie between serotypes.
     We also assess the impact of the virus avidity and serum potency terms, $v_a$ and $p_b$.
@@ -751,12 +751,12 @@ We gratefully acknowledge the authors and developers who make our work possible.
   \begin{tabular}[ht]{ c c c c c }
     Model         & Antigenic resolution  & $v_a$ and $p_b$ & RMSE              & Pearson $R^2$ \\
     \hline
-    Substitution  & Full tree             & Yes             & 0.75 (0.74--0.77) & 0.78 (0.77--0.79) \\
-    Substitution  & Full tree             & No              & 1.13 (1.11--1.16) & 0.50 (0.48--0.52) \\
+    Substitution  & Full             & Yes             & 0.75 (0.74--0.77) & 0.78 (0.77--0.79) \\
+    Substitution  & Full             & No              & 1.13 (1.11--1.16) & 0.50 (0.48--0.52) \\
     Substitution  & Interserotype         & Yes             & 0.86 (0.85--0.88) & 0.72 (0.70--0.73) \\
     Substitution  & Interserotype         & No              & 0.86 (0.84--0.87) & 0.71 (0.70--0.72) \\
-    Tree          & Full tree             & Yes             & 0.84 (0.83--0.86) & 0.72 (0.71--0.73) \\
-    Tree          & Full tree             & No              & 1.40 (1.38--1.42) & 0.24 (0.23--0.26) \\
+    Tree          & Full             & Yes             & 0.84 (0.83--0.86) & 0.72 (0.71--0.73) \\
+    Tree          & Full             & No              & 1.40 (1.38--1.42) & 0.24 (0.23--0.26) \\
     Tree          & Interserotype         & Yes             & 0.87 (0.85--0.88) & 0.70 (0.69--0.71) \\
     Tree          & Interserotype         & No              & 0.86 (0.84--0.88) & 0.72 (0.71--0.73) \\
     \hline
