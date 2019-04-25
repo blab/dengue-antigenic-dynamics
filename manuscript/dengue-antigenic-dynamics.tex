@@ -313,7 +313,7 @@ This also demonstrates that this model captures key components of dengue populat
 The fitness model includes six free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (minimizing the RMSE of frequency predictions, see Methods).
 We find that serotype fluctuations are most consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 63\% per year for the first two years after primary infection.
 We also find that these dynamics are best explained by intrinsic fitness that moderately varies by serotype (Table~\ref{fitness_model_parameters}).
-However, intrinsic fitness alone is unable to predict serotype dynamics (Table~\ref{fitness_model_performance}).
+However, intrinsic fitness alone is unable to predict serotype dynamics (Table~\ref{fitness_model_performance}) and relative strength of antigenic fitness and intrinsic fitness are approximately matched in determining overall serotype fitness.
 
 \subsection*{Antigenic novelty also partially predicts genotype success}
 To estimate how well antigenic fitness predicts genotype dynamics, we used the same model to predict genotype success and decline.
@@ -363,7 +363,7 @@ This supports and expands upon previous reports \citep{katzelnick2015dengue,fors
 
 Consistent with the relatively long timescale of dengue evolution, we observe many sites in the dengue phylogeny to have mutated multiple times.
 These represent instances of parallelism, reversion and homoplasy.
-For example, we observe that site 390 is consistently S in DENV1, N in DENV3 and H in DENV4, while DENV2 genotypes show a mixture of D, N and S (\ref{phylogeny_homoplasy}).ts of
+For example, we observe that site 390 is consistently S in DENV1, N in DENV3 and H in DENV4, while DENV2 genotypes show a mixture of D, N and S (\ref{phylogeny_homoplasy}).
 We estimate an antigenic impact of 0.18 log$_2$ titers of the N390S mutation.
 Our model predicts that the parallel N390S mutations in DENV1 and DENV2 Cosmopolitan makes these viruses slightly more antigenically similar rather than more antigenically distinct.
 Along these lines, we compared the `substitution' model to a similar model formulation (termed the `tree' model) which assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, so that each branch with a positive $d_m$ value increases antigenic distance between strains \citep{neher2016prediction}.
