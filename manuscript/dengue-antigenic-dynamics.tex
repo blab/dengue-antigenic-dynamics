@@ -361,15 +361,17 @@ For comparison, we reconstructed the ancestral sequence of each serotype and con
 While this interserotype-only model predicts titers to a reasonable degree, we find that it has higher error (RMSE = 0.86) than the full model which accounts for within-serotype heterogeneity (RMSE = 0.79; Table~\ref{titer_model_performance}).
 This supports and expands upon previous reports \citep{katzelnick2015dengue,forshey2016incomplete,waggoner2016homotypic} that the null hypothesis of antigenically uniform serotypes is inconsistent with observed patterns of cross-protection and susceptibility.
 
-Given the relatively long timescale of dengue evolution, we expect that dengue antigenic diversity has been shaped by many instances of parallelism, reversion and homoplasy.
-Indicative of this, our model identifies 13 sites where multiple specific substitutions are inferred to be antigenically relevant, including four pairs of reversions (Table~\ref{antigenic_mutations}).
-To investigate the impact of these XYZ, we compared this `substitution' model to a similar model formulation which assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, and estimates symmetrical titer distances as the sum of $d_m$ values along the shortest path separating two viruses in the phylogeny \citep{neher2016prediction}.
-By definition, branches in the phylogeny directly capture the effect of all mutations that occurred along each branch, except for XYZ.
-This tree model also explains observed antigenic phenotypes to a reasonable degree, but has higher error and less predictive power than the asymmetrical substitution model presented here (Table ~\ref{titer_model_performance}).
-This suggests that accounting for repeated mutations in the same site is necessary to most accurately explain observed antigenic variation.
+Consistent with the relatively long timescale of dengue evolution, we observe many sites in the dengue phylogeny to have mutated multiple times.
+These represent instances of parallelism, reversion and homoplasy.
+For example, we observe that site 390 is consitently S in DENV1, N in DENV3 and H in DENV4, while DENV2 genoptypes show a mixture of D, N and S (\ref{phylogeny_homoplasy}).
+We estimate an antigenic impact of 0.18 log$_2$ titers of the N390S mutation.
+Our model predicts that the parallel N390S mutations in DENV1 and DENV2 Cosmopolitan makes these viruses slightly more antigenically similar rather than antigenically distinct.
+Along these lines, we compared the `substitution' model to a similar model formulation (termed the `tree' model) which assigns $d_m$ values to individual branches in the phylogeny, rather than to individual mutations, so that each branch with a positive $d_m$ value increases antigenic distance between strains \citep{neher2016prediction}.
+As expected from the high degree of homoplasy across the dengue phylogeny, we observe that the `substitution' model outperforms the `tree' model in predicting titers in validation datasets (Table ~\ref{titer_model_performance}).
 
 To investigate the impact of this observed variation, we examine patterns of neutralization in response to vaccination with each monovalent component of the NIH vaccine candidate.
 Here, we see that each monovalent component elicits broad homotypic protection, but levels of heterotypic cross protection vary widely between heterotypic genotypes.
+\tbc{Should discuss \citet{juraska2018viral} in a sentence here.}
 This is consistent with previous reports of genotype-specific interactions between standing population immunity and subsequent heterotypic epidemics as modulating epidemic severity \citep{ohainle2011dynamics, kochel2002effect}.
 We hypothesize that this observed within-serotype variation primarily effects heterotypic secondary infection outcomes, rather than modulating homotypic immunity.
 
@@ -458,7 +460,7 @@ We compute standardized antigenic distance between virus $i$ and serum $j$ (deno
 D_{ij} = \mathrm{log}_2(T_{ii}) - \mathrm{log}_2(T_{ij}).
 \end{equation}
 We then average normalized titers across individuals.
-To predict unmeasured titers, we employ the `substitution model' from \citet{neher2016prediction} and implemented in Nextstrain \citep{hadfield2017nextstrain}, which assumes that antigenic evolution is driven by underlying genetic evolution.
+To predict unmeasured titers, we employ the `substitution model' from \citet{neher2016prediction} and implemented in Nextstrain \citep{hadfield2018nextstrain}, which assumes that antigenic evolution is driven by underlying genetic evolution.
 
 In the substitution model, observed titer drops are mapped to mutations between each serum and test virus strain after correcting for overall virus avidity, $v_i$, and serum potency, $p_j$ (`row' and `column' effects, respectively), so that
 \begin{equation}
@@ -641,7 +643,7 @@ We then fit model parameters as described above, and obtained parameter values t
 
 \subsection*{Data and software availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
-Our work relies upon many open source Python packages and software tools, including iPython \cite{perez2007ipython}, Matplotlib \cite{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \cite{mckinney2010data}, CVXOPT \cite{andersen2013cvxopt}, NumPy \cite{van2011numpy,gao2012implementing}, Biopython \cite{cock2009biopython}, SciPy \cite{jones2001scipy}, Statsmodels \cite{seabold2010statsmodels}, Nextstrain \cite{hadfield2017nextstrain}, MAFFT \cite{katoh2013mafft}, and IQ-TREE \cite{nguyen2014iq}.
+Our work relies upon many open source Python packages and software tools, including iPython \cite{perez2007ipython}, Matplotlib \cite{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \cite{mckinney2010data}, CVXOPT \cite{andersen2013cvxopt}, NumPy \cite{van2011numpy,gao2012implementing}, Biopython \cite{cock2009biopython}, SciPy \cite{jones2001scipy}, Statsmodels \cite{seabold2010statsmodels}, Nextstrain \cite{hadfield2018nextstrain}, MAFFT \cite{katoh2013mafft}, and IQ-TREE \cite{nguyen2014iq}.
 Package versions are documented in the github repository.
 
 \section*{Acknowledgements}
@@ -821,6 +823,14 @@ We gratefully acknowledge the authors and developers who make our work possible.
 \label{thai_frequencies_comparison}
 \end{figure}
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{../figures/png/phylogeny_homoplasy.png}
+  \caption{\textbf{Genotype as site E 390 across dengue phylogeny.}
+  Dengue virus genotype calls can be seen on Nextstrain \citep{hadfield2018nextstrain}.
+  A live view of this figure is available at \href{https://nextstrain.org/dengue/}{nextstrain.org/dengue/}.}
+\label{phylogeny_homoplasy}
+\end{figure}
 
 \begin{figure}[ht]
   \centering
