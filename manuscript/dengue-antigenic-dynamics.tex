@@ -134,7 +134,7 @@ DENV circulates primarily in South America and Southeast Asia, infecting 400 mil
 Primary DENV infection is more often mild and is thought to generate lifelong homotypic immunity and temporary heterotypic immunity, which typically wanes over six months to two years \citep{sabin1952research,reich2013interactions,katzelnick2016neutralizing}.
 Subsequent heterotypic secondary infection induces broad cross-protection, and symptomatic tertiary and quaternary cases are rare  \citep{gibbons2007analysis,olkowski2013reduced}.
 However, a small subset of secondary infections are enhanced by non-neutralizing, cross-reactive antibodies, resulting in severe disease via antibody dependent enhancement (ADE) \citep{halstead1979vivo,katzelnick2017antibody,sangkawibha1984risk,salje2018reconstruction}.
-Approximately 1--3\% of cases progress to severe dengue hemorrhagic fever, causing $\sim$9,000 deaths each year \cite{bhatt2013global,stanaway2016global} and relative risk of severe dengue from secondary heterotypic infection relative to primary infection is estimated to be $\sim$24 \citep{mizumoto2014risk}.
+Approximately 1--3\% of cases progress to severe dengue hemorrhagic fever, causing $\sim$9,000 deaths each year \citep{bhatt2013global,stanaway2016global} and relative risk of severe dengue from secondary heterotypic infection relative to primary infection is estimated to be $\sim$24 \citep{mizumoto2014risk}.
 Thus, the antigenic relationships between dengue viruses --- describing whether the immune response generated after primary infection results in protection or enhancement of secondary infection --- are key drivers of DENV case outcomes and epidemic patterns.
 
 While each serotype is clearly genetically and antigenically distinct, it is not clear how subserotype clades of DENV interact antigenically.
@@ -190,7 +190,7 @@ This suggests that treating each serotype as antigenically uniform potentially o
 Titer measurements are prone to noise, and there is a limited amount of available titer data.
 If the antigenic heterogeneity observed in the raw data is truly the result of an underlying evolutionary process, we expect that differences in antigenic phenotype correspond to underlying mutations in surface proteins.
 Dengue has two surface proteins, prM (membrane) and E (envelope).
-While previous studies have identified epitopes on both prM and E, it is believed that antibodies involved in ADE primarily target prM, while neutralizing antibodies primarily target E. \sbc{Leah, do you remember this reference?}
+While previous studies have identified epitopes on both prM and E, it is believed that antibodies involved in ADE primarily target prM, while neutralizing antibodies primarily target E \citep{de2014dengue}.
 The assay used to generate this titer dataset captures neutralization, but does not capture the effects of ADE; we thus focus our analysis on the \textit{E} gene.
 
 To fully map the relationship between DENV genetic and antigenic evolution, we adapt a substitution-based model originally developed for influenza \citep{neher2016prediction}.
@@ -643,7 +643,7 @@ We then fit model parameters as described above, and obtained parameter values t
 
 \subsection*{Data and software availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
-Our work relies upon many open source Python packages and software tools, including iPython \cite{perez2007ipython}, Matplotlib \cite{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \cite{mckinney2010data}, CVXOPT \cite{andersen2013cvxopt}, NumPy \cite{van2011numpy,gao2012implementing}, Biopython \cite{cock2009biopython}, SciPy \cite{jones2001scipy}, Statsmodels \cite{seabold2010statsmodels}, Nextstrain \cite{hadfield2018nextstrain}, MAFFT \cite{katoh2013mafft}, and IQ-TREE \cite{nguyen2014iq}.
+Our work relies upon many open source Python packages and software tools, including iPython \citep{perez2007ipython}, Matplotlib \citep{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \citep{mckinney2010data}, CVXOPT \citep{andersen2013cvxopt}, NumPy \citep{van2011numpy,gao2012implementing}, Biopython \citep{cock2009biopython}, SciPy \citep{jones2001scipy}, Statsmodels \citep{seabold2010statsmodels}, Nextstrain \citep{hadfield2018nextstrain}, MAFFT \citep{katoh2013mafft}, and IQ-TREE \citep{nguyen2014iq}.
 Package versions are documented in the github repository.
 
 \section*{Acknowledgements}
