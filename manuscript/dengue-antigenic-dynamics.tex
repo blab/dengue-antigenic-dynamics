@@ -313,7 +313,6 @@ This also demonstrates that this model captures key components of dengue populat
 The fitness model includes six free parameters that are optimized such that the model most accurately reproduces the observed fluctuations in DENV population composition (minimizing the RMSE of frequency predictions, see Methods).
 We find that serotype fluctuations are consistent with a model wherein population immunity wanes linearly over time, with the probability of protection dropping by about 63\% per year for the first two years after primary infection.
 This model assumes no fundamental difference between homotypic and heterotypic reinfection; rather, homotypic immunity is assumed to wane at the same rate as heterotypic immunity, but starts from a higher baseline of protection based on closer antigenic distances.
-
 We also find that these dynamics are best explained by intrinsic fitness that moderately varies by serotype (Table~\ref{fitness_model_parameters}); we are not aware of any literature that directly addresses this observation via competition experiments.
 However, intrinsic fitness alone is unable to predict serotype dynamics (Table~\ref{fitness_model_performance}) and relative strength of antigenic fitness and intrinsic fitness are approximately matched in determining overall serotype fitness.
 
@@ -410,7 +409,8 @@ We then directly compare how strongly these coarser serotype-level versus specif
 Overall, we find that antigenic fitness explains a moderate portion of the observed variation in genotype growth and decline.
 Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure~\ref{genotype_fitness}C-D).
 This suggests that although genotypes are antigenically diverse, these differences do not appear to influence large-scale regional dynamics over time.
-Alternatively, this lack of signal could also be explained by either (A) genotype-level frequency trajectories estimated from public data are overly noisy for this application or (B) our model of antigenic fitness based on PRNT assay does not match reality. In the present analysis, we are not able to firmly resolve these disparate possibilities.
+This lack of signal could be explained by either (A) genotype-level frequency trajectories estimated from public data are overly noisy for this application or (B) our model of antigenic fitness based on PRNT assay data does not match reality, due to either PRNT assay data not well reflecting human immunity or due to our particular model formulation that parameterizes immunity from titer distances (Eq.~\ref{eq_population_immunity}--\ref{eq_fitness}).
+In the present analysis, we are not able to firmly resolve these disparate possibilities.
 
 This observation is also subject to caveats imposed by the available data and model assumptions.
 Our estimates of antigenic fitness are informed by the antigenic distances inferred by the substitution model; thus, as above, we are unable to account for nuanced antigenic differences between sub-genotype clades of DENV due to limited titer data.
@@ -456,7 +456,7 @@ We selected all remaining virus strains that were annotated as a Southeast Asian
 For both datasets, we used the annotated reference dataset from \citep{pyke2016highly} to assign sequences to canonical genotypes.
 
 \subsection*{Alignments and trees}
-We used mafft v7.305b to align nucleotide \textit{E} gene sequences for each strain before translating the aligned sequences (no frame-shift indels were present) \citep{katoh2013mafft}.
+We used MAFFT v7.305b to align nucleotide \textit{E} gene sequences for each strain before translating the aligned sequences (no frame-shift indels were present) \citep{katoh2013mafft}.
 All maximum likelihood phylogenies were constructed with IQ-TREE version 1.6.8 and the GTR+I+G15 nucleotide substitution model \citep{nguyen2014iq}.
 
 \subsection*{Titer Model}
@@ -573,7 +573,7 @@ We then calculate clade growth rates, defined as the fold-change in relative cla
 \subsubsection*{Null models}
 To quantify the impact of antigenic fitness on DENV clade success, we compare our antigenically-informed model to two null models.
 
-Under the `equal null' model, all viruses have equal total fitness (antigenic and intrinsic fitness) at all timepoints
+Under the `equal fitness null' model, all viruses have equal total fitness (antigenic and intrinsic fitness) at all timepoints
 \begin{equation}
   \label{equal_null}
 f_i^{equal}(t) = 0
@@ -582,7 +582,7 @@ f_i^{equal}(t) = 0
 \hat{x_i}^{equal}(t+dt) = x_i(t) e^0 = x_i(t).
 \end{equation}
 
-Under the `intrinsic null' model, all viruses have equal antigenic fitness but serotype-specific intrinsic fitness at all timepoints
+Under the `intrinsic fitness null' model, all viruses have equal antigenic fitness but serotype-specific intrinsic fitness at all timepoints
 \begin{equation}
   \label{intrinsic_null}
   f_i^{intrinsic}(t) = f_0
@@ -650,7 +650,7 @@ We then fit model parameters as described above, and obtained parameter values t
 \subsection*{Data and software availability}
 Sequence and titer data, as well as all code used for analyses and figure generation, is publicly available at \href{https://github.com/blab/dengue-antigenic-dynamics}{github.com/blab/dengue-antigenic-dynamics}.
 Our work relies upon many open source Python packages and software tools, including iPython \citep{perez2007ipython}, Matplotlib \citep{Hunter2007computing}, Seaborn \citep{waskomseaborn}, Pandas \citep{mckinney2010data}, CVXOPT \citep{andersen2013cvxopt}, NumPy \citep{van2011numpy,gao2012implementing}, Biopython \citep{cock2009biopython}, SciPy \citep{jones2001scipy}, Statsmodels \citep{seabold2010statsmodels}, Nextstrain \citep{hadfield2018nextstrain}, MAFFT \citep{katoh2013mafft}, and IQ-TREE \citep{nguyen2014iq}.
-Package versions are documented in the github repository.
+Package versions are documented in the GitHub repository.
 
 \section*{Acknowledgements}
 We would like to thank Richard Neher, John Huddleston, Andrew Rambaut, Molly OhAinle, David Shaw, Paul Edlefsen, Michal Juraska, and all members of the Bedford Lab for useful discussion and advice.
@@ -782,15 +782,15 @@ We gratefully acknowledge the authors and developers who make our work possible.
   \label{fitness_model_performance}
   \begin{tabular}{ c c c c c }
     \hline
-    Genetic resolution  & Fitness model  & RMSE   & Pearson $R^2$ & Accuracy \\
+    Genetic resolution  & Fitness model           & RMSE   & Pearson $R^2$ & Accuracy \\
     \hline
-    Serotype            & Interserotype  & 0.105  & 0.547         & 0.660 \\
-    Serotype            & Equal null     & 0.130  & 0.000         & 0.480 \\
-    Serotype            & Intrinsic null & 0.140  & 0.042         & 0.510 \\
-    Genotype            & Interserotype  & 0.062  & 0.286         & 0.666 \\
-        Genotype            & Intergenotype  & 0.062  & 0.254         & 0.610 \\
-    Genotype            & Equal null     & 0.070  & 0.000         & 0.440 \\
-    Genotype            & Intrinsic null & 0.072  & 0.032         & 0.530 \\
+    Serotype            & Interserotype           & 0.105  & 0.547         & 0.660 \\
+    Serotype            & Equal fitness null      & 0.130  & 0.000         & 0.480 \\
+    Serotype            & Intrinsic fitness null  & 0.140  & 0.042         & 0.510 \\
+    Genotype            & Interserotype           & 0.062  & 0.286         & 0.666 \\
+    Genotype            & Intergenotype           & 0.062  & 0.254         & 0.610 \\
+    Genotype            & Equal fitness null      & 0.070  & 0.000         & 0.440 \\
+    Genotype            & Intrinsic fitness null  & 0.072  & 0.032         & 0.530 \\
     \hline
   \end{tabular}
 \end{table}
@@ -812,7 +812,7 @@ We gratefully acknowledge the authors and developers who make our work possible.
 	\caption{\textbf{Titer prediction error by serum strain and species.}
   Human sera was raised against four different virus strains (the monovalent vaccine components); non-human primate (NHP) sera was raised against many different virus strains.
   Here, we excluded NHP sera raised against the monovalent vaccine components, such that each normalized titer measurement is aggregated across individuals, but not across species.
-  We report the out-of-sample titer prediction error for each serum strain (versus all available test viruses), aggregated across 100-fold monte carlo cross-validation.
+  We report the out-of-sample titer prediction error for each serum strain (versus all available test viruses), aggregated across 100-fold Monte Carlo cross-validation.
 	}
 	\label{species_titers}
 \end{figure}
