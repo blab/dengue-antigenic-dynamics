@@ -18,7 +18,7 @@ _3 - Parse the titer model output (also output from augur) to estimate the antig
 
 _4 - Explore parameter space_  
 We fit parameters to minimize the root mean squared error between predicted and actual clade frequencies using the Nelder-Mead algorithm as implemented in SciPy. To run parameter fitting:
-`python antigenic_fitness.py --mode fit`
+`python2 antigenic_fitness.py --mode fit`
 
 **beta** Slope of linear relationship between population immunity and viral fitness  
 **gamma** Slope of linear relationship between titers and probability of protection  

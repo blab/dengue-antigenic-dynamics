@@ -563,7 +563,7 @@ if __name__=="__main__":
 
     args = argparse.ArgumentParser()
     args.add_argument('--frequency_path', help='actual_frequencies csv', default='../data/frequencies/seasia_serotype_frequencies.csv')
-    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/fulltree_Dij.tsv')
+    args.add_argument('--titer_path', help='pairwise dTiters csv', default='../data/frequencies/interserotype_Dij.tsv')
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
@@ -610,17 +610,18 @@ if __name__=="__main__":
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
             model_performance = calc_model_performance(antigenic_fitness)
-
+            print(model_performance['rmse'])
             return model_performance['rmse']
 
         from scipy.optimize import minimize
 
+        print("optimizing RMSE")
         optimizer = minimize(run,
-        (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
-        (args),
-        tol=0.01,
-        method='nelder-mead')
-        print optimizer
+            (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
+            (args),
+            tol=0.01,
+            method='nelder-mead')
+        print(optimizer)
         ofile = open('./scipy_optimize_output.csv', 'w')
         ofile.write(','.join(['%.3f'%v for v in optimizer.x]))
         ofile.write('\n')
