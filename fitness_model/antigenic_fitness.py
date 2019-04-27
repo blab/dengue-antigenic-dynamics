@@ -58,10 +58,9 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
     def sum_over_j(i, past_timepoint, time_passed):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
         antigenic_distance = [ get_Dij(j, i) if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between virus i and serum j
-        probability_protected = [ max(1. - af.sigma*Dij, 0.) for Dij in antigenic_distance ] # Linear transformation from antigenic distance to probability of protection from i given prior exposure to j
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
-        waning = max(1. - af.gamma*(time_passed), 0.) # proportion of protection originally acquired at time t expected to remain by the current_timepoint
-        cumulative_immunity = sum( [ j_frequency * waning * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
+        probability_protected = [ np.power(af.omega, time_passed) * np.exp( -1 * af.sigma * np.power(1. / af.gamma, time_passed) * Dij) for Dij in antigenic_distance ]
+        cumulative_immunity = sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
         return cumulative_immunity
 
     def sum_over_past_t(i):
@@ -565,12 +564,13 @@ if __name__=="__main__":
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
-    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=1.02)
-    args.add_argument('--gamma', type=float, help='Value or value range for the proportion of titers that wane per year post-exposure (slope of years vs. p(titers remaining))', default=0.83)
-    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.76)
-    args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 0.74)
-    args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 0.84)
-    args.add_argument('--DENV3_f0', type=float, help='Relative intrinsic fitness value for DENV3', default = 0.50)
+    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=1.4059779602869877)
+    args.add_argument('--gamma', type=float, help='Value or value range for heterotypic waning', default=0.006288474982712629)
+    args.add_argument('--omega', type=float, help='Value or value range for overall waning', default=0.11759396762081986)
+    args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.678873937640958)
+    args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 0.6906102477506093)
+    args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 0.7874678146138705)
+    args.add_argument('--DENV3_f0', type=float, help='Relative intrinsic fitness value for DENV3', default = 0.4172419615987478)
     args.add_argument('--DENV4_f0', type=float, help='Relative intrinsic fitness value for DENV4', default = 0.)
     args.add_argument('--trajectory', type=float, nargs='*', help='timepoint(s) to compute trajectories for')
     args.add_argument('--plot', help='make plots?', action='store_true')
@@ -594,10 +594,11 @@ if __name__=="__main__":
 
 
     elif args.mode == 'fit':
-        def run((beta, gamma, sigma, DENV1_f0, DENV2_f0, DENV3_f0), args):
+        def run((beta, gamma, omega, sigma, DENV1_f0, DENV2_f0, DENV3_f0), args):
             args = deepcopy(args)
             setattr(args, 'beta', beta)
             setattr(args, 'gamma', gamma)
+            setattr(args, 'omega', omega)
             setattr(args, 'sigma', sigma)
             setattr(args, 'DENV1_f0', DENV1_f0)
             setattr(args, 'DENV2_f0', DENV2_f0)
@@ -608,16 +609,17 @@ if __name__=="__main__":
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
             model_performance = calc_model_performance(antigenic_fitness)
-            print(model_performance['rmse'])
+            print(args.beta, args.gamma, args.omega, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0)
+            print(model_performance)
             return model_performance['rmse']
 
         from scipy.optimize import minimize
 
         print("optimizing RMSE")
         optimizer = minimize(run,
-            (args.beta, args.gamma, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
+            (args.beta, args.gamma, args.omega, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0),
             (args),
-            tol=0.01,
+            tol=0.001,
             method='nelder-mead')
         print(optimizer)
         ofile = open('./scipy_optimize_output.csv', 'w')
@@ -631,7 +633,7 @@ if __name__=="__main__":
         antigenic_fitness.predict_frequencies()
         antigenic_fitness.calc_growth_rates()
         model_performance = calc_model_performance(antigenic_fitness)
-        print model_performance
+        print(model_performance)
         # plot_trajectory_multiples(antigenic_fitness, n_clades_per_plot=4)
 
         if args.trajectory:

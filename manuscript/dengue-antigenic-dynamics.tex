@@ -516,18 +516,14 @@ We adapt a simple deterministic model from \citet{luksza2014predictive} to direc
 We quantify population immunity to virus $i$ at time $t$, $P_i(t)$, as a function of which clades have recently circulated in the past $N$ years, and how antigenically similar each of these clades is to virus $i$, so that
 \begin{equation}
   \label{eq_population_immunity}
-P_i(t) = \sum_{n=1}^{n=N} \left(w(n)  \sum_{j} \Big( x_j(t-n) \, C( D_{ij}) \Big) \right),
+P_i(t) = \sum_{n=1}^{n=N} \left( \sum_{j} \Big( x_j(t-n) \, C( D_{ij}, n) \Big) \right),
 \end{equation}
 where $D_{ij}$ is the antigenic distance between $i$ and each non-overlapping clade $j$, $n$ is the number of years since exposure, and $x_j(t-n)$ is the relative frequency of $j$ at year $t-n$.
-Waning immunity is modeled as a non-negative linear function of time following
+The relationship between antigenic distance and the probability of protection, $C$, is assumed to be be 50\% at antigenic distance $\sigma$ and to wane based on years since infection $n$ modified by $\gamma$ (heterotypic waning) and $\omega$ (overall waning) following
 \begin{equation}
-\label{eq_waning_immunity}
-  w(n) = \mathrm{max}(1 - \gamma n, 0).
+C(D_{ij}, n) = \omega^n \, \mathrm{exp}\left(- \sigma \, (1/\gamma)^n \, D_{ij}\right).
 \end{equation}
-The relationship between antigenic distance and the probability of protection, $C$, is also assumed to be non-negative and linear with slope $-\sigma$, such that
-\begin{equation}
-C(D_{ij}) = \mathrm{max}(1 - \sigma D_{ij}, 0).
-\end{equation}
+Note that $C$ is parameterized to lie between 0 and 1.
 
 We model the effects of population immunity, $P_i(t)$, on viral antigenic fitness, $f_i(t)$, as
 \begin{equation}
