@@ -57,9 +57,19 @@ def calc_timepoint_exposure(af, current_timepoint, frequencies=None):
 
     def sum_over_j(i, past_timepoint, time_passed):
         ''' Return a frequency-weighted sum of the probability of protection from i given prior exposure to j '''
+        gamma = af.gamma
+        if af.gamma < 0.0:
+            gamma = 0.0
+        if af.gamma > 1.0:
+            gamma = 1.0
+        omega = af.omega
+        if af.omega < 0.0:
+            omega = 0.0
+        if af.omega > 1.0:
+            omega = 1.0
         antigenic_distance = [ get_Dij(j, i) if i != j else 0. for j in af.clades] # Pull precomputed antigenic distance between virus i and serum j
         j_frequencies = [ frequencies[j][past_timepoint] for j in af.clades] # Pull relative frequency of each clade j at the timepoint of interest
-        probability_protected = [ np.power(af.omega, time_passed) * np.exp( -1 * af.sigma * np.power(1. / af.gamma, time_passed) * Dij) for Dij in antigenic_distance ]
+        probability_protected = [ np.power(omega, time_passed) * np.exp( -1 * af.sigma * np.power(1. / gamma, time_passed) * Dij) for Dij in antigenic_distance ]
         cumulative_immunity = sum( [ j_frequency * prob_protected for (j_frequency, prob_protected) in zip(j_frequencies, probability_protected)]) # return weighted sum
         return cumulative_immunity
 
@@ -564,9 +574,9 @@ if __name__=="__main__":
     args.add_argument('--date_range', nargs=2, type=float, help='which dates to look at', default=[1970., 2015.])
     args.add_argument('--years_back', type=int, help='how many years of past immunity to include in fitness estimates', default=2)
     args.add_argument('--years_forward', type=int, help='how many years into the future to predict', default=2)
-    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=1.4059779602869877)
-    args.add_argument('--gamma', type=float, help='Value or value range for heterotypic waning', default=0.006288474982712629)
-    args.add_argument('--omega', type=float, help='Value or value range for overall waning', default=0.11759396762081986)
+    args.add_argument('--beta', type=float, help='Value or value range for beta. antigenic fitness = -1.*beta*population_immunity', default=0.5)
+    args.add_argument('--gamma', type=float, help='Value or value range for heterotypic waning', default=0.9)
+    args.add_argument('--omega', type=float, help='Value or value range for overall waning', default=0.9)
     args.add_argument('--sigma', type=float, help='Value or value range for -1*probability of protection from i conferred by each log2 titer unit against i', default=0.678873937640958)
     args.add_argument('--DENV1_f0', type=float, help='Relative intrinsic fitness value for DENV1', default = 0.6906102477506093)
     args.add_argument('--DENV2_f0', type=float, help='Relative intrinsic fitness value for DENV2', default = 0.7874678146138705)
@@ -608,8 +618,8 @@ if __name__=="__main__":
             antigenic_fitness.calculate_fitness()
             antigenic_fitness.predict_frequencies()
             antigenic_fitness.calc_growth_rates()
-            model_performance = calc_model_performance(antigenic_fitness)
             print(args.beta, args.gamma, args.omega, args.sigma, args.DENV1_f0, args.DENV2_f0, args.DENV3_f0)
+            model_performance = calc_model_performance(antigenic_fitness)
             print(model_performance)
             return model_performance['rmse']
 
