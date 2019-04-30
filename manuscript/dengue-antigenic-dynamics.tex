@@ -394,9 +394,8 @@ We use these inferred antigenic relationships to directly quantify the impact of
 To do so, we measure serotype frequencies across Southeast Asia over time and construct a model to estimate how they will fluctuate (Methods, Eq.~\ref{eq_population_immunity}--\ref{eq_growth_rate}).
 This model places a fitness value on each serotype that derives from a constant intrinsic component alongside a time-dependent antigenic component.
 Antigenic fitness declines with population immunity, which is accumulated via the recent circulation of antigenically similar viruses.
-Our model parameterization assumes that both heterotypic and homotypic immunity wane linearly over time (at the same rate), with homotypic immunity starting from a higher baseline of protection based on closer antigenic distances.
-However, it is possible that heterotypic and homotypic immunity wane at different rates or with different dynamics.
-We hope that this model (with publicly available source code) will provide a framework for other groups to expand upon this formulation and directly test this hypothesis.
+Our primary model parameterization assumes that both heterotypic and homotypic immunity wane linearly over time at the same rate, with homotypic immunity starting from a higher baseline of protection based on closer antigenic distances.
+We compared this to a secondary model parameterization with only heterotypic waning (see Methods), under which we observe similar model performance (Table~\ref{fitness_model_performance}).
 
 We find that antigenic fitness is able to explain much of the observed variation in serotype growth and decline (Figure~\ref{serotype_fitness_model}).
 Forward simulations under the optimized parameter set display damped oscillations around the serotype-specific `set points' determined by intrinsic fitnesses, but intrinsic fitness alone is unable to explain serotype fluctuations ($R^2=0.04$; Table~\ref{fitness_model_performance}, Figure~\ref{simulated_frequencies_modelParameters}).
@@ -528,6 +527,11 @@ The relationship between antigenic distance and the probability of protection, $
 \begin{equation}
 C(D_{ij}) = \mathrm{max}(1 - \sigma D_{ij}, 0).
 \end{equation}
+In addition to this primary analysis, we conducted a secondary analysis with a different parameterization of immunity that removes waning of homotypic immunity while allowing waning of heterotypic immunity.
+In this case, we assume the relationship between antigenic distance and the probability of protection, $C$, to be 50\% at antigenic distance $1/\sigma$ and to wane based on years since infection $n$ modified by $\gamma_{\mathrm{het}}$ following
+\begin{equation}
+C(D_{ij}, n) = \mathrm{exp}\left(- \sigma \, (1/\gamma_{\mathrm{het}})^n \, D_{ij}\right).
+\end{equation}
 
 We model the effects of population immunity, $P_i(t)$, on viral antigenic fitness, $f_i(t)$, as
 \begin{equation}
@@ -603,7 +607,7 @@ We use $N=2$ years of previous immunity that contribute to antigenic fitness and
 \begin{table}[ht!]
   \centering
   \caption{
-    \textbf{Optimized fitness model parameters}
+    \textbf{Optimized fitness model parameters for primary analysis}
   }
   \label{fitness_model_parameters}
   \begin{tabular}{c c p{0.75\textwidth}}
@@ -759,12 +763,12 @@ We gratefully acknowledge the authors and developers who make our work possible.
     \hline
     Substitution  & Full             & Yes             & 0.75 (0.74--0.77) & 0.78 (0.77--0.79) \\
     Substitution  & Full             & No              & 1.13 (1.11--1.16) & 0.50 (0.48--0.52) \\
-    Substitution  & Interserotype         & Yes             & 0.86 (0.85--0.88) & 0.72 (0.70--0.73) \\
-    Substitution  & Interserotype         & No              & 0.86 (0.84--0.87) & 0.71 (0.70--0.72) \\
+    Substitution  & Interserotype    & Yes             & 0.86 (0.85--0.88) & 0.72 (0.70--0.73) \\
+    Substitution  & Interserotype    & No              & 0.86 (0.84--0.87) & 0.71 (0.70--0.72) \\
     Tree          & Full             & Yes             & 0.84 (0.83--0.86) & 0.72 (0.71--0.73) \\
     Tree          & Full             & No              & 1.40 (1.38--1.42) & 0.24 (0.23--0.26) \\
-    Tree          & Interserotype         & Yes             & 0.87 (0.85--0.88) & 0.70 (0.69--0.71) \\
-    Tree          & Interserotype         & No              & 0.86 (0.84--0.88) & 0.72 (0.71--0.73) \\
+    Tree          & Interserotype    & Yes             & 0.87 (0.85--0.88) & 0.70 (0.69--0.71) \\
+    Tree          & Interserotype    & No              & 0.86 (0.84--0.88) & 0.72 (0.71--0.73) \\
     \hline
   \end{tabular}
 \end{table}
@@ -780,17 +784,20 @@ We gratefully acknowledge the authors and developers who make our work possible.
     For both formulations, all other parameters were set to the values reported in Table~\ref{fitness_model_parameters} (optimized for RMSE).
   }
   \label{fitness_model_performance}
-  \begin{tabular}{ c c c c c }
+  \begin{tabular}{ c c c c c c }
     \hline
-    Genetic resolution  & Fitness model           & RMSE   & Pearson $R^2$ & Accuracy \\
+    Resolution  & Fitness model           & Waning        & RMSE    & Pearson $R^2$ & Accuracy \\
     \hline
-    Serotype            & Interserotype           & 0.105  & 0.547         & 0.660 \\
-    Serotype            & Equal fitness null      & 0.130  & 0.000         & 0.480 \\
-    Serotype            & Intrinsic fitness null  & 0.140  & 0.042         & 0.510 \\
-    Genotype            & Interserotype           & 0.062  & 0.286         & 0.666 \\
-    Genotype            & Intergenotype           & 0.062  & 0.254         & 0.610 \\
-    Genotype            & Equal fitness null      & 0.070  & 0.000         & 0.440 \\
-    Genotype            & Intrinsic fitness null  & 0.072  & 0.032         & 0.530 \\
+    Serotype    & Interserotype           & Generalized   & 0.105   & 0.547         & 0.660 \\
+    Serotype    & Equal fitness null      & Generalized   & 0.130   & 0.000         & 0.480 \\
+    Serotype    & Intrinsic fitness null  & Generalized   & 0.140   & 0.042         & 0.510 \\
+    Genotype    & Interserotype           & Generalized   & 0.062   & 0.286         & 0.666 \\
+    Genotype    & Intergenotype           & Generalized   & 0.062   & 0.254         & 0.610 \\
+    Genotype    & Equal fitness null      & Generalized   & 0.070   & 0.000         & 0.440 \\
+    Genotype    & Intrinsic fitness null  & Generalized   & 0.072   & 0.032         & 0.530 \\
+    Serotype    & Interserotype           & Heterotypic   & 0.109   & 0.533         & 0.666 \\
+    Genotype    & Interserotype           & Heterotypic   & 0.063   & 0.291         & 0.661 \\
+    Genotype    & Intergenotype           & Heterotypic   & 0.063   & 0.203         & 0.599 \\
     \hline
   \end{tabular}
 \end{table}
