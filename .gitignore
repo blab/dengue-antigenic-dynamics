@@ -29,6 +29,7 @@ Icon?
 *.blg
 *.out
 *.pdfsync
+*.suppinfo
 
 manuscript/elife-aux/
 
