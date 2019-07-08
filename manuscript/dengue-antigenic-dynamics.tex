@@ -44,7 +44,7 @@ However, recent analyses suggest that antigenic heterogeneity may exist within e
 Here, we construct a sequence-based model to directly map antigenic change to underlying genetic divergence.
 We identify 49 specific substitutions and four colinear substitution clusters that robustly predict dengue antigenic relationships.
 We report moderate antigenic diversity within each serotype, resulting in variation in genotype-specific patterns of heterotypic cross-neutralization.
-We also quantify the impact of this antigenic heterogeneity on real-world DENV population dynamics, and find that serotype-level antigenic fitness is a dominant driver of dengue clade turnover.
+We also quantify the impact of antigenic variation on real-world DENV population dynamics, and find that serotype-level antigenic fitness is a dominant driver of dengue clade turnover.
 These results provide a more nuanced understanding of the relationship between dengue genetic and antigenic evolution, and quantify the effect of antigenic fitness on dengue evolutionary dynamics.
 \end{abstract}
 
@@ -62,7 +62,7 @@ We map antigenic changes to specific mutations in \textit{E}, the dengue envelop
 We identify 49 specific substitutions and four colinear substitution clusters that contribute to dengue antigenic evolution.
 We find that DENV antigenic divergence is tightly coupled to DENV genetic divergence, and is likely a gradual, ongoing process.
 We report modest but significant antigenic diversity within each serotype of DENV, which may have important ramifications for vaccine design.
-To understand the impact of this antigenic heterogeneity on real-world DENV population dynamics, we also quantify the extent to which population immunity---accumulated through recent circulation of antigenically similar genotypes---determines the success and decline of DENV clades in a hyperendemic population.
+To understand the impact of antigenic variation on real-world DENV population dynamics, we also quantify the extent to which population immunity---accumulated through recent circulation of antigenically similar genotypes---determines the success and decline of DENV clades in a hyperendemic population.
 We find that serotype-level antigenic fitness is a key determinant of DENV population turnover.
 By leveraging both molecular data and real-world population dynamics, these results provide a more nuanced understanding of the relationship between dengue genetic and antigenic evolution, and quantify the effect of antigenic fitness on dengue evolutionary dynamics.
 
@@ -506,7 +506,7 @@ We compared this to a secondary model parameterization with only heterotypic wan
 
 We find that antigenic fitness is able to explain much of the observed variation in serotype growth and decline (Figure~\ref{serotype_fitness_model}).
 Forward simulations under the optimized parameter set display damped oscillations around the serotype-specific `set points' determined by intrinsic fitnesses, but intrinsic fitness alone is unable to explain serotype fluctuations ($R^2=0.04$; Table~\ref{fitness_model_performance}, Figure~\ref{serotype_fitness_model}---Figure Supplement~\ref{simulated_frequencies_modelParameters}).
-This demonstrates that although intrinsic fitness plays an important role in dictating long-term dynamics, wherein particular serotypes tend to circulate at low frequency (e.g., DENV4) and others at high frequency (e.g., DENV1 and DENV2),  antigenic fitness plays out on shorter-term time scales, dictating circulation over several subsequent years.
+This demonstrates that although intrinsic fitness plays an important role in dictating long-term dynamics, wherein particular serotypes tend to circulate at low frequency (e.g., DENV4) and others at high frequency (e.g., DENV1 and DENV2), antigenic fitness plays out on shorter-term time scales, dictating circulation over several subsequent years.
 
 We similarly use this model to quantify the effect of within-serotype antigenic variation on the success and decline of canonical DENV genotypes (Figure~\ref{genotype_fitness}).
 As above, genotype antigenic fitness declines with population immunity.
@@ -514,16 +514,16 @@ Here, we estimate population immunity based on antigenic distance from recently 
 We then directly compare how strongly these coarser serotype-level versus specific genotype-level antigenic relationships impact DENV population dynamics.
 Overall, we find that antigenic fitness explains a moderate portion of the observed variation in genotype growth and decline.
 Surprisingly, however, we find that incorporating within-serotype antigenic differences does not improve our predictions (Figure~\ref{genotype_fitness}C-D).
-This suggests that although genotypes are antigenically diverse, these differences do not appear to influence large-scale regional dynamics over time.
-This lack of signal could be explained by either (A) genotype-level frequency trajectories estimated from public data are overly noisy for this application or (B) our model of antigenic fitness based on PRNT assay data does not match reality, due to either PRNT assay data not well reflecting human immunity or due to our particular model formulation that parameterizes immunity from titer distances (Eq.~\ref{eq_population_immunity}--\ref{eq_fitness}).
+We suggest two possible explanations for this observation.
+
+First, it may be that although genotypes are antigenically diverse, these differences do not influence large-scale regional dynamics over time.
+We may then hypothesize that within-serotype antigenic heterogeneity mediates disease severity, but does not influence infection or onward transmission.
+This hypothesis is consistent with the findings of \citet{nagao2008decreases}, who demonstrated that dengue epidemiological dynamics are compatible with a model wherein immunity confers protection against severe symptoms, but not asymptomatic infection.
+This is also consistent with \citet{tenBosch2018contributions}'s findings that asymptomatic dengue infections contribute to onward transmission.
+
+Alternatively, this lack of signal could be methodlogically explained if either (A) genotype-level frequency trajectories estimated from public data are overly noisy for this application or (B) our model of antigenic fitness based on PRNT assay data does not match reality, due to either PRNT assay data not well reflecting human immunity or due to our particular model formulation that parameterizes immunity from titer distances (Eq.~\ref{eq_population_immunity}--\ref{eq_fitness}).
 In the present analysis, we are not able to firmly resolve these disparate possibilities.
 
-% EDIT THIS PARAGRAPH
-Alternatively, it is possible that within-serotype antigenic heterogeneity mediates individual disease severity but not infection or onward transmission.
-Consistent with this hypothesis, recent work by \citet{quirine2018contributions} \textit{et al.} demonstrates that dengue transmissibility is largely independent of disease severity.
-This is also consistent with \citet{nagao2008decreases}'s findings that epidemiological incidence data is consistent with a model of clinical protection, wherein immunity confers protection against symptomatic infection, but asymptomatic infection is largey unaffected.
-ached
-% FIX THIS TRANSITION
 These observations are also subject to caveats imposed by the available data and model assumptions.
 Our estimates of antigenic fitness are informed by the antigenic distances inferred by the substitution model; thus, as above, we are unable to account for nuanced antigenic differences between sub-genotype clades of DENV due to limited titer data.
 We estimate DENV population composition over time based on available sequence data, pooled across all of Southeast Asia (Methods, Eq.~\ref{eq_estimate_frequency}).
@@ -535,7 +535,7 @@ Thus, it is possible that these sub-serotype antigenic differences impact finer-
 
 \subsection*{Conclusions}
 We find that within-serotype antigenic evolution helps explain observed patterns of cross-neutralization among dengue genotypes.
-We also find that population immunity is a strong determinant of the composition of the DENV population across Southeast Asia, although this is putatively driven by coarser, serotype-level antigenic differences.
+We also find that serotype-level population immunity is a strong determinant of viral clade dynamics across Southeast Asia.
 As richer datasets become available, future studies that similarly combine viral genomics, functional antigenic characterization, and population modeling have great potential to improve our understanding of how DENV evolves antigenically and moves through populations.
 
 \subsection*{Model sharing and extensions}
