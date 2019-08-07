@@ -6,7 +6,7 @@ Sidney M. Bell<sup>1,2</sup>, Leah Katzelnick<sup>3,4</sup>, Trevor Bedford<sup>
 
 ## Abstract
 
-<img align="right" width="450" src="figures/png/genotype_dTiter_heatmap.png">
+<img align="right" width="450" src="figures/png/figure4-genotype_dTiter_heatmap.png">
 
 Dengue virus (DENV) exists as four genetically distinct serotypes, each of which is historically assumed to be antigenically uniform. However, recent analyses suggest that antigenic heterogeneity may exist within each serotype, but its source, extent and impact remain unclear. Here, we construct a sequence-based model to directly map antigenic change to underlying genetic divergence. We identify 49 specific substitutions and four colinear substitution clusters that robustly predict dengue antigenic relationships. We report moderate antigenic diversity within each serotype, resulting in variation in genotype-specific patterns of heterotypic cross-neutralization. We also quantify the impact of antigenic variation on real-world DENV population dynamics, and find that serotype-level antigenic fitness is a dominant driver of dengue clade turnover. These results provide a more nuanced understanding of the relationship between dengue genetic and antigenic evolution, and quantify the effect of antigenic fitness on dengue evolutionary dynamics.
 
@@ -27,4 +27,4 @@ pip install -r requirements
 
 ## Citation
 
-[Bell SM, Katzelnick L, Bedford T. 2018. Dengue antigenic relationships predict evolutionary dynamics. bioRxiv: 432054.](https://doi.org/10.1101/432054)
+[Bell SM, Katzelnick L, Bedford T. 2019. Dengue genetic divergence generates within-serotype antigenic variation, but serotypes dominate evolutionary dynamics. eLife 8: e42496.](https://doi.org/10.7554/eLife.42496)
