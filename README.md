@@ -28,3 +28,7 @@ pip install -r requirements
 ## Citation
 
 [Bell SM, Katzelnick L, Bedford T. 2019. Dengue genetic divergence generates within-serotype antigenic variation, but serotypes dominate evolutionary dynamics. eLife 8: e42496.](https://doi.org/10.7554/eLife.42496)
+
+-----------------------------------
+
+All contents including manuscript text and source code are copyright 2016-2019 Sidney Bell, Leah Katzelnick and Trevor Bedford. All manuscript text (files ending in `.tex`) are licensed under [Creative Commons Attribution 4.0](CC-LICENSE.txt) and all code (files ending in `.py` and `.ipynb`) is licensed under an [MIT License](MIT-LICENSE.txt).
