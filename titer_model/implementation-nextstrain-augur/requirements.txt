@@ -1,6 +1,6 @@
 biopython==1.69
 boto==2.38.0
-cvxopt==1.1.8
+cvxopt==1.2.7
 ipdb==0.10.1
 matplotlib==2.0
 pandas==0.16.2
